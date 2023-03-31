@@ -8,7 +8,7 @@ type UserDetailRecord struct {
 	Password    string    `gorm:"not null"`
 	Email       string    `gorm:"not null"`
 	Name        string    `gorm:"not null"`
-	MobilePhone string    `gorm:"not null"`
+	MobilePhone int       `gorm:"not null"`
 	Address     string    `gorm:"not null"`
 	Status      string    `gorm:"not null"`
 	CreatedAt   time.Time `gorm:"not null"`
