@@ -1,11 +1,14 @@
 package accounts
 
-import "gotodo/internal/infra/persistence/record"
+import (
+	"context"
+	"gotodo/internal/infra/persistence/record"
+)
 
 type UserDetailRecordRepository interface {
-	SaveUser(taskRecord *record.UserDetailRecord) (int64, error)
-	FindUserById(id int64) (*record.UserDetailRecord, error)
-	UpdateUser(taskRecord *record.UserDetailRecord) error
-	DeleteUserById(id int64) error
-	FindUserAll(taskRecord record.UserDetailRecord) error
+	SaveUser(ctx context.Context, accountRecord *record.UserDetailRecord) (int64, error)
+	FindUserById(ctx context.Context, id int64) (*record.UserDetailRecord, error)
+	UpdateUser(ctx context.Context, accountRecord *record.UserDetailRecord) error
+	DeleteUserById(ctx context.Context, id int64) error
+	FindUserAll(ctx context.Context) ([]record.UserDetailRecord, error)
 }

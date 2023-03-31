@@ -1,10 +1,14 @@
 package accounts
 
-import "gotodo/internal/infra/persistence/record"
+import (
+	"context"
+	"gotodo/internal/infra/persistence/record"
+)
 
 type AccountRecordRepository interface {
-	Save(taskRecord *record.AccountRecord) (int64, error)
-	FindById(id int64) (*record.AccountRecord, error)
-	Update(taskRecord *record.AccountRecord) error
-	DeleteById(id int64) error
+	SaveAccount(ctx context.Context, accountRecord *record.AccountRecord) (int64, error)
+	FindAccountById(ctx context.Context, id int64) (*record.AccountRecord, error)
+	UpdateAccount(ctx context.Context, accountRecord *record.AccountRecord) error
+	DeleteAccountById(ctx context.Context, id int64) error
+	FindAccountAll(ctx context.Context) ([]record.AccountRecord, error)
 }
