@@ -21,4 +21,11 @@ func TestAccountRecord(t *testing.T) {
 
 	// Test TableName() function
 	assert.Equal(t, "accounts", account.TableName())
+
+	// Test struct field values
+	assert.Equal(t, "root_name", account.Username)
+	assert.Equal(t, "password", account.Password)
+	assert.Equal(t, "active", account.Status)
+	assert.Equal(t, now, account.CreatedAt)
+	assert.Equal(t, now, account.UpdatedAt)
 }
