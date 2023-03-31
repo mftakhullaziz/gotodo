@@ -6,9 +6,9 @@ import (
 )
 
 type TaskRecordRepository interface {
-	SaveTask(ctx context.Context, taskRecord *record.TaskRecord) (int64, error)
-	FindTaskById(ctx context.Context, id int64) (*record.TaskRecord, error)
-	UpdateTask(ctx context.Context, taskRecord *record.TaskRecord) error
+	SaveTask(ctx context.Context, taskRecord record.TaskRecord) (record.TaskRecord, error)
+	FindTaskById(ctx context.Context, id int64) (record.TaskRecord, error)
+	UpdateTask(ctx context.Context, id int64, taskRecord record.TaskRecord) (record.TaskRecord, error)
 	DeleteTaskById(ctx context.Context, id int64) error
 	FindTaskAll(ctx context.Context) ([]record.TaskRecord, error)
 }

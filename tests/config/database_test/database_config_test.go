@@ -19,7 +19,7 @@ func TestNewDatabaseConnection(t *testing.T) {
 	assert.NotNil(t, rootDir)
 
 	// Construct the full path to the .env file
-	envPath := filepath.Join(rootDir, "gotodo", ".env")
+	envPath := filepath.Join(rootDir, ".env")
 	assert.NotNil(t, envPath)
 
 	err = godotenv.Load(envPath)
@@ -32,9 +32,5 @@ func TestNewDatabaseConnection(t *testing.T) {
 	assert.NoError(t, err, "Unexpected error creating database connection")
 	assert.NotNil(t, db, "Expected non-nil database connection")
 	assert.Equal(t, "*gorm.DB", fmt.Sprintf("%T", db), "Unexpected type for database connection")
-	assert.Equal(t, "mysql", db.Dialect().GetName(), "Unexpected dialect for database connection")
-
-	// Close the database connection
-	err = db.Close()
-	assert.NoError(t, err, "Unexpected error closing database connection")
+	assert.Equal(t, "mysql", db.Name(), "Unexpected dialect for database connection")
 }

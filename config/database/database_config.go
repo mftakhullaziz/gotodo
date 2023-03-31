@@ -3,9 +3,9 @@ package database
 import (
 	"context"
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
 	"os"
 	"path/filepath"
@@ -23,7 +23,7 @@ func NewDatabaseConnection(ctx context.Context) (db *gorm.DB, errs error) {
 	rootDir := filepath.Dir(filepath.Dir(filepath.Dir(dir)))
 
 	// Construct the full path to the .env file
-	envPath := filepath.Join(rootDir, "gotodo", ".env")
+	envPath := filepath.Join(rootDir, ".env")
 	err = godotenv.Load(envPath)
 
 	if err != nil {
@@ -41,13 +41,13 @@ func NewDatabaseConnection(ctx context.Context) (db *gorm.DB, errs error) {
 
 	//connection, err := gorm.Open(mysql.Open(databaseConnection), &gorm.Config{})
 
-	connection, err := gorm.Open("mysql", databaseConnection)
+	connection, err := gorm.Open(mysql.Open(databaseConnection), &gorm.Config{})
 
 	if err != nil {
 		panic("Failed to create connection to database")
 	}
 
-	sqlDB := connection.DB()
+	sqlDB, err := connection.DB()
 
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
