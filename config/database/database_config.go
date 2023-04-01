@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"os"
@@ -32,13 +33,22 @@ func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs 
 	databaseConnection := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
 		username, password, hostname, databaseName)
 
-	//connection, err := gorm.Open(mysql.Open(databaseConnection), &gorm.Config{})
-
 	connection, err := gorm.Open(mysql.Open(databaseConnection), &gorm.Config{})
-
 	if err != nil {
 		panic("Failed to create connection to database")
 	}
+
+	// Set up a logger to print SQL statements
+	newLogger := logger.New(
+		log, // Output to console
+		logger.Config{
+			SlowThreshold:             time.Second, // Log slow queries
+			LogLevel:                  logger.Info, // Log SQL statements
+			IgnoreRecordNotFoundError: true,        // Ignore "not found" errors
+			Colorful:                  true,        // Enable colorful output
+		},
+	)
+	connection.Logger = newLogger
 
 	err = connection.AutoMigrate(&record.TaskRecord{}, &record.AccountRecord{}, &record.UserDetailRecord{})
 	if err != nil {
@@ -51,9 +61,9 @@ func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs 
 
 	// Check if the MyModel table exists in the database
 	if hasTableTaskRecord || hasTableAccountRecord || hasTableUserRecord {
-		log.Info("Table Record Already Migrations")
+		log.Println("Table Record Already Migrations")
 	} else {
-		log.Info("Table Record Not Have Migrations")
+		log.Println("Table Record Not Have Migrations")
 	}
 
 	sqlDB, err := connection.DB()
@@ -68,7 +78,7 @@ func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs 
 		_ = fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Info("Connected to Database")
+	log.Println("Connected to Database")
 
 	return connection, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/go-playground/validator/v10"
+	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/tasks"
@@ -19,7 +20,7 @@ func NewTaskRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) tasks.Tas
 }
 
 func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.TaskRecord) (record.TaskRecord, error) {
-	result := t.SQL.WithContext(ctx).Create(&taskRecord)
+	result := t.SQL.WithContext(ctx).Save(&taskRecord)
 	if result.Error != nil {
 		return record.TaskRecord{}, result.Error
 	}

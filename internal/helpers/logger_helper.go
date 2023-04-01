@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
@@ -14,6 +16,23 @@ func LoggerParent() *logrus.Logger {
 		FullTimestamp:   true,
 	})
 	log.SetOutput(os.Stdout)
+
+	dir, err := os.Getwd()
+	PanicIfError(err)
+
+	logPath := dir + "/logs/application.log"
+	fmt.Println(logPath)
+	fileHook := lfshook.NewHook(lfshook.PathMap{
+		logrus.InfoLevel:  logPath,
+		logrus.ErrorLevel: logPath,
+		logrus.DebugLevel: logPath,
+		logrus.PanicLevel: logPath,
+		logrus.WarnLevel:  logPath,
+		logrus.TraceLevel: logPath,
+	}, &logrus.JSONFormatter{})
+
+	// Add the file hook to the logger
+	log.AddHook(fileHook)
 	return log
 }
 
