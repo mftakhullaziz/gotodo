@@ -2,7 +2,7 @@ package accounts
 
 import (
 	"context"
-	"gotodo/internal/infra/persistence/record"
+	"gotodo/internal/persistence/record"
 )
 
 type UserDetailRecordRepository interface {

@@ -6,28 +6,20 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gotodo/internal/persistence/record"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
 )
 
 // NewDatabaseConnection
 // Do: Function to open connection with database mysql
 // Param: Context
-func NewDatabaseConnection(ctx context.Context) (db *gorm.DB, errs error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	rootDir := filepath.Dir(filepath.Dir(filepath.Dir(dir)))
-
-	// Construct the full path to the .env file
-	envPath := filepath.Join(rootDir, ".env")
-	err = godotenv.Load(envPath)
+func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs error) {
+	err := godotenv.Load(path)
 
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Fatalf("Error loading .env.test file: %v", err)
 	}
 
 	// Do get from environment file
@@ -45,6 +37,20 @@ func NewDatabaseConnection(ctx context.Context) (db *gorm.DB, errs error) {
 
 	if err != nil {
 		panic("Failed to create connection to database")
+	}
+
+	err = connection.AutoMigrate(&record.TaskRecord{}, &record.AccountRecord{}, &record.UserDetailRecord{})
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if the MyModel table exists in the database
+	if connection.Migrator().HasTable(&record.TaskRecord{}) ||
+		connection.Migrator().HasTable(&record.AccountRecord{}) ||
+		connection.Migrator().HasTable(&record.UserDetailRecord{}) {
+		fmt.Println("table record already migrations")
+	} else {
+		fmt.Println("table record not have migrations")
 	}
 
 	sqlDB, err := connection.DB()

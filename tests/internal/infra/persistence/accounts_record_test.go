@@ -2,7 +2,7 @@ package persistence
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gotodo/internal/infra/persistence/record"
+	"gotodo/internal/persistence/record"
 	"testing"
 	"time"
 )

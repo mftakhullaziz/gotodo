@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
-	"gotodo/internal/infra/persistence/record"
+	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/accounts"
 )
 

@@ -1,6 +1,8 @@
 package record
 
-import "time"
+import (
+	"time"
+)
 
 type TaskRecord struct {
 	ID          uint      `gorm:"primaryKey"`

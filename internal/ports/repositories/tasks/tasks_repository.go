@@ -2,7 +2,7 @@ package tasks
 
 import (
 	"context"
-	"gotodo/internal/infra/persistence/record"
+	"gotodo/internal/persistence/record"
 )
 
 type TaskRecordRepository interface {

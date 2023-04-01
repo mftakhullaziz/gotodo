@@ -5,18 +5,17 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
-	"gotodo/internal/infra/persistence/record"
+	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/tasks"
 )
 
 type TaskRepositoryImpl struct {
-	TaskRepository tasks.TaskRecordRepository
-	SQL            *gorm.DB
-	validate       *validator.Validate
+	SQL      *gorm.DB
+	validate *validator.Validate
 }
 
-func NewTaskRepositoryImpl(taskRepository tasks.TaskRecordRepository, SQL *gorm.DB, validate *validator.Validate) tasks.TaskRecordRepository {
-	return &TaskRepositoryImpl{TaskRepository: taskRepository, SQL: SQL, validate: validate}
+func NewTaskRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) tasks.TaskRecordRepository {
+	return &TaskRepositoryImpl{SQL: SQL, validate: validate}
 }
 
 func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.TaskRecord) (record.TaskRecord, error) {
