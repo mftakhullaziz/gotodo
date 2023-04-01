@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/julienschmidt/httprouter"
+	"github.com/gorilla/mux"
 	"gotodo/config"
 	"gotodo/config/database"
 	handler "gotodo/internal/adapters/handlers/tasks"
@@ -17,10 +16,12 @@ import (
 )
 
 func main() {
+	log := helpers.LoggerParent()
+
 	ctx := context.Background()
 	envName := config.LoadEnv(".env")
-	db, err := database.NewDatabaseConnection(ctx, envName)
-	helpers.PanicIfError(err)
+	db, errs := database.NewDatabaseConnection(ctx, envName)
+	helpers.PanicIfError(errs)
 
 	validate := validator.New()
 
@@ -29,17 +30,26 @@ func main() {
 	taskUsecase := usecase.NewTaskUseCaseImpl(taskService, validate)
 	taskHandler := handler.NewTaskHandlerAPI(taskUsecase)
 
-	router := httprouter.New()
-	router.POST("/handler/api/createTask", taskHandler.CreateTaskHandler)
+	router := mux.NewRouter()
+	router.Use(helpers.LoggingMiddleware)
 
-	router.PanicHandler = helpers.ErrorHandler
+	handlerTask := router.PathPrefix("/api/v1/task/").Subrouter()
+	handlerTask.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods("POST")
+	handlerTask.HandleFunc("/updateTask/{id}", taskHandler.UpdateTaskHandler).Methods("PUT")
+	handlerTask.HandleFunc("/findTaskId/{id}", taskHandler.FindTaskHandlerById).Methods("GET")
+	handlerTask.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods("GET")
+	handlerTask.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods("DELETE")
+
+	// handlerAccount := router.PathPrefix("/api/v1/account/").Subrouter()
+
+	helpers.LogRoutes(router)
 
 	server := http.Server{
-		Addr:    "localhost:3000",
+		Addr:    "127.0.0.1:3000",
 		Handler: router,
 	}
-	fmt.Println(server.Addr)
 
-	err = server.ListenAndServe()
+	log.Infoln("Server Run: ", server.Addr)
+	err := server.ListenAndServe()
 	helpers.PanicIfError(err)
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
-	"log"
 	"os"
 	"time"
 )
@@ -16,8 +16,9 @@ import (
 // Do: Function to open connection with database mysql
 // Param: Context
 func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs error) {
-	err := godotenv.Load(path)
+	log := helpers.LoggerParent()
 
+	err := godotenv.Load(path)
 	if err != nil {
 		log.Fatalf("Error loading .env.test file: %v", err)
 	}
@@ -44,13 +45,15 @@ func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs 
 		return nil, err
 	}
 
+	hasTableTaskRecord := connection.Migrator().HasTable(&record.TaskRecord{})
+	hasTableAccountRecord := connection.Migrator().HasTable(&record.AccountRecord{})
+	hasTableUserRecord := connection.Migrator().HasTable(&record.UserDetailRecord{})
+
 	// Check if the MyModel table exists in the database
-	if connection.Migrator().HasTable(&record.TaskRecord{}) ||
-		connection.Migrator().HasTable(&record.AccountRecord{}) ||
-		connection.Migrator().HasTable(&record.UserDetailRecord{}) {
-		fmt.Println("table record already migrations")
+	if hasTableTaskRecord || hasTableAccountRecord || hasTableUserRecord {
+		log.Info("Table Record Already Migrations")
 	} else {
-		fmt.Println("table record not have migrations")
+		log.Info("Table Record Not Have Migrations")
 	}
 
 	sqlDB, err := connection.DB()
@@ -65,7 +68,7 @@ func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, errs 
 		_ = fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Println("Connected to database")
+	log.Info("Connected to Database")
 
 	return connection, nil
 }

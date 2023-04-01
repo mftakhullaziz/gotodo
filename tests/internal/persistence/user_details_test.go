@@ -24,7 +24,7 @@ func TestUserDetail(t *testing.T) {
 	}
 
 	// Test TableName() function
-	assert.Equal(t, "user_details", userDetail.TableName())
+	assert.Equal(t, "user_details", userDetail.TableName(), "Matcher")
 
 	// Test struct field values
 	assert.Equal(t, "username", userDetail.Username)

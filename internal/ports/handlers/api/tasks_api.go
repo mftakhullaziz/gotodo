@@ -1,10 +1,13 @@
 package api
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
 type TaskHandlerAPI interface {
-	CreateTaskHandler(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	CreateTaskHandler(writer http.ResponseWriter, request *http.Request)
+	UpdateTaskHandler(writer http.ResponseWriter, request *http.Request)
+	FindTaskHandlerById(writer http.ResponseWriter, request *http.Request)
+	FindTaskHandler(writer http.ResponseWriter, request *http.Request)
+	DeleteTaskHandler(writer http.ResponseWriter, request *http.Request)
 }
