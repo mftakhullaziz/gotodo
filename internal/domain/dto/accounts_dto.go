@@ -1,9 +1,9 @@
 package dto
 
 type CreateAccountDTO struct {
-	Username string `json:"title" form:"title" binding:"required"`
-	Email    string `json:"description" form:"description" binding:"required"`
-	Password uint64 `json:"user_id,omitempty" form:"user_id,omitempty"`
+	Username string `json:"username" form:"title" binding:"required"`
+	Email    string `json:"email" form:"description" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
 }
 
 type LoginAccountDTO struct {

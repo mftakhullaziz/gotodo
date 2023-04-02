@@ -1,12 +1,14 @@
 package helpers
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"net/http"
 	"os"
+	"time"
 )
 
 func LoggerParent() *logrus.Logger {
@@ -21,7 +23,6 @@ func LoggerParent() *logrus.Logger {
 	PanicIfError(err)
 
 	logPath := dir + "/logs/application.log"
-	fmt.Println(logPath)
 	fileHook := lfshook.NewHook(lfshook.PathMap{
 		logrus.InfoLevel:  logPath,
 		logrus.ErrorLevel: logPath,
@@ -58,4 +59,16 @@ func LogRoutes(router *mux.Router) {
 	if err != nil {
 		log.Infoln("Error Walking Routes:", err)
 	}
+}
+
+func LoggerQueryInit(db *gorm.DB) {
+	log := LoggerParent()
+	// Set up a logger to print SQL statements
+	newLogger := logger.New(log, logger.Config{
+		SlowThreshold:             time.Second, // Log slow queries
+		LogLevel:                  logger.Info, // Log SQL Statement
+		IgnoreRecordNotFoundError: true,        // Ignore "not found" errors
+		Colorful:                  true,        // Enable colorful output
+	})
+	db.Logger = newLogger
 }

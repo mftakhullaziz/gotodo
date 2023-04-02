@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -12,6 +13,7 @@ import (
 	service "gotodo/internal/adapters/services/tasks"
 	usecase "gotodo/internal/adapters/usecases/tasks"
 	"gotodo/internal/helpers"
+	"gotodo/internal/persistence/record"
 	"net/http"
 )
 
@@ -22,6 +24,10 @@ func main() {
 	envName := config.LoadEnv(".env")
 	db, errs := database.NewDatabaseConnection(ctx, envName)
 	helpers.PanicIfError(errs)
+	helpers.LoggerQueryInit(db)
+
+	err := database.MigrateDatabase(db, &record.TaskRecord{}, &record.AccountRecord{}, &record.UserDetailRecord{})
+	helpers.PanicIfError(err)
 
 	validate := validator.New()
 
@@ -50,6 +56,7 @@ func main() {
 	}
 
 	log.Infoln("Server Run: ", server.Addr)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	helpers.PanicIfError(err)
+	fmt.Println("==== SERVER RUNNING ====")
 }
