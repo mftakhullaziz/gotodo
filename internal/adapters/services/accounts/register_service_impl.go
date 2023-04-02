@@ -30,12 +30,14 @@ func NewRegisterServiceImpl(
 
 func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error) {
 	log := helpers.LoggerParent()
+
 	err := r.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
+	existingUsername := r.AccountRepository.IsDuplicateUsername(ctx, request.Username)
 	existingEmail := r.AccountRepository.FindAccountByEmail(ctx, request.Email)
 
-	if existingEmail == true {
+	if existingEmail == true && existingUsername == true {
 		log.Info("Email already registered")
 		return dto.AccountDTO{}, nil
 	} else {

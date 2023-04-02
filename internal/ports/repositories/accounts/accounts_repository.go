@@ -12,4 +12,5 @@ type AccountRecordRepository interface {
 	DeleteAccountById(ctx context.Context, id int64) error
 	FindAccountAll(ctx context.Context) ([]record.AccountRecord, error)
 	FindAccountByEmail(ctx context.Context, email string) bool
+	IsDuplicateUsername(ctx context.Context, username string) bool
 }

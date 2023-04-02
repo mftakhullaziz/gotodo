@@ -42,4 +42,3 @@ clean:
 clean/test:
 	@echo "Cleaning test cache"
 	go clean -cache -testcache -modcache
-

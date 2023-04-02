@@ -94,3 +94,22 @@ func (a AccountRepositoryImpl) FindAccountByEmail(ctx context.Context, email str
 	}
 	return true
 }
+
+func (a AccountRepositoryImpl) IsDuplicateUsername(ctx context.Context, username string) bool {
+	accountRecord := &record.UserDetailRecord{}
+	result := a.SQL.WithContext(ctx).
+		Table("accounts").
+		Joins("inner join user_details "+
+			"on accounts.user_id = user_details.user_id "+
+			"and accounts.username = user_details.username").
+		Where("accounts.username = ?", username).
+		Pluck("user_details.username", &accountRecord.Username)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return false
+		}
+		return false
+	}
+	return true
+}
