@@ -40,6 +40,6 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 clean/test:
-	echo "Cleaning test cache"
+	@echo "Cleaning test cache"
 	go clean -cache -testcache -modcache
 
