@@ -52,11 +52,11 @@ func main() {
 	router.Use(helpers.LoggingMiddleware)
 
 	handlerTask := router.PathPrefix("/api/v1/task/").Subrouter()
-	handlerTask.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods("POST")
-	handlerTask.HandleFunc("/updateTask/{id}", taskHandler.UpdateTaskHandler).Methods("PUT")
-	handlerTask.HandleFunc("/findTaskId/{id}", taskHandler.FindTaskHandlerById).Methods("GET")
-	handlerTask.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods("GET")
-	handlerTask.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods("DELETE")
+	handlerTask.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
+	handlerTask.HandleFunc("/updateTask/{id}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
+	handlerTask.HandleFunc("/findTaskId/{id}", taskHandler.FindTaskHandlerById).Methods(http.MethodGet)
+	handlerTask.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods(http.MethodGet)
+	handlerTask.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods(http.MethodDelete)
 
 	handlerAccount := router.PathPrefix("/api/v1/account/").Subrouter()
 	handlerAccount.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)

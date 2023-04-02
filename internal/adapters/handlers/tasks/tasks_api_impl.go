@@ -1,16 +1,12 @@
 package tasks
 
 import (
-	"github.com/sirupsen/logrus"
 	"gotodo/internal/domain/models/request"
-	"gotodo/internal/domain/models/response"
 	"gotodo/internal/helpers"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/tasks"
 	"net/http"
 )
-
-var log logrus.Logger
 
 type TaskHandlerAPI struct {
 	TaskUseCase tasks.TaskUseCase
@@ -21,23 +17,18 @@ func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlerAPI {
 }
 
 func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
-	log.Debug("Received request to create a task")
+	log := helpers.LoggerParent()
 
 	taskRequest := request.TaskRequest{}
 	helpers.ReadFromRequestBody(requests, &taskRequest)
+	log.Info("Task Request: ", taskRequest)
 
 	createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest)
 	helpers.PanicIfError(err)
 
-	rest := response.DefaultServiceResponse{
-		StatusCode: 201,
-		Message:    "Create Task Success",
-		IsSuccess:  true,
-		Data:       createHandler,
-	}
-
+	responses := helpers.CreateResponses(createHandler, http.StatusCreated, "Create task successfully")
 	log.Info("Task created successfully")
-	helpers.WriteToResponseBody(writer, &rest)
+	helpers.WriteToResponseBody(writer, &responses)
 }
 
 func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, request *http.Request) {

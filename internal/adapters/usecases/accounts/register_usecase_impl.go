@@ -23,8 +23,10 @@ func (r RegisterUseCaseImpl) CreateAccountUseCase(ctx context.Context, request r
 	err := r.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	registerUseCase, err := r.Register.CreateNewAccount(ctx, request)
-	helpers.PanicIfError(err)
+	registerUseCase, errRegister := r.Register.CreateNewAccount(ctx, request)
+	if errRegister != nil {
+		return response.RegisterResponse{}, err
+	}
 
 	result := response.RegisterResponse{
 		AccountID: registerUseCase.AccountID,

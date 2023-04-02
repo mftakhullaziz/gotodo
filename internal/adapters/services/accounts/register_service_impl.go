@@ -33,9 +33,10 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 	err := r.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	existingEmail, err := r.AccountRepository.FindAccountByEmail(ctx, request.Email)
-	if existingEmail {
-		log.Warn("Email already registered")
+	existingEmail := r.AccountRepository.FindAccountByEmail(ctx, request.Email)
+
+	if existingEmail == true {
+		log.Info("Email already registered")
 		return dto.AccountDTO{}, nil
 	} else {
 		hashPassword := helpers.HashPassword(request.Password)
@@ -63,6 +64,7 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 		helpers.PanicIfError(err)
 
 		accountDTO := helpers.RecordToAccountDTO(createAccount)
+		log.Info("Account created successfully")
 		return accountDTO, nil
 	}
 

@@ -83,14 +83,14 @@ func (a AccountRepositoryImpl) FindAccountAll(ctx context.Context) ([]record.Acc
 	return accountRecords, nil
 }
 
-func (a AccountRepositoryImpl) FindAccountByEmail(ctx context.Context, email string) (bool, error) {
-	var accountRecord record.AccountRecord
+func (a AccountRepositoryImpl) FindAccountByEmail(ctx context.Context, email string) bool {
+	accountRecord := &record.UserDetailRecord{}
 	result := a.SQL.WithContext(ctx).Where("email = ?", email).First(accountRecord)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return false, nil
+			return false
 		}
-		return false, result.Error
+		return false
 	}
-	return true, nil
+	return true
 }

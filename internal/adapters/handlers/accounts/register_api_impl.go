@@ -1,8 +1,7 @@
 package accounts
 
 import (
-	request "gotodo/internal/domain/models/request"
-	"gotodo/internal/domain/models/response"
+	"gotodo/internal/domain/models/request"
 	"gotodo/internal/helpers"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/accounts"
@@ -25,16 +24,12 @@ func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests
 	log.Info("Account request: ", registerRequest)
 
 	registerHandler, err := r.RegisterUseCase.CreateAccountUseCase(requests.Context(), registerRequest)
-	helpers.PanicIfError(err)
-
-	accountResponse := response.DefaultServiceResponse{
-		StatusCode: 201,
-		Message:    "Create Account Success",
-		IsSuccess:  true,
-		Data:       registerHandler,
+	if err != nil {
+		log.Info("Account already created please using another 'email'")
 	}
-	log.Info("Account created successfully")
-	helpers.WriteToResponseBody(writer, &accountResponse)
+
+	responses := helpers.CreateResponses(registerHandler, http.StatusCreated, "Create account successfully")
+	helpers.WriteToResponseBody(writer, &responses)
 }
 
 func (r RegisterHandlerAPI) ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request) {
