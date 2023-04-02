@@ -6,7 +6,7 @@ import (
 )
 
 func TaskRecordToDTO(record record.TaskRecord) dto.TasksDTO {
-	toDTO := dto.TasksDTO{
+	return dto.TasksDTO{
 		ID:          record.ID,
 		Title:       record.Title,
 		Description: record.Description,
@@ -15,11 +15,10 @@ func TaskRecordToDTO(record record.TaskRecord) dto.TasksDTO {
 		CreatedAt:   record.CreatedAt,
 		UpdatedAt:   record.UpdatedAt,
 	}
-	return toDTO
 }
 
 func TaskDTOToRecord(recordDTO dto.TasksDTO) record.TaskRecord {
-	toRecord := record.TaskRecord{
+	return record.TaskRecord{
 		ID:          recordDTO.ID,
 		Title:       recordDTO.Title,
 		Description: recordDTO.Description,
@@ -28,5 +27,58 @@ func TaskDTOToRecord(recordDTO dto.TasksDTO) record.TaskRecord {
 		CreatedAt:   recordDTO.CreatedAt,
 		UpdatedAt:   recordDTO.UpdatedAt,
 	}
-	return toRecord
+}
+
+func RecordToAccountDTO(accountRecord record.AccountRecord) dto.AccountDTO {
+	return dto.AccountDTO{
+		AccountID: accountRecord.AccountID,
+		UserID:    accountRecord.UserID,
+		Username:  accountRecord.Username,
+		Password:  accountRecord.Password,
+		Status:    accountRecord.Status,
+		CreatedAt: accountRecord.CreatedAt,
+		UpdatedAt: accountRecord.UpdatedAt,
+	}
+}
+
+func AccountDtoToRecord(accountDTO dto.AccountDTO) record.AccountRecord {
+	return record.AccountRecord{
+		AccountID: accountDTO.AccountID,
+		UserID:    accountDTO.UserID,
+		Username:  accountDTO.Username,
+		Password:  accountDTO.Password,
+		Status:    accountDTO.Status,
+		CreatedAt: accountDTO.CreatedAt,
+		UpdatedAt: accountDTO.UpdatedAt,
+	}
+}
+
+func RecordToUserDTO(detailRecord record.UserDetailRecord) dto.UserDetailDTO {
+	return dto.UserDetailDTO{
+		UserID:      detailRecord.UserID,
+		Username:    detailRecord.Username,
+		Password:    detailRecord.Password,
+		Email:       detailRecord.Email,
+		Name:        detailRecord.Name,
+		MobilePhone: detailRecord.MobilePhone,
+		Address:     detailRecord.Address,
+		Status:      detailRecord.Status,
+		CreatedAt:   detailRecord.CreatedAt,
+		UpdatedAt:   detailRecord.UpdatedAt,
+	}
+}
+
+func UserDTOToRecord(detailDTO dto.UserDetailDTO) record.UserDetailRecord {
+	return record.UserDetailRecord{
+		UserID:      detailDTO.UserID,
+		Username:    detailDTO.Username,
+		Password:    detailDTO.Password,
+		Email:       detailDTO.Email,
+		Name:        detailDTO.Name,
+		MobilePhone: detailDTO.MobilePhone,
+		Address:     detailDTO.Address,
+		Status:      detailDTO.Status,
+		CreatedAt:   detailDTO.CreatedAt,
+		UpdatedAt:   detailDTO.UpdatedAt,
+	}
 }

@@ -11,4 +11,5 @@ type AccountRecordRepository interface {
 	UpdateAccount(ctx context.Context, id int64, accountRecord record.AccountRecord) (record.AccountRecord, error)
 	DeleteAccountById(ctx context.Context, id int64) error
 	FindAccountAll(ctx context.Context) ([]record.AccountRecord, error)
+	FindAccountByEmail(ctx context.Context, email string) (bool, error)
 }

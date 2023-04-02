@@ -361,3 +361,20 @@
 {"level":"info","msg":"[GET] /api/v1/task/findTask","time":"2023-04-02T09:45:43+07:00"}
 {"level":"info","msg":"[DELETE] /api/v1/task/deleteTask","time":"2023-04-02T09:45:43+07:00"}
 {"level":"info","msg":"Server Run:  127.0.0.1:3000","time":"2023-04-02T09:45:43+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/go/pkg/mod/gorm.io/driver/mysql@v1.4.7/migrator.go:295\n\u001b[0m\u001b[33m[0.077ms] \u001b[34;1m[rows:-]\u001b[0m SELECT DATABASE()","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/go/pkg/mod/gorm.io/driver/mysql@v1.4.7/migrator.go:298\n\u001b[0m\u001b[33m[0.401ms] \u001b[34;1m[rows:1]\u001b[0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'todo_app%' ORDER BY SCHEMA_NAME='todo_app' DESC,SCHEMA_NAME limit 1","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/Learning/golang/project/gotodo/config/database/migrations_database_config.go:12\n\u001b[0m\u001b[33m[0.284ms] \u001b[34;1m[rows:-]\u001b[0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'todo_app' AND table_name = 'tasks' AND table_type = 'BASE TABLE'","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/go/pkg/mod/gorm.io/driver/mysql@v1.4.7/migrator.go:295\n\u001b[0m\u001b[33m[0.091ms] \u001b[34;1m[rows:-]\u001b[0m SELECT DATABASE()","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/go/pkg/mod/gorm.io/driver/mysql@v1.4.7/migrator.go:298\n\u001b[0m\u001b[33m[0.208ms] \u001b[34;1m[rows:1]\u001b[0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'todo_app%' ORDER BY SCHEMA_NAME='todo_app' DESC,SCHEMA_NAME limit 1","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/Learning/golang/project/gotodo/config/database/migrations_database_config.go:12\n\u001b[0m\u001b[33m[0.141ms] \u001b[34;1m[rows:-]\u001b[0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'todo_app' AND table_name = 'accounts' AND table_type = 'BASE TABLE'","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/go/pkg/mod/gorm.io/driver/mysql@v1.4.7/migrator.go:295\n\u001b[0m\u001b[33m[0.079ms] \u001b[34;1m[rows:-]\u001b[0m SELECT DATABASE()","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/go/pkg/mod/gorm.io/driver/mysql@v1.4.7/migrator.go:298\n\u001b[0m\u001b[33m[0.266ms] \u001b[34;1m[rows:1]\u001b[0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'todo_app%' ORDER BY SCHEMA_NAME='todo_app' DESC,SCHEMA_NAME limit 1","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"\u001b[32m/home/amift/Learning/golang/project/gotodo/config/database/migrations_database_config.go:12\n\u001b[0m\u001b[33m[0.139ms] \u001b[34;1m[rows:-]\u001b[0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'todo_app' AND table_name = 'user_details' AND table_type = 'BASE TABLE'","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"Registered Handler Router:","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"[] /api/v1/task/","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"[POST] /api/v1/task/createTask","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"[PUT] /api/v1/task/updateTask/{id}","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"[GET] /api/v1/task/findTaskId/{id}","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"[GET] /api/v1/task/findTask","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"[DELETE] /api/v1/task/deleteTask","time":"2023-04-02T10:01:19+07:00"}
+{"level":"info","msg":"Server Run:  127.0.0.1:3000","time":"2023-04-02T10:01:19+07:00"}

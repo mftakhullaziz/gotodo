@@ -1,0 +1,62 @@
+package accounts
+
+import (
+	"context"
+	"github.com/go-playground/validator/v10"
+	"gotodo/internal/domain/dto"
+	"gotodo/internal/domain/models/request"
+	"gotodo/internal/helpers"
+	"gotodo/internal/ports/repositories/accounts"
+	account "gotodo/internal/ports/services/accounts"
+	"time"
+)
+
+type RegisterServiceImpl struct {
+	AccountRepository accounts.AccountRecordRepository
+	Validate          *validator.Validate
+	UserRepository    accounts.UserDetailRecordRepository
+}
+
+func NewRegisterServiceImpl(accountRepository accounts.AccountRecordRepository, validate *validator.Validate, userRepository accounts.UserDetailRecordRepository) account.RegisterService {
+	return &RegisterServiceImpl{AccountRepository: accountRepository, Validate: validate, UserRepository: userRepository}
+}
+
+func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error) {
+	log := helpers.LoggerParent()
+	err := r.Validate.Struct(request)
+	helpers.PanicIfError(err)
+
+	existingEmail, err := r.AccountRepository.FindAccountByEmail(ctx, request.Email)
+	if existingEmail {
+		log.Warn("Email already registered")
+		return dto.AccountDTO{}, nil
+	} else {
+		hashPassword := helpers.HashPassword(request.Password)
+		userCreate := dto.UserDetailDTO{
+			Username:  request.Username,
+			Password:  hashPassword,
+			Email:     request.Email,
+			Status:    "active",
+			CreatedAt: time.Now(),
+		}
+		userRecord := helpers.UserDTOToRecord(userCreate)
+		createUser, err := r.UserRepository.SaveUser(ctx, userRecord)
+		helpers.PanicIfError(err)
+
+		accountService := dto.AccountDTO{
+			UserID:    int(createUser.UserID),
+			Username:  createUser.Username,
+			Password:  createUser.Password,
+			Status:    "active",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		accountRecord := helpers.AccountDtoToRecord(accountService)
+		createAccount, err := r.AccountRepository.SaveAccount(ctx, accountRecord)
+		helpers.PanicIfError(err)
+
+		accountDTO := helpers.RecordToAccountDTO(createAccount)
+		return accountDTO, nil
+	}
+
+}

@@ -17,11 +17,13 @@ type TaskServiceImpl struct {
 	Validate       *validator.Validate
 }
 
+func NewTaskServiceImpl(taskRepository tasks.TaskRecordRepository, validate *validator.Validate) service.TaskService {
+	return &TaskServiceImpl{TaskRepository: taskRepository, Validate: validate}
+}
+
 func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.TaskRequest) (dto.TasksDTO, error) {
 	err := t.Validate.Struct(request)
-	if err != nil {
-		panic(err)
-	}
+	helpers.PanicIfError(err)
 
 	createTask := dto.TasksDTO{
 		UserID:      rand.Int(),
@@ -60,8 +62,4 @@ func (t TaskServiceImpl) FindTaskAllService(ctx context.Context) ([]dto.TasksDTO
 func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id uint8) error {
 	//TODO implement me
 	panic("implement me")
-}
-
-func NewTaskServiceImpl(taskRepository tasks.TaskRecordRepository, validate *validator.Validate) service.TaskService {
-	return &TaskServiceImpl{TaskRepository: taskRepository, Validate: validate}
 }

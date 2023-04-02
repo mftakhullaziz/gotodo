@@ -1,15 +1,13 @@
 package dto
 
-type CreateAccountDTO struct {
-	Username string `json:"username" form:"title" binding:"required"`
-	Email    string `json:"email" form:"description" binding:"required"`
-	Password string `json:"password" form:"password" binding:"required"`
-}
+import "time"
 
-type LoginAccountDTO struct {
-	Email    string `json:"email" form:"email" binding:"required"`
-	Password uint64 `json:"password" form:"email" binding:"required"`
-}
-
-type UpdateAccountDTO struct {
+type AccountDTO struct {
+	AccountID uint      `json:"account_id"`
+	UserID    int       `json:"user_id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
