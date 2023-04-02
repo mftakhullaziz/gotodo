@@ -15,8 +15,8 @@ type AccountRepositoryImpl struct {
 	validate           *validator.Validate
 }
 
-func NewAccountsRepositoryImpl(accountsRepository accounts.AccountRecordRepository, SQL *gorm.DB, validate *validator.Validate) accounts.AccountRecordRepository {
-	return &AccountRepositoryImpl{AccountsRepository: accountsRepository, SQL: SQL, validate: validate}
+func NewAccountsRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) accounts.AccountRecordRepository {
+	return &AccountRepositoryImpl{SQL: SQL, validate: validate}
 }
 
 func (a AccountRepositoryImpl) SaveAccount(ctx context.Context, accountRecord record.AccountRecord) (record.AccountRecord, error) {

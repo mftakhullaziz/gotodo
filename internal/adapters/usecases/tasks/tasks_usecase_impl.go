@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
+	"gotodo/internal/helpers"
 	service "gotodo/internal/ports/services/tasks"
 	"gotodo/internal/ports/usecases/tasks"
 )
@@ -20,14 +21,10 @@ func NewTaskUseCaseImpl(taskService service.TaskService, validate *validator.Val
 
 func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
-	if err != nil {
-		panic(err)
-	}
+	helpers.PanicIfError(err)
 
 	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request)
-	if err != nil {
-		panic(err)
-	}
+	helpers.PanicIfError(err)
 
 	result := response.TaskResponse{
 		ID:          createTaskUsecase.ID,

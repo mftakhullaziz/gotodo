@@ -7,5 +7,5 @@ import (
 )
 
 type RegisterService interface {
-	CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.CreateAccountDTO, error)
+	CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error)
 }

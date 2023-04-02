@@ -8,10 +8,14 @@ import (
 	"github.com/gorilla/mux"
 	"gotodo/config"
 	"gotodo/config/database"
-	handler "gotodo/internal/adapters/handlers/tasks"
-	repository "gotodo/internal/adapters/repositories/tasks"
-	service "gotodo/internal/adapters/services/tasks"
-	usecase "gotodo/internal/adapters/usecases/tasks"
+	accountsHandler "gotodo/internal/adapters/handlers/accounts"
+	tasksHandler "gotodo/internal/adapters/handlers/tasks"
+	accountsRepository "gotodo/internal/adapters/repositories/accounts"
+	tasksRepository "gotodo/internal/adapters/repositories/tasks"
+	accountsService "gotodo/internal/adapters/services/accounts"
+	tasksService "gotodo/internal/adapters/services/tasks"
+	accountsUsecase "gotodo/internal/adapters/usecases/accounts"
+	tasksUsecase "gotodo/internal/adapters/usecases/tasks"
 	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"net/http"
@@ -31,10 +35,18 @@ func main() {
 
 	validate := validator.New()
 
-	taskRepository := repository.NewTaskRepositoryImpl(db, validate)
-	taskService := service.NewTaskServiceImpl(taskRepository, validate)
-	taskUsecase := usecase.NewTaskUseCaseImpl(taskService, validate)
-	taskHandler := handler.NewTaskHandlerAPI(taskUsecase)
+	// Init Task Handler
+	taskRepository := tasksRepository.NewTaskRepositoryImpl(db, validate)
+	taskService := tasksService.NewTaskServiceImpl(taskRepository, validate)
+	taskUsecase := tasksUsecase.NewTaskUseCaseImpl(taskService, validate)
+	taskHandler := tasksHandler.NewTaskHandlerAPI(taskUsecase)
+
+	// Init Account Handler
+	userRepository := accountsRepository.NewUserDetailRepositoryImpl(db, validate)
+	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
+	accountService := accountsService.NewRegisterServiceImpl(accountRepository, userRepository, validate)
+	accountUsecase := accountsUsecase.NewRegisterUseCaseImpl(accountService, validate)
+	accountHandler := accountsHandler.NewRegisterHandlerAPI(accountUsecase)
 
 	router := mux.NewRouter()
 	router.Use(helpers.LoggingMiddleware)
@@ -46,7 +58,8 @@ func main() {
 	handlerTask.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods("GET")
 	handlerTask.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods("DELETE")
 
-	// handlerAccount := router.PathPrefix("/api/v1/account/").Subrouter()
+	handlerAccount := router.PathPrefix("/api/v1/account/").Subrouter()
+	handlerAccount.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
 
 	helpers.LogRoutes(router)
 

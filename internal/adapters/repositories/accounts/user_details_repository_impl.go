@@ -15,8 +15,8 @@ type UserDetailRepositoryImpl struct {
 	validate             *validator.Validate
 }
 
-func NewUserDetailRepositoryImpl(UserDetailRepository accounts.UserDetailRecordRepository, SQL *gorm.DB, validate *validator.Validate) accounts.UserDetailRecordRepository {
-	return &UserDetailRepositoryImpl{UserDetailRepository: UserDetailRepository, SQL: SQL, validate: validate}
+func NewUserDetailRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) accounts.UserDetailRecordRepository {
+	return &UserDetailRepositoryImpl{SQL: SQL, validate: validate}
 }
 
 func (u UserDetailRepositoryImpl) SaveUser(ctx context.Context, userRecord record.UserDetailRecord) (record.UserDetailRecord, error) {

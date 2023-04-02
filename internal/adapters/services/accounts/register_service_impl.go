@@ -13,12 +13,19 @@ import (
 
 type RegisterServiceImpl struct {
 	AccountRepository accounts.AccountRecordRepository
-	Validate          *validator.Validate
 	UserRepository    accounts.UserDetailRecordRepository
+	Validate          *validator.Validate
 }
 
-func NewRegisterServiceImpl(accountRepository accounts.AccountRecordRepository, validate *validator.Validate, userRepository accounts.UserDetailRecordRepository) account.RegisterService {
-	return &RegisterServiceImpl{AccountRepository: accountRepository, Validate: validate, UserRepository: userRepository}
+func NewRegisterServiceImpl(
+	accountRepository accounts.AccountRecordRepository,
+	userRepository accounts.UserDetailRecordRepository,
+	validate *validator.Validate) account.RegisterService {
+
+	return &RegisterServiceImpl{
+		AccountRepository: accountRepository,
+		UserRepository:    userRepository,
+		Validate:          validate}
 }
 
 func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error) {
