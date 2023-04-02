@@ -26,7 +26,7 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 	taskRequest := request.TaskRequest{}
 	helpers.ReadFromRequestBody(requests, &taskRequest)
 
-	createHandler, err := t.TaskUseCase.CreateAccountUseCase(requests.Context(), taskRequest)
+	createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest)
 	helpers.PanicIfError(err)
 
 	rest := response.DefaultServiceResponse{

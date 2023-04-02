@@ -18,7 +18,7 @@ func NewTaskUseCaseImpl(taskService service.TaskService, validate *validator.Val
 	return &TaskUseCaseImpl{TaskService: taskService, Validate: validate}
 }
 
-func (t TaskUseCaseImpl) CreateAccountUseCase(ctx context.Context, request request.TaskRequest) (response.TaskResponse, error) {
+func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
 	if err != nil {
 		panic(err)

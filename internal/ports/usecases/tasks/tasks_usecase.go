@@ -7,5 +7,5 @@ import (
 )
 
 type TaskUseCase interface {
-	CreateAccountUseCase(ctx context.Context, request request.TaskRequest) (response.TaskResponse, error)
+	CreateTaskUseCase(ctx context.Context, request request.TaskRequest) (response.TaskResponse, error)
 }
