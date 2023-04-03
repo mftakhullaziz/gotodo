@@ -26,8 +26,9 @@ func main() {
 
 	ctx := context.Background()
 	envName := config.LoadEnv(".env")
+
 	db, errs := database.NewDatabaseConnection(ctx, envName)
-	helpers.PanicIfError(errs)
+	helpers.PanicIfErrorWithCustomMessage(errs, "New database connection is failed")
 	helpers.LoggerQueryInit(db)
 
 	err := database.MigrateDatabase(db,
@@ -36,7 +37,7 @@ func main() {
 		&record.UserDetailRecord{},
 		&record.AccountLoginHistoriesRecord{})
 
-	helpers.PanicIfError(err)
+	helpers.LoggerIfError(err)
 
 	validate := validator.New()
 

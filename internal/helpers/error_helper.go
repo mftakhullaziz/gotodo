@@ -34,6 +34,6 @@ func ErrorStructJoinUserAccountRecord(gdb *gorm.DB) {
 func LoggerIfError(err error) {
 	log := LoggerParent()
 	if err != nil {
-		log.Errorln("Error within: ", err.Error())
+		log.Errorln("Logger : ", err.Error())
 	}
 }

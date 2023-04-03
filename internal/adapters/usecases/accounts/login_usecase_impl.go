@@ -24,7 +24,7 @@ func (l LoginUsecaseImpl) LoginAccountUseCase(ctx context.Context, request reque
 	err := l.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	loginUsecase, errLogin := l.LoginService.VerifyCredentialAccount(ctx, request)
+	loginUsecase, token, errLogin := l.LoginService.VerifyCredentialAccount(ctx, request)
 	if errLogin != nil {
 		return response.LoginResponse{}, err
 	}
@@ -34,6 +34,7 @@ func (l LoginUsecaseImpl) LoginAccountUseCase(ctx context.Context, request reque
 		Username:  loginUsecase.Username,
 		Password:  loginUsecase.Password,
 		LoginAt:   time.Time{},
+		Token:     token,
 	}
 	return responseUsecase, nil
 }

@@ -9,6 +9,7 @@ import (
 func TaskRecordToDTO(record record.TaskRecord) dto.TasksDTO {
 	return dto.TasksDTO{
 		ID:          record.ID,
+		UserID:      record.UserID,
 		Title:       record.Title,
 		Description: record.Description,
 		Completed:   record.Completed,
@@ -21,6 +22,7 @@ func TaskRecordToDTO(record record.TaskRecord) dto.TasksDTO {
 func TaskDTOToRecord(recordDTO dto.TasksDTO) record.TaskRecord {
 	return record.TaskRecord{
 		ID:          recordDTO.ID,
+		UserID:      recordDTO.UserID,
 		Title:       recordDTO.Title,
 		Description: recordDTO.Description,
 		Completed:   recordDTO.Completed,
@@ -84,22 +86,26 @@ func UserDTOToRecord(detailDTO dto.UserDetailDTO) record.UserDetailRecord {
 	}
 }
 
+type NewOptionalColumnParams struct {
+	Token   string
+	TimeAt  time.Time
+	TimeOut time.Time
+}
+
 func UserAndAccountRecordToAccountLoginHistoryRecord(
 	detailRecord record.UserDetailRecord,
 	accountRecord record.AccountRecord,
-	loginStatus string,
-	timeAt time.Time,
-	timeOut time.Time) record.AccountLoginHistoriesRecord {
+	params NewOptionalColumnParams) record.AccountLoginHistoriesRecord {
 
 	return record.AccountLoginHistoriesRecord{
-		AccountID:   int(accountRecord.AccountID),
-		UserID:      int(detailRecord.UserID),
-		Email:       detailRecord.Email,
-		Password:    accountRecord.Password,
-		LoginStatus: loginStatus,
-		LoginAt:     timeAt,
-		LoginOutAt:  timeOut,
-		CreatedAt:   timeAt,
-		UpdatedAt:   time.Time{},
+		AccountID:  int(accountRecord.AccountID),
+		UserID:     int(detailRecord.UserID),
+		Username:   accountRecord.Username,
+		Password:   accountRecord.Password,
+		Token:      params.Token,
+		LoginAt:    params.TimeAt,
+		LoginOutAt: params.TimeOut,
+		CreatedAt:  params.TimeAt,
+		UpdatedAt:  time.Time{},
 	}
 }

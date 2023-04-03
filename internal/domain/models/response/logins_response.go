@@ -7,4 +7,5 @@ type LoginResponse struct {
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 	LoginAt   time.Time `json:"login_at"`
+	Token     string    `json:"token"`
 }

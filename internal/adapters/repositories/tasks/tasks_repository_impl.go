@@ -20,7 +20,7 @@ func NewTaskRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) tasks.Tas
 }
 
 func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.TaskRecord) (record.TaskRecord, error) {
-	result := t.SQL.WithContext(ctx).Save(&taskRecord)
+	result := t.SQL.WithContext(ctx).Create(&taskRecord)
 	if result.Error != nil {
 		return record.TaskRecord{}, result.Error
 	}

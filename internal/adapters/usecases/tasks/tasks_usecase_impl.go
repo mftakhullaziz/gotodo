@@ -19,11 +19,11 @@ func NewTaskUseCaseImpl(taskService service.TaskService, validate *validator.Val
 	return &TaskUseCaseImpl{TaskService: taskService, Validate: validate}
 }
 
-func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest) (response.TaskResponse, error) {
+func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest, id int) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request)
+	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request, id)
 	helpers.PanicIfError(err)
 
 	result := response.TaskResponse{

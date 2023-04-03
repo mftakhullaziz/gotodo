@@ -6,13 +6,13 @@ type AccountLoginHistoriesRecord struct {
 	AccountLoginHistoryID uint      `gorm:"primaryKey"`
 	AccountID             int       `gorm:"not null"`
 	UserID                int       `gorm:"not null"`
-	Email                 string    `gorm:"null"`
-	Password              string    `gorm:"null"`
-	LoginStatus           string    `gorm:"null"`
-	LoginAt               time.Time `gorm:"null"`
-	LoginOutAt            time.Time `gorm:"null"`
-	CreatedAt             time.Time `gorm:"null"`
-	UpdatedAt             time.Time `gorm:"null"`
+	Username              string    `gorm:"default:null;"`
+	Password              string    `gorm:"default:null;"`
+	Token                 string    `gorm:"default:null;"`
+	LoginAt               time.Time `gorm:"default:null;"`
+	LoginOutAt            time.Time `gorm:"default:null;"`
+	CreatedAt             time.Time `gorm:"default:null;"`
+	UpdatedAt             time.Time `gorm:"default:null;"`
 }
 
 func (AccountLoginHistoriesRecord) TableName() string {

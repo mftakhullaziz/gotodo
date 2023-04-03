@@ -8,7 +8,6 @@ import (
 	"gotodo/internal/helpers"
 	"gotodo/internal/ports/repositories/tasks"
 	service "gotodo/internal/ports/services/tasks"
-	"math/rand"
 	"time"
 )
 
@@ -21,12 +20,12 @@ func NewTaskServiceImpl(taskRepository tasks.TaskRecordRepository, validate *val
 	return &TaskServiceImpl{TaskRepository: taskRepository, Validate: validate}
 }
 
-func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.TaskRequest) (dto.TasksDTO, error) {
+func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.TaskRequest, authorizedId int) (dto.TasksDTO, error) {
 	err := t.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
 	createTask := dto.TasksDTO{
-		UserID:      rand.Int(),
+		UserID:      authorizedId,
 		Title:       request.Title,
 		Description: request.Description,
 		Completed:   false,

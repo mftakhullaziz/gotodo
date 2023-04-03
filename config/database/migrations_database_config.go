@@ -14,7 +14,7 @@ func MigrateDatabase(db *gorm.DB, models ...interface{}) error {
 		}
 
 		err := db.AutoMigrate(model)
-		helpers.PanicIfError(err)
+		helpers.LoggerIfError(err)
 	}
 	return nil
 }

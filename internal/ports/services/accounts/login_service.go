@@ -7,5 +7,5 @@ import (
 )
 
 type LoginService interface {
-	VerifyCredentialAccount(ctx context.Context, request request.LoginRequest) (dto.AccountDTO, error)
+	VerifyCredentialAccount(ctx context.Context, request request.LoginRequest) (dto.AccountDTO, string, error)
 }
