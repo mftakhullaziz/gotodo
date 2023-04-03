@@ -3,6 +3,7 @@ package helpers
 import (
 	"gotodo/internal/domain/dto"
 	"gotodo/internal/persistence/record"
+	"time"
 )
 
 func TaskRecordToDTO(record record.TaskRecord) dto.TasksDTO {
@@ -80,5 +81,25 @@ func UserDTOToRecord(detailDTO dto.UserDetailDTO) record.UserDetailRecord {
 		Status:      detailDTO.Status,
 		CreatedAt:   detailDTO.CreatedAt,
 		UpdatedAt:   detailDTO.UpdatedAt,
+	}
+}
+
+func UserAndAccountRecordToAccountLoginHistoryRecord(
+	detailRecord record.UserDetailRecord,
+	accountRecord record.AccountRecord,
+	loginStatus string,
+	timeAt time.Time,
+	timeOut time.Time) record.AccountLoginHistoriesRecord {
+
+	return record.AccountLoginHistoriesRecord{
+		AccountID:   int(accountRecord.AccountID),
+		UserID:      int(detailRecord.UserID),
+		Email:       detailRecord.Email,
+		Password:    accountRecord.Password,
+		LoginStatus: loginStatus,
+		LoginAt:     timeAt,
+		LoginOutAt:  timeOut,
+		CreatedAt:   timeAt,
+		UpdatedAt:   time.Time{},
 	}
 }

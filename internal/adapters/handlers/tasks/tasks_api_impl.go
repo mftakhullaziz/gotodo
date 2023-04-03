@@ -26,8 +26,12 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 	createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest)
 	helpers.PanicIfError(err)
 
-	responses := helpers.CreateResponses(createHandler, http.StatusCreated, "Create task successfully")
-	log.Info("Task created successfully")
+	responses := helpers.CreateResponses(
+		createHandler,
+		http.StatusCreated,
+		"Create task successfully",
+		"Create task not success!")
+
 	helpers.WriteToResponseBody(writer, &responses)
 }
 

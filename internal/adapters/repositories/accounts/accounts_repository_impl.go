@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
+	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/accounts"
 )
@@ -83,7 +84,7 @@ func (a AccountRepositoryImpl) FindAccountAll(ctx context.Context) ([]record.Acc
 	return accountRecords, nil
 }
 
-func (a AccountRepositoryImpl) FindAccountByEmail(ctx context.Context, email string) bool {
+func (a AccountRepositoryImpl) IsExistAccountEmail(ctx context.Context, email string) bool {
 	accountRecord := &record.UserDetailRecord{}
 	result := a.SQL.WithContext(ctx).Where("email = ?", email).First(accountRecord)
 	if result.Error != nil {
@@ -95,7 +96,7 @@ func (a AccountRepositoryImpl) FindAccountByEmail(ctx context.Context, email str
 	return true
 }
 
-func (a AccountRepositoryImpl) IsDuplicateUsername(ctx context.Context, username string) bool {
+func (a AccountRepositoryImpl) IsExistUsername(ctx context.Context, username string) bool {
 	accountRecord := &record.UserDetailRecord{}
 	result := a.SQL.WithContext(ctx).
 		Table("accounts").
@@ -112,4 +113,50 @@ func (a AccountRepositoryImpl) IsDuplicateUsername(ctx context.Context, username
 		return false
 	}
 	return true
+}
+
+func (a AccountRepositoryImpl) VerifyCredential(ctx context.Context, username string) (record.AccountRecord, error) {
+	accountRecord := record.AccountRecord{}
+	result := a.SQL.WithContext(ctx).Select("username, password").
+		Where("username = ? and status = ?", username, "active").
+		First(&accountRecord)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			ErrRecordNotFound := errors.New("error Record Not Found")
+			return record.AccountRecord{}, ErrRecordNotFound
+		}
+		return record.AccountRecord{}, result.Error
+	} else if result.RowsAffected == 0 {
+		return record.AccountRecord{}, nil
+	}
+
+	return accountRecord, nil
+}
+
+func (a AccountRepositoryImpl) FindAccountUser(ctx context.Context, username string) (helpers.UserAccounts, error) {
+	userAccount := helpers.UserAccounts{}
+
+	resultAccount := a.SQL.WithContext(ctx).
+		Joins("inner join user_details ud on accounts.user_id = ud.user_id and accounts.username = ud.username").
+		Where("accounts.username = ?", username).
+		First(&userAccount.Accounts)
+
+	helpers.ErrorStructJoinUserAccountRecord(resultAccount)
+
+	resultUser := a.SQL.WithContext(ctx).Table("user_details").
+		Where("user_id = ?", userAccount.Accounts.UserID).
+		First(&userAccount.Users)
+
+	helpers.ErrorStructJoinUserAccountRecord(resultUser)
+
+	return userAccount, nil
+}
+
+func (a AccountRepositoryImpl) SaveLoginHistories(ctx context.Context, historiesRecord record.AccountLoginHistoriesRecord) error {
+	result := a.SQL.WithContext(ctx).Create(&historiesRecord)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

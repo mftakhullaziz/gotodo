@@ -34,14 +34,14 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 	err := r.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	existingUsername := r.AccountRepository.IsDuplicateUsername(ctx, request.Username)
-	existingEmail := r.AccountRepository.FindAccountByEmail(ctx, request.Email)
+	existingUsername := r.AccountRepository.IsExistUsername(ctx, request.Username)
+	existingEmail := r.AccountRepository.IsExistAccountEmail(ctx, request.Email)
 
 	if existingEmail == true && existingUsername == true {
 		log.Info("Email already registered")
 		return dto.AccountDTO{}, nil
 	} else {
-		hashPassword := helpers.HashPassword(request.Password)
+		hashPassword := helpers.HashPasswordAndSalt([]byte(request.Password))
 		userCreate := dto.UserDetailDTO{
 			Username:  request.Username,
 			Password:  hashPassword,

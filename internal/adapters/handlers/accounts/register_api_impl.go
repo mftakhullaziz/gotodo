@@ -28,7 +28,12 @@ func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests
 		log.Info("Account already created please using another 'email'")
 	}
 
-	responses := helpers.CreateResponses(registerHandler, http.StatusCreated, "Create account successfully")
+	responses := helpers.CreateResponses(
+		registerHandler,
+		http.StatusCreated,
+		"Create account successfully",
+		"Create account not success please check your username or email or password again!")
+
 	helpers.WriteToResponseBody(writer, &responses)
 }
 

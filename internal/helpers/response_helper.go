@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func CreateResponses(handler interface{}, statusCode int, message string) response.DefaultServiceResponse {
+func CreateResponses(handler interface{}, statusCode int, message string, errMessage string) response.DefaultServiceResponse {
 	if HasValue(handler) {
 		return response.DefaultServiceResponse{
 			StatusCode: statusCode,
@@ -18,7 +18,7 @@ func CreateResponses(handler interface{}, statusCode int, message string) respon
 	var emptyInterface interface{}
 	return response.DefaultServiceResponse{
 		StatusCode: http.StatusInternalServerError,
-		Message:    "Request is failed",
+		Message:    errMessage,
 		IsSuccess:  false,
 		Data:       emptyInterface,
 	}

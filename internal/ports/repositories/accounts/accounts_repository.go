@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"context"
+	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 )
 
@@ -11,6 +12,9 @@ type AccountRecordRepository interface {
 	UpdateAccount(ctx context.Context, id int64, accountRecord record.AccountRecord) (record.AccountRecord, error)
 	DeleteAccountById(ctx context.Context, id int64) error
 	FindAccountAll(ctx context.Context) ([]record.AccountRecord, error)
-	FindAccountByEmail(ctx context.Context, email string) bool
-	IsDuplicateUsername(ctx context.Context, username string) bool
+	IsExistAccountEmail(ctx context.Context, email string) bool
+	IsExistUsername(ctx context.Context, username string) bool
+	VerifyCredential(ctx context.Context, username string) (record.AccountRecord, error)
+	FindAccountUser(ctx context.Context, username string) (helpers.UserAccounts, error)
+	SaveLoginHistories(ctx context.Context, historiesRecord record.AccountLoginHistoriesRecord) error
 }

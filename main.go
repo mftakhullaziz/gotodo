@@ -30,7 +30,12 @@ func main() {
 	helpers.PanicIfError(errs)
 	helpers.LoggerQueryInit(db)
 
-	err := database.MigrateDatabase(db, &record.TaskRecord{}, &record.AccountRecord{}, &record.UserDetailRecord{})
+	err := database.MigrateDatabase(db,
+		&record.TaskRecord{},
+		&record.AccountRecord{},
+		&record.UserDetailRecord{},
+		&record.AccountLoginHistoriesRecord{})
+
 	helpers.PanicIfError(err)
 
 	validate := validator.New()
@@ -42,11 +47,17 @@ func main() {
 	taskHandler := tasksHandler.NewTaskHandlerAPI(taskUsecase)
 
 	// Init Account Handler
+	// Register Handler
 	userRepository := accountsRepository.NewUserDetailRepositoryImpl(db, validate)
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
 	accountService := accountsService.NewRegisterServiceImpl(accountRepository, userRepository, validate)
 	accountUsecase := accountsUsecase.NewRegisterUseCaseImpl(accountService, validate)
 	accountHandler := accountsHandler.NewRegisterHandlerAPI(accountUsecase)
+
+	// Login Handler :=
+	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)
+	loginUsecase := accountsUsecase.NewLoginUsecaseImpl(loginService, validate)
+	loginHandler := accountsHandler.NewLoginHandlerAPI(loginUsecase)
 
 	router := mux.NewRouter()
 	router.Use(helpers.LoggingMiddleware)
@@ -60,6 +71,7 @@ func main() {
 
 	handlerAccount := router.PathPrefix("/api/v1/account/").Subrouter()
 	handlerAccount.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
+	handlerAccount.HandleFunc("/login", loginHandler.LoginHandler).Methods(http.MethodPost)
 
 	helpers.LogRoutes(router)
 
