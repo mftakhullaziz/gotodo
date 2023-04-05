@@ -62,3 +62,8 @@ func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id uint8) error 
 	//TODO implement me
 	panic("implement me")
 }
+
+func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, id uint8, boolean bool) (dto.TasksDTO, error) {
+	//TODO implement me
+	panic("implement me")
+}
