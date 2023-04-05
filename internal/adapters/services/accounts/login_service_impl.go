@@ -3,7 +3,6 @@ package accounts
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
-	log "github.com/sirupsen/logrus"
 	"gotodo/internal/domain/dto"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/helpers"
@@ -24,29 +23,31 @@ func NewLoginServiceImpl(accountRepository accounts.AccountRecordRepository, val
 }
 
 func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request request.LoginRequest) (dto.AccountDTO, string, error) {
-	// log := helpers.LoggerParent()
+	log := helpers.LoggerParent()
 
 	validate := l.Validate.Struct(request)
 	helpers.PanicIfError(validate)
 
 	credentialAccount, err := l.AccountRepository.VerifyCredential(ctx, request.Username)
-	helpers.PanicIfErrorWithCustomMessage(err, "Username not found")
+	helpers.PanicIfErrorWithCustomMessage(err, "username not found")
+	log.Info("verify credential: ", credentialAccount)
 
 	comparedPassword, errCompare := helpers.ComparedPassword(credentialAccount.Password, []byte(request.Password))
 	if comparedPassword != true && errCompare != nil {
-		log.Info("Password not matched")
+		log.Info("password not matched")
 		return dto.AccountDTO{}, "", errCompare
 	} else {
-		log.Info("Password is matched")
+		log.Info("user and password is validate")
 
 		findUserAccount, errUserAccount := l.AccountRepository.FindAccountUser(ctx, credentialAccount.Username)
 		if errUserAccount != nil {
-			log.Error("Error find user account not found", errUserAccount.Error())
+			log.Error("error find user account not found", errUserAccount.Error())
 		}
-		log.Info("User Account Find: ", findUserAccount)
+		log.Info("user account find: ", findUserAccount)
 
 		userRecord := findUserAccount.Users
 		accountRecord := findUserAccount.Accounts
+		log.Infoln("account record: ", accountRecord)
 
 		tokenGenerate, expireTokenGenerate, errToken := middleware.GenerateJWTToken()
 		helpers.LoggerIfError(errToken)
@@ -59,7 +60,7 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 		// Add token authorization header
 		header, errHeader := middleware.MakeAuthenticatedRequest(tokenGenerate)
 		helpers.LoggerIfError(errHeader)
-		log.Info("Add to header authorization: ", header.Body.Close())
+		log.Info("add to header authorization: ", header)
 
 		optionalUserLoginHistory := helpers.NewOptionalColumnParams{
 			Token:   tokenGenerate,
@@ -69,13 +70,13 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 
 		userLoginHistory := helpers.UserAndAccountRecordToAccountLoginHistoryRecord(
 			userRecord, accountRecord, optionalUserLoginHistory)
-
-		log.Info("User login histories record: ", userLoginHistory)
+		log.Info("user login histories: ", userLoginHistory)
 
 		saveLoginHistory := l.AccountRepository.SaveLoginHistories(ctx, userLoginHistory)
 		helpers.LoggerIfError(saveLoginHistory)
 
-		userAccounts := helpers.RecordToAccountDTO(credentialAccount)
+		userAccounts := helpers.RecordToAccountDTO(accountRecord)
+		log.Info("user accounts record to dto: ", userAccounts)
 
 		return userAccounts, optionalUserLoginHistory.Token, nil
 	}

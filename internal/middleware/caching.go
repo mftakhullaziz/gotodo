@@ -12,13 +12,13 @@ var c *cache.Cache
 
 // Initialize the cache when the application starts up
 func init() {
-	c = cache.New(5*time.Minute, 60*time.Minute)
+	c = cache.New(1*time.Hour, 24*time.Hour)
 }
 
 // GenerateTokenToCache Generate a new token for the user and store it in the cache
 func GenerateTokenToCache(userID string, token string, expirationTime time.Time) error {
 	log := helpers.LoggerParent()
-	log.Infoln("Cache token expire at: ", expirationTime.Sub(time.Now()))
+	log.Infoln("caching token expire at count down: ", expirationTime.Sub(time.Now()))
 
 	err := c.Add(token, userID, expirationTime.Sub(time.Now()))
 	if err != nil {
@@ -27,10 +27,10 @@ func GenerateTokenToCache(userID string, token string, expirationTime time.Time)
 	return nil
 }
 
-// AuthenticateUser Authenticate the user by checking their token against the cache
+// AuthenticateUser Authenticate the user by checking their token against the cache and check token if expire or not
 func AuthenticateUser(token string) (string, error) {
 	userID, found, err := c.GetWithExpiration(token)
-	fmt.Println("Times: ", found)
+	fmt.Println("Tokens: ", found)
 	if err != true {
 		return "", errors.New("user account unauthorized")
 	}

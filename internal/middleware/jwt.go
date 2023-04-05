@@ -9,7 +9,7 @@ import (
 
 func GenerateJWTToken() (string, time.Time, error) {
 	// Set the expiration time of the token
-	expirationTime := time.Now().Add(2 * time.Minute) // 1 day
+	expirationTime := time.Now().Add(1 * time.Hour) // 1 day
 
 	// Create a new JWT token with the claims
 	claims := &jwt.StandardClaims{
@@ -27,6 +27,7 @@ func GenerateJWTToken() (string, time.Time, error) {
 	return tokenString, expirationTime, nil
 }
 
+// AuthenticateWithInTokenToken function to check token if available or not using JWT and check token if expire or not
 func AuthenticateWithInTokenToken(tokenString string) (bool, error) {
 	log := helpers.LoggerParent()
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

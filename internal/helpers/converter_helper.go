@@ -92,11 +92,8 @@ type NewOptionalColumnParams struct {
 	TimeOut time.Time
 }
 
-func UserAndAccountRecordToAccountLoginHistoryRecord(
-	detailRecord record.UserDetailRecord,
-	accountRecord record.AccountRecord,
-	params NewOptionalColumnParams) record.AccountLoginHistoriesRecord {
-
+func UserAndAccountRecordToAccountLoginHistoryRecord(detailRecord record.UserDetailRecord,
+	accountRecord record.AccountRecord, params NewOptionalColumnParams) record.AccountLoginHistoriesRecord {
 	return record.AccountLoginHistoriesRecord{
 		AccountID:  int(accountRecord.AccountID),
 		UserID:     int(detailRecord.UserID),
