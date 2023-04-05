@@ -64,8 +64,14 @@ func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request 
 }
 
 func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int) (dto.TasksDTO, error) {
-	//TODO implement me
-	panic("implement me")
+	err := t.Validate.StructPartial(id)
+	helpers.LoggerIfError(err)
+
+	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(id))
+	helpers.LoggerIfError(err)
+
+	findTaskResponse := helpers.TaskRecordToDTO(findTaskService)
+	return findTaskResponse, nil
 }
 
 func (t TaskServiceImpl) FindTaskAllService(ctx context.Context) ([]dto.TasksDTO, error) {

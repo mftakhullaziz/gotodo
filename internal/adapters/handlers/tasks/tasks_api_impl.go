@@ -57,15 +57,15 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	// Define logger helpers
 	log := helpers.LoggerParent()
 
+	// Do get authorization token if any from user login
+	token := requests.Header.Get("Authorization")
+	authorizedUser, err := middleware.AuthenticateUser(token)
+	helpers.LoggerIfError(err)
+
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
 	idTaskVar := vars["idTask"]
 	idTask, err := strconv.Atoi(idTaskVar)
-	helpers.LoggerIfError(err)
-
-	// Do get authorization token if any from user login
-	token := requests.Header.Get("Authorization")
-	authorizedUser, err := middleware.AuthenticateUser(token)
 	helpers.LoggerIfError(err)
 
 	// Do updateRequest transform to request body as json
@@ -85,9 +85,30 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	helpers.WriteToResponseBody(writer, &updateTaskResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, request *http.Request) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request) {
+	// Define logger helpers
+	log := helpers.LoggerParent()
+
+	// Do get authorization token if any from user login
+	token := requests.Header.Get("Authorization")
+	authorized, err := middleware.AuthenticateUser(token)
+	helpers.LoggerIfError(err)
+
+	// Define to get idTask from param
+	vars := mux.Vars(requests)
+	idTaskVar := vars["idTask"]
+	idTask, err := strconv.Atoi(idTaskVar)
+	helpers.LoggerIfError(err)
+	log.Infoln("Find task by idTask: ", idTask)
+
+	// Do get usecase updateTask function with param context, updateRequest, idTask
+	findTaskHandler, err := t.TaskUseCase.FindTaskByIdUseCase(requests.Context(), idTask)
+	helpers.LoggerIfError(err)
+
+	findTaskHandlerResponse := helpers.BuildResponseWithAuthorization(findTaskHandler, http.StatusAccepted, authorized,
+		"API request find task successful", "Request is failed please check again taskId!")
+
+	helpers.WriteToResponseBody(writer, findTaskHandlerResponse)
 }
 
 func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, request *http.Request) {
