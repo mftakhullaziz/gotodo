@@ -117,6 +117,9 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get("Authorization")
+	expires, err := middleware.AuthenticateWithInTokenToken(token)
+	log.Infoln("log expire: ", expires)
+
 	authorized, err := middleware.AuthenticateUser(token)
 	helpers.LoggerIfError(err)
 	log.Infoln("User account is authorized: ", authorized)

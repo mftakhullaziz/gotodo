@@ -86,8 +86,13 @@ func (t TaskServiceImpl) FindTaskAllService(ctx context.Context) ([]dto.TasksDTO
 }
 
 func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id int) error {
-	//TODO implement me
-	panic("implement me")
+	err := t.Validate.StructPartial(id)
+	helpers.LoggerIfError(err)
+
+	deleteTask := t.TaskRepository.DeleteTaskById(ctx, int64(id))
+	helpers.LoggerIfError(err)
+
+	return deleteTask
 }
 
 func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, id int, boolean bool) (dto.TasksDTO, error) {

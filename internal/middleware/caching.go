@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"github.com/patrickmn/go-cache"
 	"gotodo/internal/helpers"
 	"time"
@@ -11,7 +12,7 @@ var c *cache.Cache
 
 // Initialize the cache when the application starts up
 func init() {
-	c = cache.New(5*time.Minute, 10*time.Minute)
+	c = cache.New(5*time.Minute, 60*time.Minute)
 }
 
 // GenerateTokenToCache Generate a new token for the user and store it in the cache
@@ -28,8 +29,9 @@ func GenerateTokenToCache(userID string, token string, expirationTime time.Time)
 
 // AuthenticateUser Authenticate the user by checking their token against the cache
 func AuthenticateUser(token string) (string, error) {
-	userID, found := c.Get(token)
-	if !found {
+	userID, found, err := c.GetWithExpiration(token)
+	fmt.Println("Times: ", found)
+	if err != true {
 		return "", errors.New("user account unauthorized")
 	}
 
