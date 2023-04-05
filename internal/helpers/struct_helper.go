@@ -23,3 +23,8 @@ type UserAccounts struct {
 	Accounts record.AccountRecord `gorm:"foreignKey:UserID;references:UserID"`
 	Users    record.UserDetailRecord
 }
+
+func HasValueSlice(handler interface{}) bool {
+	v := reflect.ValueOf(handler)
+	return v.Kind() != reflect.Ptr && !v.IsNil()
+}

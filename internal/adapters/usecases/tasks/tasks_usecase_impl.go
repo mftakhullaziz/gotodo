@@ -78,3 +78,27 @@ func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int) (r
 
 	return findTaskResponse, nil
 }
+
+func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context) ([]response.TaskResponse, error) {
+	var findAllTaskResponse []response.TaskResponse
+
+	findAllTaskUsecase, errUsecase := t.TaskService.FindTaskAllService(ctx)
+	helpers.LoggerIfError(errUsecase)
+
+	for _, task := range findAllTaskUsecase {
+		responses := response.TaskResponse{
+			ID:          task.ID,
+			UserID:      task.UserID,
+			Title:       task.Title,
+			Description: task.Description,
+			Completed:   task.Completed,
+			CompletedAt: task.CompletedAt,
+			UpdatedAt:   task.UpdatedAt,
+			CreatedAt:   task.CreatedAt,
+		}
+
+		findAllTaskResponse = append(findAllTaskResponse, responses)
+	}
+
+	return findAllTaskResponse, nil
+}

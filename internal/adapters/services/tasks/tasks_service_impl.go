@@ -75,8 +75,14 @@ func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int) (dto.T
 }
 
 func (t TaskServiceImpl) FindTaskAllService(ctx context.Context) ([]dto.TasksDTO, error) {
-	//TODO implement me
-	panic("implement me")
+	log := helpers.LoggerParent()
+
+	findAllTaskService, err := t.TaskRepository.FindTaskAll(ctx)
+	helpers.LoggerIfError(err)
+	log.Infoln("List tasks: ", findAllTaskService)
+
+	findAllTaskResponse := helpers.TaskRecordsToTaskDTOs(findAllTaskService)
+	return findAllTaskResponse, nil
 }
 
 func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id int) error {

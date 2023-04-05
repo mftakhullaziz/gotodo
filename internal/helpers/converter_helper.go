@@ -109,3 +109,23 @@ func UserAndAccountRecordToAccountLoginHistoryRecord(
 		UpdatedAt:  time.Time{},
 	}
 }
+
+func TaskRecordsToTaskDTOs(tasks []record.TaskRecord) []dto.TasksDTO {
+	var tasksDto []dto.TasksDTO
+
+	for _, task := range tasks {
+		dtoTask := dto.TasksDTO{
+			ID:          task.ID,
+			UserID:      task.UserID,
+			Title:       task.Title,
+			Description: task.Description,
+			Completed:   task.Completed,
+			CompletedAt: task.CompletedAt,
+			UpdatedAt:   task.UpdatedAt,
+			CreatedAt:   task.CreatedAt,
+		}
+		tasksDto = append(tasksDto, dtoTask)
+	}
+
+	return tasksDto
+}

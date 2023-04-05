@@ -42,3 +42,22 @@ func BuildResponseWithAuthorization(handler interface{}, statusCode int, userId 
 		Data:       emptyInterface,
 	}
 }
+
+func BuildAllResponseWithAuthorization(handler interface{}, statusCode int, userId string, message string, errMessage string) response.DefaultServiceAllResponse {
+	if HasValueSlice(handler) && userId != "" {
+		return response.DefaultServiceAllResponse{
+			StatusCode: statusCode,
+			Message:    message,
+			IsSuccess:  true,
+			Data:       handler,
+		}
+	}
+
+	var emptyInterface []interface{}
+	return response.DefaultServiceAllResponse{
+		StatusCode: http.StatusInternalServerError,
+		Message:    errMessage,
+		IsSuccess:  false,
+		Data:       emptyInterface,
+	}
+}

@@ -111,9 +111,24 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	helpers.WriteToResponseBody(writer, findTaskHandlerResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, request *http.Request) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *http.Request) {
+	// Define logger helpers
+	log := helpers.LoggerParent()
+
+	// Do get authorization token if any from user login
+	token := requests.Header.Get("Authorization")
+	authorized, err := middleware.AuthenticateUser(token)
+	helpers.LoggerIfError(err)
+	log.Infoln("User account is authorized: ", authorized)
+
+	findAllTaskHandler, err := t.TaskUseCase.FindTaskAllUseCase(requests.Context())
+	helpers.LoggerIfError(err)
+
+	tasksSlice := []interface{}{findAllTaskHandler}
+	findAllTaskHandlerResponse := helpers.BuildAllResponseWithAuthorization(tasksSlice[0], http.StatusAccepted, authorized,
+		"API request find all task successful", "Request all task is failed!")
+
+	helpers.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
 
 func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, request *http.Request) {
