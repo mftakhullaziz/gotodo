@@ -65,7 +65,7 @@ func main() {
 
 	handlerTask := router.PathPrefix("/api/v1/task/").Subrouter()
 	handlerTask.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
-	handlerTask.HandleFunc("/updateTask/{id}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
+	handlerTask.HandleFunc("/updateTask/{idTask}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
 	handlerTask.HandleFunc("/findTaskId/{id}", taskHandler.FindTaskHandlerById).Methods(http.MethodGet)
 	handlerTask.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods(http.MethodGet)
 	handlerTask.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods(http.MethodDelete)

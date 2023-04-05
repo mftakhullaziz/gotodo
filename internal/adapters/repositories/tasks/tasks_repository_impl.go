@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
+	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/tasks"
 )
@@ -41,6 +42,7 @@ func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, id int64) (record.
 }
 
 func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, id int64, taskRecord record.TaskRecord) (record.TaskRecord, error) {
+	log := helpers.LoggerParent()
 	var existingTask record.TaskRecord
 
 	// Check if the record exists
@@ -52,12 +54,14 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, id int64, taskRecord
 		}
 		return record.TaskRecord{}, err
 	}
+	log.Infoln("Find Record Based On Task Id: ", existingTask)
 
 	// Update the fields of the existing record with the fields of the taskRecord argument
 	err = t.SQL.WithContext(ctx).Model(&existingTask).Updates(taskRecord).Error
 	if err != nil {
 		return record.TaskRecord{}, err
 	}
+	log.Infoln("Find Record Based On Task Id After Update: ", existingTask)
 
 	return existingTask, nil
 }

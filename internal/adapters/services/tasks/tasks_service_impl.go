@@ -43,12 +43,27 @@ func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.
 	return dtoResult, nil
 }
 
-func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id uint8, request request.TaskRequest) (dto.TasksDTO, error) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request request.TaskRequest) (dto.TasksDTO, error) {
+	err := t.Validate.Struct(request)
+	helpers.LoggerIfError(err)
+
+	// Update record Title, Description, UpdateAt
+	updateTask := dto.TasksDTO{
+		Title:       request.Title,
+		Description: request.Description,
+		Completed:   false,
+		UpdatedAt:   time.Time{},
+	}
+
+	taskRecord := helpers.TaskDTOToRecord(updateTask)
+	updateService, err := t.TaskRepository.UpdateTask(ctx, int64(id), taskRecord)
+	helpers.LoggerIfError(err)
+
+	taskDtoResponse := helpers.TaskRecordToDTO(updateService)
+	return taskDtoResponse, nil
 }
 
-func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id uint8) (dto.TasksDTO, error) {
+func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int) (dto.TasksDTO, error) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -58,12 +73,12 @@ func (t TaskServiceImpl) FindTaskAllService(ctx context.Context) ([]dto.TasksDTO
 	panic("implement me")
 }
 
-func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id uint8) error {
+func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, id uint8, boolean bool) (dto.TasksDTO, error) {
+func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, id int, boolean bool) (dto.TasksDTO, error) {
 	//TODO implement me
 	panic("implement me")
 }
