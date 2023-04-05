@@ -24,23 +24,29 @@ func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlerAPI {
 func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
 	// Define logger helpers
 	log := helpers.LoggerParent()
+
 	// Do get authorization token if any from user login
 	token := requests.Header.Get("Authorization")
 	authorized, err := middleware.AuthenticateUser(token)
 	helpers.LoggerIfError(err)
+
 	// Do convert string authorized to integer
 	authorizedUserId, err := strconv.Atoi(authorized)
 	helpers.LoggerIfError(err)
+
 	// Do createRequest transform to request body as json
 	taskRequest := request.TaskRequest{}
 	helpers.ReadFromRequestBody(requests, &taskRequest)
 	log.Info("Task Request: ", taskRequest)
+
 	// Do get usecase createTask function with param context, updateRequest, userId
 	createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest, authorizedUserId)
 	helpers.PanicIfError(err)
+
 	// Do build response handler
 	responses := helpers.BuildResponseWithAuthorization(createHandler, http.StatusCreated, authorized,
 		"Create task successfully", "Create task not success!")
+
 	// Do build write response to response body
 	helpers.WriteToResponseBody(writer, &responses)
 }
@@ -50,25 +56,31 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
 	// Define logger helpers
 	log := helpers.LoggerParent()
+
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
 	idTaskVar := vars["idTask"]
 	idTask, err := strconv.Atoi(idTaskVar)
 	helpers.LoggerIfError(err)
+
 	// Do get authorization token if any from user login
 	token := requests.Header.Get("Authorization")
 	authorizedUser, err := middleware.AuthenticateUser(token)
 	helpers.LoggerIfError(err)
+
 	// Do updateRequest transform to request body as json
 	updateRequest := request.TaskRequest{}
 	helpers.ReadFromRequestBody(requests, &updateRequest)
 	log.Infoln("Update task request: ", updateRequest)
+
 	// Do get usecase updateTask function with param context, updateRequest, idTask
 	updateTaskHandler, err := t.TaskUseCase.UpdateTaskUseCase(requests.Context(), updateRequest, idTask)
 	helpers.LoggerIfError(err)
+
 	// Do build response handler
 	updateTaskResponse := helpers.BuildResponseWithAuthorization(updateTaskHandler, http.StatusCreated, authorizedUser,
 		"Update task successfully", "Update task is fail please check your parameters!")
+
 	// Do build write response to response body
 	helpers.WriteToResponseBody(writer, &updateTaskResponse)
 }
