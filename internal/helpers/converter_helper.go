@@ -6,26 +6,28 @@ import (
 	"time"
 )
 
-func TaskRecordToDTO(record record.TaskRecord) dto.TasksDTO {
+func ConvertTaskRecordToTaskDto(record record.TaskRecord) dto.TasksDTO {
 	return dto.TasksDTO{
 		ID:          record.ID,
 		UserID:      record.UserID,
 		Title:       record.Title,
 		Description: record.Description,
 		Completed:   record.Completed,
+		TaskStatus:  record.TaskStatus,
 		CompletedAt: record.CompletedAt,
 		CreatedAt:   record.CreatedAt,
 		UpdatedAt:   record.UpdatedAt,
 	}
 }
 
-func TaskDTOToRecord(recordDTO dto.TasksDTO) record.TaskRecord {
+func ConvertTaskDtoToTaskRecord(recordDTO dto.TasksDTO) record.TaskRecord {
 	return record.TaskRecord{
 		ID:          recordDTO.ID,
 		UserID:      recordDTO.UserID,
 		Title:       recordDTO.Title,
 		Description: recordDTO.Description,
 		Completed:   recordDTO.Completed,
+		TaskStatus:  recordDTO.TaskStatus,
 		CompletedAt: recordDTO.CompletedAt,
 		CreatedAt:   recordDTO.CreatedAt,
 		UpdatedAt:   recordDTO.UpdatedAt,

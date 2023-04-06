@@ -3,6 +3,7 @@ package tasks
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
@@ -25,6 +26,7 @@ func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.Task
 	if result.Error != nil {
 		return record.TaskRecord{}, result.Error
 	}
+	fmt.Println("result: ", taskRecord)
 	return taskRecord, nil
 }
 
@@ -78,9 +80,9 @@ func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, id int64) error 
 	return nil
 }
 
-func (t TaskRepositoryImpl) FindTaskAll(ctx context.Context) ([]record.TaskRecord, error) {
+func (t TaskRepositoryImpl) FindTaskAll(ctx context.Context, userId int64) ([]record.TaskRecord, error) {
 	var taskRecords []record.TaskRecord
-	result := t.SQL.WithContext(ctx).Find(&taskRecords)
+	result := t.SQL.WithContext(ctx).Where("user_id = ?", userId).Find(&taskRecords)
 	if result.Error != nil {
 		return []record.TaskRecord{}, result.Error
 	}

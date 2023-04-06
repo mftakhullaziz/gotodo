@@ -21,26 +21,27 @@ func NewTaskServiceImpl(taskRepository tasks.TaskRecordRepository, validate *val
 }
 
 func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.TaskRequest, authorizedId int) (dto.TasksDTO, error) {
+	// log := helpers.LoggerParent()
 	err := t.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	createTask := dto.TasksDTO{
+	createTaskDTO := dto.TasksDTO{
 		UserID:      authorizedId,
 		Title:       request.Title,
 		Description: request.Description,
 		Completed:   false,
-		CompletedAt: time.Now().Add(60),
+		TaskStatus:  "on_progress",
+		CompletedAt: time.Time{},
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Time{},
 	}
 
-	records := helpers.TaskDTOToRecord(createTask)
-	serviceTask, err := t.TaskRepository.SaveTask(ctx, records)
-	if err != nil {
-		panic(err)
-	}
-	dtoResult := helpers.TaskRecordToDTO(serviceTask)
-	return dtoResult, nil
+	taskRecord := helpers.ConvertTaskDtoToTaskRecord(createTaskDTO)
+	createTaskService, err := t.TaskRepository.SaveTask(ctx, taskRecord)
+	helpers.LoggerIfError(err)
+
+	taskDtoResponse := helpers.ConvertTaskRecordToTaskDto(createTaskService)
+	return taskDtoResponse, nil
 }
 
 func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request request.TaskRequest) (dto.TasksDTO, error) {
@@ -55,11 +56,11 @@ func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request 
 		UpdatedAt:   time.Time{},
 	}
 
-	taskRecord := helpers.TaskDTOToRecord(updateTask)
+	taskRecord := helpers.ConvertTaskDtoToTaskRecord(updateTask)
 	updateService, err := t.TaskRepository.UpdateTask(ctx, int64(id), taskRecord)
 	helpers.LoggerIfError(err)
 
-	taskDtoResponse := helpers.TaskRecordToDTO(updateService)
+	taskDtoResponse := helpers.ConvertTaskRecordToTaskDto(updateService)
 	return taskDtoResponse, nil
 }
 
@@ -70,16 +71,16 @@ func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int) (dto.T
 	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(id))
 	helpers.LoggerIfError(err)
 
-	findTaskResponse := helpers.TaskRecordToDTO(findTaskService)
+	findTaskResponse := helpers.ConvertTaskRecordToTaskDto(findTaskService)
 	return findTaskResponse, nil
 }
 
-func (t TaskServiceImpl) FindTaskAllService(ctx context.Context) ([]dto.TasksDTO, error) {
+func (t TaskServiceImpl) FindTaskAllService(ctx context.Context, userId int) ([]dto.TasksDTO, error) {
 	log := helpers.LoggerParent()
 
-	findAllTaskService, err := t.TaskRepository.FindTaskAll(ctx)
+	findAllTaskService, err := t.TaskRepository.FindTaskAll(ctx, int64(userId))
 	helpers.LoggerIfError(err)
-	log.Infoln("List tasks: ", findAllTaskService)
+	log.Infoln("list tasks: ", findAllTaskService)
 
 	findAllTaskResponse := helpers.TaskRecordsToTaskDTOs(findAllTaskService)
 	return findAllTaskResponse, nil

@@ -10,9 +10,10 @@ type TaskRecord struct {
 	Title       string    `gorm:"not null"`
 	Description string    `gorm:"not null"`
 	Completed   bool      `gorm:"not null"`
-	CompletedAt time.Time `gorm:"not null"`
-	CreatedAt   time.Time `gorm:"not null"`
-	UpdatedAt   time.Time `gorm:"not null"`
+	TaskStatus  string    `gorm:"default:null"`
+	CompletedAt time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05"`
+	CreatedAt   time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05"`
+	UpdatedAt   time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05"`
 }
 
 func (TaskRecord) TableName() string {

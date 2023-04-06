@@ -10,6 +10,8 @@ import (
 	"gotodo/internal/ports/usecases/tasks"
 )
 
+const formatDatetime = "2006-01-02 15:04:05"
+
 type TaskUseCaseImpl struct {
 	TaskService service.TaskService
 	Validate    *validator.Validate
@@ -26,17 +28,19 @@ func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.
 	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request, id)
 	helpers.PanicIfError(err)
 
-	result := response.TaskResponse{
+	createTaskResponse := response.TaskResponse{
 		ID:          createTaskUsecase.ID,
 		UserID:      createTaskUsecase.UserID,
 		Title:       createTaskUsecase.Title,
 		Description: createTaskUsecase.Description,
 		Completed:   createTaskUsecase.Completed,
-		CompletedAt: createTaskUsecase.CompletedAt,
-		CreatedAt:   createTaskUsecase.CreatedAt,
+		TaskStatus:  createTaskUsecase.TaskStatus,
+		CompletedAt: createTaskUsecase.CompletedAt.Format(formatDatetime),
+		CreatedAt:   createTaskUsecase.CreatedAt.Format(formatDatetime),
+		UpdatedAt:   createTaskUsecase.UpdatedAt.Format(formatDatetime),
 	}
 
-	return result, nil
+	return createTaskResponse, nil
 }
 
 func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.TaskRequest, idTask int) (response.TaskResponse, error) {
@@ -45,6 +49,8 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 
 	updateTaskUsecase, errUsecase := t.TaskService.UpdateTaskService(ctx, idTask, request)
 	helpers.LoggerIfError(errUsecase)
+	completedTime := updateTaskUsecase.CompletedAt.Format(formatDatetime)
+	updateTime := updateTaskUsecase.UpdatedAt.Format(formatDatetime)
 
 	updateTaskResult := response.TaskResponse{
 		ID:          updateTaskUsecase.ID,
@@ -52,8 +58,10 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 		Title:       updateTaskUsecase.Title,
 		Description: updateTaskUsecase.Description,
 		Completed:   updateTaskUsecase.Completed,
-		CompletedAt: updateTaskUsecase.CompletedAt,
-		CreatedAt:   updateTaskUsecase.CreatedAt,
+		TaskStatus:  updateTaskUsecase.TaskStatus,
+		CompletedAt: completedTime,
+		CreatedAt:   updateTaskUsecase.CreatedAt.Format(formatDatetime),
+		UpdatedAt:   updateTime,
 	}
 
 	return updateTaskResult, nil
@@ -72,17 +80,18 @@ func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int) (r
 		Title:       findTaskUsecase.Title,
 		Description: findTaskUsecase.Description,
 		Completed:   findTaskUsecase.Completed,
-		CompletedAt: findTaskUsecase.CompletedAt,
-		CreatedAt:   findTaskUsecase.CreatedAt,
+		TaskStatus:  findTaskUsecase.TaskStatus,
+		CompletedAt: findTaskUsecase.CompletedAt.Format(formatDatetime),
+		CreatedAt:   findTaskUsecase.CreatedAt.Format(formatDatetime),
 	}
 
 	return findTaskResponse, nil
 }
 
-func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context) ([]response.TaskResponse, error) {
+func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]response.TaskResponse, error) {
 	var findAllTaskResponse []response.TaskResponse
 
-	findAllTaskUsecase, errUsecase := t.TaskService.FindTaskAllService(ctx)
+	findAllTaskUsecase, errUsecase := t.TaskService.FindTaskAllService(ctx, userId)
 	helpers.LoggerIfError(errUsecase)
 
 	for _, task := range findAllTaskUsecase {
@@ -92,11 +101,11 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context) ([]response.Tas
 			Title:       task.Title,
 			Description: task.Description,
 			Completed:   task.Completed,
-			CompletedAt: task.CompletedAt,
-			UpdatedAt:   task.UpdatedAt,
-			CreatedAt:   task.CreatedAt,
+			TaskStatus:  task.TaskStatus,
+			CompletedAt: task.CompletedAt.Format(formatDatetime),
+			UpdatedAt:   task.UpdatedAt.Format(formatDatetime),
+			CreatedAt:   task.CreatedAt.Format(formatDatetime),
 		}
-
 		findAllTaskResponse = append(findAllTaskResponse, responses)
 	}
 

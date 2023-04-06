@@ -12,4 +12,6 @@ type DefaultServiceAllResponse struct {
 	Message    string      `json:"message"`
 	IsSuccess  bool        `json:"is_success"`
 	Data       interface{} `json:"data"`
+	TotalData  int         `json:"total_data"`
+	RequestAt  string      `json:"request_at"`
 }

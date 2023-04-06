@@ -9,7 +9,10 @@ import (
 	"gotodo/internal/ports/usecases/tasks"
 	"net/http"
 	"strconv"
+	"time"
 )
+
+const formatDatetime = "2006-01-02 15:04:05"
 
 type TaskHandlerAPI struct {
 	TaskUseCase tasks.TaskUseCase
@@ -30,25 +33,31 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 	authorized, err := middleware.AuthenticateUser(token)
 	helpers.LoggerIfError(err)
 
-	// Do convert string authorized to integer
-	authorizedUserId, err := strconv.Atoi(authorized)
-	helpers.LoggerIfError(err)
+	if authorized == "" {
+		responses := helpers.BuildEmptyResponse("user account not authorized to create task, please login or sign up!")
+		// Do build write response to response body
+		helpers.WriteToResponseBody(writer, &responses)
+	} else {
+		// Do convert string authorized to integer
+		authorizedUserId, err := strconv.Atoi(authorized)
+		helpers.LoggerIfError(err)
 
-	// Do createRequest transform to request body as json
-	taskRequest := request.TaskRequest{}
-	helpers.ReadFromRequestBody(requests, &taskRequest)
-	log.Info("Task Request: ", taskRequest)
+		// Do createRequest transform to request body as json
+		taskRequest := request.TaskRequest{}
+		helpers.ReadFromRequestBody(requests, &taskRequest)
+		log.Info("task request body: ", taskRequest)
 
-	// Do get usecase createTask function with param context, updateRequest, userId
-	createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest, authorizedUserId)
-	helpers.PanicIfError(err)
+		// Do get usecase createTask function with param context, updateRequest, userId
+		createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest, authorizedUserId)
+		helpers.PanicIfError(err)
 
-	// Do build response handler
-	responses := helpers.BuildResponseWithAuthorization(createHandler, http.StatusCreated, authorized,
-		"Create task successfully", "Create task not success!")
+		// Do build response handler
+		responses := helpers.BuildResponseWithAuthorization(createHandler, http.StatusCreated, authorized,
+			"create task successful", "create task not success!")
 
-	// Do build write response to response body
-	helpers.WriteToResponseBody(writer, &responses)
+		// Do build write response to response body
+		helpers.WriteToResponseBody(writer, &responses)
+	}
 }
 
 // UpdateTaskHandler : do update task based on user authorized and idTask
@@ -120,13 +129,23 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 	authorized, err := middleware.AuthenticateUser(token)
 	helpers.LoggerIfError(err)
 
-	findAllTaskHandler, err := t.TaskUseCase.FindTaskAllUseCase(requests.Context())
+	authorizedUserId, err := strconv.Atoi(authorized)
+	helpers.LoggerIfError(err)
+
+	findAllTaskHandler, err := t.TaskUseCase.FindTaskAllUseCase(requests.Context(), authorizedUserId)
 	helpers.LoggerIfError(err)
 
 	tasksSlice := []interface{}{findAllTaskHandler}
 	log.Infoln("Tasks: ", tasksSlice)
-	findAllTaskHandlerResponse := helpers.BuildAllResponseWithAuthorization(tasksSlice[0], http.StatusAccepted, authorized,
-		"API request find all task successful", "Request all task is failed!")
+
+	findAllTaskHandlerResponse := helpers.BuildAllResponseWithAuthorization(
+		tasksSlice[0],
+		http.StatusAccepted,
+		authorized,
+		"API request find all task successful",
+		"Request all task is failed!",
+		len(findAllTaskHandler),
+		time.Now().Format(formatDatetime))
 
 	helpers.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
