@@ -37,8 +37,7 @@ func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.
 		TaskStatus:  createTaskUsecase.TaskStatus,
 		CompletedAt: createTaskUsecase.CompletedAt.Format(formatDatetime),
 		CreatedAt:   createTaskUsecase.CreatedAt.Format(formatDatetime),
-		UpdatedAt:   createTaskUsecase.UpdatedAt.Format(formatDatetime),
-	}
+		UpdatedAt:   createTaskUsecase.UpdatedAt.Format(formatDatetime)}
 
 	return createTaskResponse, nil
 }
@@ -61,8 +60,7 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 		TaskStatus:  updateTaskUsecase.TaskStatus,
 		CompletedAt: completedTime,
 		CreatedAt:   updateTaskUsecase.CreatedAt.Format(formatDatetime),
-		UpdatedAt:   updateTime,
-	}
+		UpdatedAt:   updateTime}
 
 	return updateTaskResult, nil
 }
@@ -82,8 +80,7 @@ func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int) (r
 		Completed:   findTaskUsecase.Completed,
 		TaskStatus:  findTaskUsecase.TaskStatus,
 		CompletedAt: findTaskUsecase.CompletedAt.Format(formatDatetime),
-		CreatedAt:   findTaskUsecase.CreatedAt.Format(formatDatetime),
-	}
+		CreatedAt:   findTaskUsecase.CreatedAt.Format(formatDatetime)}
 
 	return findTaskResponse, nil
 }
@@ -104,8 +101,8 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 			TaskStatus:  task.TaskStatus,
 			CompletedAt: task.CompletedAt.Format(formatDatetime),
 			UpdatedAt:   task.UpdatedAt.Format(formatDatetime),
-			CreatedAt:   task.CreatedAt.Format(formatDatetime),
-		}
+			CreatedAt:   task.CreatedAt.Format(formatDatetime)}
+
 		findAllTaskResponse = append(findAllTaskResponse, responses)
 	}
 
