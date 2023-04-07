@@ -3,6 +3,7 @@ package tasks
 import (
 	"github.com/gorilla/mux"
 	"gotodo/internal/domain/models/request"
+	"gotodo/internal/domain/models/response"
 	"gotodo/internal/helpers"
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
@@ -196,9 +197,44 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 	helpers.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
 
-func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, request *http.Request) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request) {
+	// Define logger helpers
+	log := helpers.LoggerParent()
+
+	// Do get authorization token if any from user login
+	token := requests.Header.Get(authHeaderKey)
+	authorized, err := middleware.AuthenticateUser(token)
+	helpers.LoggerIfError(err)
+
+	// Do check if user account not authorized return empty response
+	if authorized == "" {
+		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		// Do build write response to response body
+		helpers.WriteToResponseBody(writer, &responses)
+		return
+	}
+
+	authorizedUserId, err := strconv.Atoi(authorized)
+	helpers.LoggerIfError(err)
+
+	// Define to get idTask from param
+	params := requests.URL.Query()
+	taskIdParam := params.Get("taskId")
+	taskId, err := strconv.Atoi(taskIdParam)
+	helpers.LoggerIfError(err)
+
+	deleteHandler := t.TaskUseCase.DeleteTaskUseCase(requests.Context(), taskId, authorizedUserId)
+	if deleteHandler != nil {
+		log.Infoln("delete handler not successful on task_id: ", taskId)
+	}
+
+	res := response.DefaultServiceResponse{
+		StatusCode: http.StatusAccepted,
+		Message:    "delete task is completed",
+		IsSuccess:  true,
+		Data:       "delete task is success"}
+
+	helpers.WriteToResponseBody(writer, res)
 }
 
 func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, request *http.Request) {

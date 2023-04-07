@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"errors"
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
@@ -109,12 +110,19 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 	return findAllTaskResponse, nil
 }
 
-func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, userId int) ([]response.TaskResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, userId int) error {
+	log := helpers.LoggerParent()
+	if taskId == 0 || userId == 0 {
+		return errors.New("taskId or userId must be greater than 0")
+	}
+	err := t.TaskService.DeleteTaskService(ctx, taskId, userId)
+	if err != nil {
+		log.Infoln("delete tasks data with task_id: ", taskId, " and user_id: ", userId, " is failed")
+	}
+	return nil
 }
 
-func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) ([]response.TaskResponse, error) {
+func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }

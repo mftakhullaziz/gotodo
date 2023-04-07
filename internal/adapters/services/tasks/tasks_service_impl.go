@@ -3,6 +3,7 @@ package tasks
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
+	log "github.com/sirupsen/logrus"
 	"gotodo/internal/domain/dto"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/helpers"
@@ -91,7 +92,8 @@ func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, taskId int, user
 	helpers.LoggerIfError(err)
 
 	deleteTask := t.TaskRepository.DeleteTaskById(ctx, int64(taskId), int64(userId))
-	helpers.LoggerIfError(err)
+	helpers.LoggerIfError(deleteTask)
+	log.Info("error disini: ", deleteTask)
 
 	return deleteTask
 }

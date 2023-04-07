@@ -11,6 +11,6 @@ type TaskUseCase interface {
 	UpdateTaskUseCase(ctx context.Context, request request.TaskRequest, taskId int) (response.TaskResponse, error)
 	FindTaskByIdUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error)
 	FindTaskAllUseCase(ctx context.Context, userId int) ([]response.TaskResponse, error)
-	DeleteTaskUseCase(ctx context.Context, taskId int, userId int) ([]response.TaskResponse, error)
-	UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) ([]response.TaskResponse, error)
+	DeleteTaskUseCase(ctx context.Context, taskId int, userId int) error
+	UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error)
 }
