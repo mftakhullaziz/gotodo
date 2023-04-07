@@ -95,7 +95,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
-	idTaskVar := vars["task_id"]
+	idTaskVar := vars["taskId"]
 	idTask, err := strconv.Atoi(idTaskVar)
 	helpers.LoggerIfError(err)
 
@@ -142,7 +142,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
-	idTaskVar := vars["task_id"]
+	idTaskVar := vars["taskId"]
 	idTask, err := strconv.Atoi(idTaskVar)
 	helpers.LoggerIfError(err)
 	log.Infoln("find task by id_task: ", idTask)
@@ -237,7 +237,39 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 	helpers.WriteToResponseBody(writer, res)
 }
 
-func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, request *http.Request) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request) {
+	// Do get authorization token if any from user login
+	token := requests.Header.Get(authHeaderKey)
+	authorized, err := middleware.AuthenticateUser(token)
+	helpers.LoggerIfError(err)
+
+	// Do check if user account not authorized return empty response
+	if authorized == "" {
+		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		// Do build write response to response body
+		helpers.WriteToResponseBody(writer, &responses)
+		return
+	}
+
+	authorizedUserId, err := strconv.Atoi(authorized)
+	helpers.LoggerIfError(err)
+
+	// Define to get idTask from param
+	params := requests.URL.Query()
+	completedParam := params.Get("isCompleted")
+	taskIdParam, err := strconv.Atoi(params.Get("taskId"))
+	helpers.LoggerIfError(err)
+
+	completedCompletedHandler, err := t.TaskUseCase.UpdateTaskStatusUseCase(
+		requests.Context(), taskIdParam, authorizedUserId, completedParam)
+	helpers.LoggerIfError(err)
+
+	completedHandlerResponse := helpers.BuildResponseWithAuthorization(
+		completedCompletedHandler,
+		http.StatusAccepted,
+		int(completedCompletedHandler.TaskID),
+		authorized,
+		"update completed task successful!")
+
+	helpers.WriteToResponseBody(writer, completedHandlerResponse)
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
@@ -71,7 +72,7 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRe
 func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, taskId int64, userId int64) error {
 	var taskRecord record.TaskRecord
 	result := t.SQL.WithContext(ctx).
-		Where("task_id = ? AND user_id = ?", taskId, userId).
+		Where("user_id = ?", userId).
 		First(&taskRecord, taskId)
 
 	if result.Error != nil {
@@ -102,7 +103,30 @@ func (t TaskRepositoryImpl) FindTaskAll(ctx context.Context, userId int64) ([]re
 	return taskRecords, nil
 }
 
-func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, userId int) (record.TaskRecord, error) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, userId int64, completed string) (record.TaskRecord, error) {
+	var taskRecord record.TaskRecord
+
+	// Check if the record exists
+	err := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ErrRecordNotFound := errors.New("error Record Not Found")
+			return record.TaskRecord{}, ErrRecordNotFound
+		}
+		return record.TaskRecord{}, err
+	}
+
+	if completed == "" {
+		log.Info("update task completed is failed")
+		return record.TaskRecord{}, nil
+	}
+
+	// Set task status inactive
+	taskRecord.Completed = true
+	updateCompleted := t.SQL.WithContext(ctx).Save(&taskRecord)
+	if updateCompleted != nil {
+		return record.TaskRecord{}, updateCompleted.Error
+	}
+
+	return taskRecord, nil
 }

@@ -12,5 +12,5 @@ type TaskService interface {
 	FindTaskByIdService(ctx context.Context, taskId int, userId int64) (dto.TasksDTO, error)
 	FindTaskAllService(ctx context.Context, userId int) ([]dto.TasksDTO, error)
 	DeleteTaskService(ctx context.Context, taskId int, userId int) error
-	UpdateTaskStatusService(ctx context.Context, taskId int, userId int, boolean bool) (dto.TasksDTO, error)
+	UpdateTaskStatusService(ctx context.Context, taskId int, userId int, completed string) (dto.TasksDTO, error)
 }

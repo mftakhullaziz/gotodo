@@ -63,16 +63,17 @@ func main() {
 	router := mux.NewRouter()
 	router.Use(helpers.LoggingMiddleware)
 
-	handlerTask := router.PathPrefix("/api/v1/task/").Subrouter()
-	handlerTask.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
-	handlerTask.HandleFunc("/updateTask/{task_id}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
-	handlerTask.HandleFunc("/findTaskId/{task_id}", taskHandler.FindTaskHandlerById).Methods(http.MethodGet)
-	handlerTask.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods(http.MethodGet)
-	handlerTask.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods(http.MethodDelete)
+	authentications := router.PathPrefix("/api/v1/account/").Subrouter()
+	authentications.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
+	authentications.HandleFunc("/login", loginHandler.LoginHandler).Methods(http.MethodPost)
 
-	handlerAccount := router.PathPrefix("/api/v1/account/").Subrouter()
-	handlerAccount.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
-	handlerAccount.HandleFunc("/login", loginHandler.LoginHandler).Methods(http.MethodPost)
+	tasks := router.PathPrefix("/api/v1/task/").Subrouter()
+	tasks.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
+	tasks.HandleFunc("/updateTask/{taskId}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
+	tasks.HandleFunc("/findTaskId/{taskId}", taskHandler.FindTaskHandlerById).Methods(http.MethodGet)
+	tasks.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods(http.MethodGet)
+	tasks.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods(http.MethodDelete)
+	tasks.HandleFunc("/updateCompletedTask", taskHandler.UpdateTaskStatusHandler).Methods(http.MethodPut)
 
 	helpers.LogRoutes(router)
 

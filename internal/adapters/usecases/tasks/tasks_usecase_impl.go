@@ -122,7 +122,23 @@ func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, user
 	return nil
 }
 
-func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int, completedParam string) (response.TaskResponse, error) {
+	updateTaskUsecase, errUsecase := t.TaskService.UpdateTaskStatusService(ctx, taskId, userId, completedParam)
+	helpers.LoggerIfError(errUsecase)
+
+	completedTime := updateTaskUsecase.CompletedAt.Format(formatDatetime)
+	updateTime := updateTaskUsecase.UpdatedAt.Format(formatDatetime)
+
+	updateTaskResult := response.TaskResponse{
+		TaskID:      updateTaskUsecase.TaskID,
+		UserID:      updateTaskUsecase.UserID,
+		Title:       updateTaskUsecase.Title,
+		Description: updateTaskUsecase.Description,
+		Completed:   updateTaskUsecase.Completed,
+		TaskStatus:  updateTaskUsecase.TaskStatus,
+		CompletedAt: completedTime,
+		CreatedAt:   updateTaskUsecase.CreatedAt.Format(formatDatetime),
+		UpdatedAt:   updateTime}
+
+	return updateTaskResult, nil
 }

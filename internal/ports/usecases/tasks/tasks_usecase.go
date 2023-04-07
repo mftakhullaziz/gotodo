@@ -12,5 +12,5 @@ type TaskUseCase interface {
 	FindTaskByIdUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error)
 	FindTaskAllUseCase(ctx context.Context, userId int) ([]response.TaskResponse, error)
 	DeleteTaskUseCase(ctx context.Context, taskId int, userId int) error
-	UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error)
+	UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int, completedParam string) (response.TaskResponse, error)
 }

@@ -3,7 +3,6 @@ package tasks
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
-	log "github.com/sirupsen/logrus"
 	"gotodo/internal/domain/dto"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/helpers"
@@ -93,12 +92,17 @@ func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, taskId int, user
 
 	deleteTask := t.TaskRepository.DeleteTaskById(ctx, int64(taskId), int64(userId))
 	helpers.LoggerIfError(deleteTask)
-	log.Info("error disini: ", deleteTask)
 
 	return deleteTask
 }
 
-func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, taskId int, userId int, boolean bool) (dto.TasksDTO, error) {
-	//TODO implement me
-	panic("implement me")
+func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, taskId int, userId int, completed string) (dto.TasksDTO, error) {
+	err := t.Validate.Struct(taskId)
+	helpers.LoggerIfError(err)
+
+	updateTaskStatus, err := t.TaskRepository.UpdateTaskStatus(ctx, int64(taskId), int64(userId), completed)
+	helpers.LoggerIfError(err)
+
+	taskDtoResponse := helpers.ConvertTaskRecordToTaskDto(updateTaskStatus)
+	return taskDtoResponse, nil
 }
