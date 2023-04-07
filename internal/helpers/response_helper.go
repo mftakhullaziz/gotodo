@@ -33,8 +33,7 @@ func BuildResponseWithAuthorization(
 			StatusCode: statusCode,
 			Message:    message1,
 			IsSuccess:  true,
-			Data:       handler,
-		}
+			Data:       handler}
 	}
 
 	var emptyInterface interface{}
@@ -42,8 +41,7 @@ func BuildResponseWithAuthorization(
 		StatusCode: http.StatusOK,
 		Message:    message1,
 		IsSuccess:  true,
-		Data:       emptyInterface,
-	}
+		Data:       emptyInterface}
 }
 
 func BuildEmptyResponse(messages string) response.DefaultServiceResponse {
@@ -52,8 +50,7 @@ func BuildEmptyResponse(messages string) response.DefaultServiceResponse {
 		StatusCode: http.StatusInternalServerError,
 		Message:    messages,
 		IsSuccess:  false,
-		Data:       emptyInterface,
-	}
+		Data:       emptyInterface}
 }
 
 func BuildAllResponseWithAuthorization(handler interface{},
@@ -65,8 +62,7 @@ func BuildAllResponseWithAuthorization(handler interface{},
 			IsSuccess:  true,
 			Data:       handler,
 			TotalData:  totalData,
-			RequestAt:  requestAt,
-		}
+			RequestAt:  requestAt}
 	}
 
 	var emptyInterface []interface{}
@@ -76,6 +72,5 @@ func BuildAllResponseWithAuthorization(handler interface{},
 		IsSuccess:  true,
 		Data:       emptyInterface,
 		TotalData:  0,
-		RequestAt:  requestAt,
-	}
+		RequestAt:  requestAt}
 }

@@ -119,6 +119,7 @@ func TaskRecordsToTaskDTOs(tasks []record.TaskRecord) []dto.TasksDTO {
 			Title:       task.Title,
 			Description: task.Description,
 			Completed:   task.Completed,
+			TaskStatus:  task.TaskStatus,
 			CompletedAt: task.CompletedAt,
 			UpdatedAt:   task.UpdatedAt,
 			CreatedAt:   task.CreatedAt,
