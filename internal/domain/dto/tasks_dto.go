@@ -5,7 +5,7 @@ import (
 )
 
 type TasksDTO struct {
-	ID          uint      `json:"id"`
+	TaskID      uint      `json:"task_id"`
 	UserID      int       `json:"user_id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`

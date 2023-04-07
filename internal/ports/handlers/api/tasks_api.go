@@ -10,4 +10,5 @@ type TaskHandlerAPI interface {
 	FindTaskHandlerById(writer http.ResponseWriter, request *http.Request)
 	FindTaskHandler(writer http.ResponseWriter, request *http.Request)
 	DeleteTaskHandler(writer http.ResponseWriter, request *http.Request)
+	UpdateTaskStatusHandler(writer http.ResponseWriter, request *http.Request)
 }

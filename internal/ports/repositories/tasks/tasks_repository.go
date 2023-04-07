@@ -11,4 +11,5 @@ type TaskRecordRepository interface {
 	UpdateTask(ctx context.Context, id int64, taskRecord record.TaskRecord) (record.TaskRecord, error)
 	DeleteTaskById(ctx context.Context, id int64) error
 	FindTaskAll(ctx context.Context, userId int64) ([]record.TaskRecord, error)
+	UpdateTaskStatus(ctx context.Context, taskId int64, userId int) (record.TaskRecord, error)
 }

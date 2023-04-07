@@ -29,7 +29,7 @@ func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.
 	helpers.PanicIfError(err)
 
 	createTaskResponse := response.TaskResponse{
-		ID:          createTaskUsecase.ID,
+		TaskID:      createTaskUsecase.TaskID,
 		UserID:      createTaskUsecase.UserID,
 		Title:       createTaskUsecase.Title,
 		Description: createTaskUsecase.Description,
@@ -52,7 +52,7 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 	updateTime := updateTaskUsecase.UpdatedAt.Format(formatDatetime)
 
 	updateTaskResult := response.TaskResponse{
-		ID:          updateTaskUsecase.ID,
+		TaskID:      updateTaskUsecase.TaskID,
 		UserID:      updateTaskUsecase.UserID,
 		Title:       updateTaskUsecase.Title,
 		Description: updateTaskUsecase.Description,
@@ -73,7 +73,7 @@ func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int, us
 	helpers.LoggerIfError(errUsecase)
 
 	findTaskResponse := response.TaskResponse{
-		ID:          findTaskUsecase.ID,
+		TaskID:      findTaskUsecase.TaskID,
 		UserID:      findTaskUsecase.UserID,
 		Title:       findTaskUsecase.Title,
 		Description: findTaskUsecase.Description,
@@ -93,7 +93,7 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 
 	for _, task := range findAllTaskUsecase {
 		responses := response.TaskResponse{
-			ID:          task.ID,
+			TaskID:      task.TaskID,
 			UserID:      task.UserID,
 			Title:       task.Title,
 			Description: task.Description,
@@ -107,4 +107,14 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 	}
 
 	return findAllTaskResponse, nil
+}
+
+func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, idTask int) ([]response.TaskResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, idTask int, userId int) ([]response.TaskResponse, error) {
+	//TODO implement me
+	panic("implement me")
 }

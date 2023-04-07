@@ -30,7 +30,7 @@ func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.
 		Title:       request.Title,
 		Description: request.Description,
 		Completed:   false,
-		TaskStatus:  "on_progress",
+		TaskStatus:  "active",
 		CompletedAt: time.Time{},
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Time{},

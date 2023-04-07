@@ -65,7 +65,7 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 	responses := helpers.BuildResponseWithAuthorization(
 		createHandler,
 		http.StatusCreated,
-		int(createHandler.ID),
+		int(createHandler.TaskID),
 		authorized,
 		"create task successful")
 
@@ -111,7 +111,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	updateTaskResponse := helpers.BuildResponseWithAuthorization(
 		updateTaskHandler,
 		http.StatusCreated,
-		int(updateTaskHandler.ID),
+		int(updateTaskHandler.TaskID),
 		authorized,
 		"update task successfully")
 
@@ -154,7 +154,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	findTaskHandlerResponse := helpers.BuildResponseWithAuthorization(
 		findTaskHandler,
 		http.StatusAccepted,
-		int(findTaskHandler.ID),
+		int(findTaskHandler.TaskID),
 		authorized,
 		"request find task successful!")
 
@@ -197,6 +197,11 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 }
 
 func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, request *http.Request) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, request *http.Request) {
 	//TODO implement me
 	panic("implement me")
 }

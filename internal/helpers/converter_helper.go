@@ -8,7 +8,7 @@ import (
 
 func ConvertTaskRecordToTaskDto(record record.TaskRecord) dto.TasksDTO {
 	return dto.TasksDTO{
-		ID:          record.ID,
+		TaskID:      record.TaskID,
 		UserID:      record.UserID,
 		Title:       record.Title,
 		Description: record.Description,
@@ -22,7 +22,7 @@ func ConvertTaskRecordToTaskDto(record record.TaskRecord) dto.TasksDTO {
 
 func ConvertTaskDtoToTaskRecord(recordDTO dto.TasksDTO) record.TaskRecord {
 	return record.TaskRecord{
-		ID:          recordDTO.ID,
+		TaskID:      recordDTO.TaskID,
 		UserID:      recordDTO.UserID,
 		Title:       recordDTO.Title,
 		Description: recordDTO.Description,
@@ -114,7 +114,7 @@ func TaskRecordsToTaskDTOs(tasks []record.TaskRecord) []dto.TasksDTO {
 
 	for _, task := range tasks {
 		dtoTask := dto.TasksDTO{
-			ID:          task.ID,
+			TaskID:      task.TaskID,
 			UserID:      task.UserID,
 			Title:       task.Title,
 			Description: task.Description,

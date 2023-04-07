@@ -88,3 +88,8 @@ func (t TaskRepositoryImpl) FindTaskAll(ctx context.Context, userId int64) ([]re
 	}
 	return taskRecords, nil
 }
+
+func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, userId int) (record.TaskRecord, error) {
+	//TODO implement me
+	panic("implement me")
+}
