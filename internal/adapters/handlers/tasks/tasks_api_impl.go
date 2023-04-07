@@ -102,7 +102,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	// Do updateRequest transform to request body as json
 	updateRequest := request.TaskRequest{}
 	helpers.ReadFromRequestBody(requests, &updateRequest)
-	log.Infoln("Update task request: ", updateRequest)
+	log.Infoln("update task request: ", updateRequest)
 
 	// Do get usecase updateTask function with param context, updateRequest, idTask
 	updateTaskHandler, err := t.TaskUseCase.UpdateTaskUseCase(requests.Context(), updateRequest, idTask)
@@ -257,7 +257,8 @@ func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requ
 	// Define to get idTask from param
 	params := requests.URL.Query()
 	completedParam := params.Get("isCompleted")
-	taskIdParam, err := strconv.Atoi(params.Get("taskId"))
+	taskIds := params.Get("taskId")
+	taskIdParam, err := strconv.Atoi(taskIds)
 	helpers.LoggerIfError(err)
 
 	completedCompletedHandler, err := t.TaskUseCase.UpdateTaskStatusUseCase(

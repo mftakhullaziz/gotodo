@@ -97,11 +97,11 @@ func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, taskId int, user
 }
 
 func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, taskId int, userId int, completed string) (dto.TasksDTO, error) {
-	err := t.Validate.Struct(taskId)
+	err := t.Validate.StructPartial(taskId)
 	helpers.LoggerIfError(err)
 
-	updateTaskStatus, err := t.TaskRepository.UpdateTaskStatus(ctx, int64(taskId), int64(userId), completed)
-	helpers.LoggerIfError(err)
+	updateTaskStatus, errStatus := t.TaskRepository.UpdateTaskStatus(ctx, int64(taskId), int64(userId), completed)
+	helpers.LoggerIfError(errStatus)
 
 	taskDtoResponse := helpers.ConvertTaskRecordToTaskDto(updateTaskStatus)
 	return taskDtoResponse, nil

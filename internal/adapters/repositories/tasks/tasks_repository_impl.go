@@ -11,6 +11,7 @@ import (
 	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/tasks"
+	"time"
 )
 
 type TaskRepositoryImpl struct {
@@ -45,7 +46,7 @@ func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, taskId int64, user
 }
 
 func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRecord record.TaskRecord) (record.TaskRecord, error) {
-	log := helpers.LoggerParent()
+	logger := helpers.LoggerParent()
 	var existingTask record.TaskRecord
 
 	// Check if the record exists
@@ -57,14 +58,14 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRe
 		}
 		return record.TaskRecord{}, err
 	}
-	log.Infoln("Find Record Based On Task Id: ", existingTask)
+	logger.Infoln("Find Record Based On Task Id: ", existingTask)
 
 	// Update the fields of the existing record with the fields of the taskRecord argument
 	err = t.SQL.WithContext(ctx).Model(&existingTask).Updates(taskRecord).Error
 	if err != nil {
 		return record.TaskRecord{}, err
 	}
-	log.Infoln("Find Record Based On Task Id After Update: ", existingTask)
+	logger.Infoln("Find Record Based On Task Id After Update: ", existingTask)
 
 	return existingTask, nil
 }
@@ -110,7 +111,7 @@ func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, 
 	err := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("error task record not found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
 		return record.TaskRecord{}, err
@@ -123,8 +124,10 @@ func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, 
 
 	// Set task status inactive
 	taskRecord.Completed = true
+	taskRecord.CompletedAt = time.Now()
 	updateCompleted := t.SQL.WithContext(ctx).Save(&taskRecord)
-	if updateCompleted != nil {
+
+	if updateCompleted.Error != nil {
 		return record.TaskRecord{}, updateCompleted.Error
 	}
 
