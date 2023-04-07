@@ -64,11 +64,11 @@ func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request 
 	return taskDtoResponse, nil
 }
 
-func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int) (dto.TasksDTO, error) {
+func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int, userId int64) (dto.TasksDTO, error) {
 	err := t.Validate.StructPartial(id)
 	helpers.LoggerIfError(err)
 
-	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(id))
+	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(id), userId)
 	helpers.LoggerIfError(err)
 
 	findTaskResponse := helpers.ConvertTaskRecordToTaskDto(findTaskService)

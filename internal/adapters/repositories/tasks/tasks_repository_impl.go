@@ -30,9 +30,9 @@ func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.Task
 	return taskRecord, nil
 }
 
-func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, id int64) (record.TaskRecord, error) {
+func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, id int64, userId int64) (record.TaskRecord, error) {
 	var taskRecord record.TaskRecord
-	result := t.SQL.WithContext(ctx).First(&taskRecord, id)
+	result := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")

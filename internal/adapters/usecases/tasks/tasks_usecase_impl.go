@@ -65,11 +65,11 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 	return updateTaskResult, nil
 }
 
-func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int) (response.TaskResponse, error) {
+func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int, userId int) (response.TaskResponse, error) {
 	err := t.Validate.StructPartial(idTask)
 	helpers.LoggerIfError(err)
 
-	findTaskUsecase, errUsecase := t.TaskService.FindTaskByIdService(ctx, idTask)
+	findTaskUsecase, errUsecase := t.TaskService.FindTaskByIdService(ctx, idTask, int64(userId))
 	helpers.LoggerIfError(errUsecase)
 
 	findTaskResponse := response.TaskResponse{

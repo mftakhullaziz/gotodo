@@ -1,6 +1,8 @@
 package helpers
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/sirupsen/logrus"
+)
 import "gorm.io/gorm"
 
 func PanicIfError(err error) {
