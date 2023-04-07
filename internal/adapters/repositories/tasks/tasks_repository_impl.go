@@ -30,9 +30,9 @@ func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.Task
 	return taskRecord, nil
 }
 
-func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, id int64, userId int64) (record.TaskRecord, error) {
+func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, taskId int64, userId int64) (record.TaskRecord, error) {
 	var taskRecord record.TaskRecord
-	result := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, id)
+	result := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")
@@ -43,12 +43,12 @@ func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, id int64, userId i
 	return taskRecord, nil
 }
 
-func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, id int64, taskRecord record.TaskRecord) (record.TaskRecord, error) {
+func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRecord record.TaskRecord) (record.TaskRecord, error) {
 	log := helpers.LoggerParent()
 	var existingTask record.TaskRecord
 
 	// Check if the record exists
-	err := t.SQL.WithContext(ctx).First(&existingTask, id).Error
+	err := t.SQL.WithContext(ctx).First(&existingTask, taskId).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")
@@ -68,8 +68,12 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, id int64, taskRecord
 	return existingTask, nil
 }
 
-func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, id int64) error {
-	result := t.SQL.WithContext(ctx).Delete(&record.TaskRecord{}, id)
+func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, taskId int64, userId int64) error {
+	var taskRecord record.TaskRecord
+	result := t.SQL.WithContext(ctx).
+		Where("task_id = ? AND user_id = ?", taskId, userId).
+		First(&taskRecord, taskId)
+
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")
@@ -77,6 +81,15 @@ func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, id int64) error 
 		}
 		return result.Error
 	}
+
+	// Set task status inactive
+	taskRecord.TaskStatus = "inactive"
+	// Update the fields of the existing record with the fields of the taskRecord argument
+	err := t.SQL.WithContext(ctx).Save(&taskRecord)
+	if err != nil {
+		return err.Error
+	}
+
 	return nil
 }
 

@@ -21,11 +21,11 @@ func NewTaskUseCaseImpl(taskService service.TaskService, validate *validator.Val
 	return &TaskUseCaseImpl{TaskService: taskService, Validate: validate}
 }
 
-func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest, id int) (response.TaskResponse, error) {
+func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest, userId int) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
-	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request, id)
+	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request, userId)
 	helpers.PanicIfError(err)
 
 	createTaskResponse := response.TaskResponse{
@@ -42,11 +42,11 @@ func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.
 	return createTaskResponse, nil
 }
 
-func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.TaskRequest, idTask int) (response.TaskResponse, error) {
+func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.TaskRequest, taskId int) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
 	helpers.LoggerIfError(err)
 
-	updateTaskUsecase, errUsecase := t.TaskService.UpdateTaskService(ctx, idTask, request)
+	updateTaskUsecase, errUsecase := t.TaskService.UpdateTaskService(ctx, taskId, request)
 	helpers.LoggerIfError(errUsecase)
 	completedTime := updateTaskUsecase.CompletedAt.Format(formatDatetime)
 	updateTime := updateTaskUsecase.UpdatedAt.Format(formatDatetime)
@@ -65,11 +65,11 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 	return updateTaskResult, nil
 }
 
-func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, idTask int, userId int) (response.TaskResponse, error) {
-	err := t.Validate.StructPartial(idTask)
+func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error) {
+	err := t.Validate.StructPartial(taskId)
 	helpers.LoggerIfError(err)
 
-	findTaskUsecase, errUsecase := t.TaskService.FindTaskByIdService(ctx, idTask, int64(userId))
+	findTaskUsecase, errUsecase := t.TaskService.FindTaskByIdService(ctx, taskId, int64(userId))
 	helpers.LoggerIfError(errUsecase)
 
 	findTaskResponse := response.TaskResponse{
@@ -109,12 +109,12 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 	return findAllTaskResponse, nil
 }
 
-func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, idTask int) ([]response.TaskResponse, error) {
+func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, userId int) ([]response.TaskResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, idTask int, userId int) ([]response.TaskResponse, error) {
+func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int) ([]response.TaskResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }

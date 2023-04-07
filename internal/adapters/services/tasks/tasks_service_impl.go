@@ -44,7 +44,7 @@ func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.
 	return taskDtoResponse, nil
 }
 
-func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request request.TaskRequest) (dto.TasksDTO, error) {
+func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, taskId int, request request.TaskRequest) (dto.TasksDTO, error) {
 	err := t.Validate.Struct(request)
 	helpers.LoggerIfError(err)
 
@@ -57,18 +57,18 @@ func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, id int, request 
 	}
 
 	taskRecord := helpers.ConvertTaskDtoToTaskRecord(updateTask)
-	updateService, err := t.TaskRepository.UpdateTask(ctx, int64(id), taskRecord)
+	updateService, err := t.TaskRepository.UpdateTask(ctx, int64(taskId), taskRecord)
 	helpers.LoggerIfError(err)
 
 	taskDtoResponse := helpers.ConvertTaskRecordToTaskDto(updateService)
 	return taskDtoResponse, nil
 }
 
-func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, id int, userId int64) (dto.TasksDTO, error) {
-	err := t.Validate.StructPartial(id)
+func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, taskId int, userId int64) (dto.TasksDTO, error) {
+	err := t.Validate.StructPartial(taskId)
 	helpers.LoggerIfError(err)
 
-	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(id), userId)
+	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(taskId), userId)
 	helpers.LoggerIfError(err)
 
 	findTaskResponse := helpers.ConvertTaskRecordToTaskDto(findTaskService)
@@ -86,17 +86,17 @@ func (t TaskServiceImpl) FindTaskAllService(ctx context.Context, userId int) ([]
 	return findAllTaskResponse, nil
 }
 
-func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, id int) error {
-	err := t.Validate.StructPartial(id)
+func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, taskId int, userId int) error {
+	err := t.Validate.StructPartial(taskId)
 	helpers.LoggerIfError(err)
 
-	deleteTask := t.TaskRepository.DeleteTaskById(ctx, int64(id))
+	deleteTask := t.TaskRepository.DeleteTaskById(ctx, int64(taskId), int64(userId))
 	helpers.LoggerIfError(err)
 
 	return deleteTask
 }
 
-func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, id int, boolean bool) (dto.TasksDTO, error) {
+func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, taskId int, userId int, boolean bool) (dto.TasksDTO, error) {
 	//TODO implement me
 	panic("implement me")
 }
