@@ -89,23 +89,24 @@ func UserDTOToRecord(detailDTO dto.UserDetailDTO) record.UserDetailRecord {
 }
 
 type NewOptionalColumnParams struct {
-	Token   string
-	TimeAt  time.Time
-	TimeOut time.Time
+	BearerToken string
+	TimeNow     time.Time
+	TimeIsNull  time.Time
 }
 
 func UserAndAccountRecordToAccountLoginHistoryRecord(detailRecord record.UserDetailRecord,
-	accountRecord record.AccountRecord, params NewOptionalColumnParams) record.AccountLoginHistoriesRecord {
+	accountRecord record.AccountRecord, params NewOptionalColumnParams, expireToken time.Time) record.AccountLoginHistoriesRecord {
 	return record.AccountLoginHistoriesRecord{
-		AccountID:  int(accountRecord.AccountID),
-		UserID:     int(detailRecord.UserID),
-		Username:   accountRecord.Username,
-		Password:   accountRecord.Password,
-		Token:      params.Token,
-		LoginAt:    params.TimeAt,
-		LoginOutAt: params.TimeOut,
-		CreatedAt:  params.TimeAt,
-		UpdatedAt:  time.Time{},
+		AccountID:     int(accountRecord.AccountID),
+		UserID:        int(detailRecord.UserID),
+		Username:      accountRecord.Username,
+		Password:      accountRecord.Password,
+		Token:         params.BearerToken,
+		TokenExpireAt: expireToken,
+		LoginAt:       params.TimeNow,
+		LoginOutAt:    params.TimeIsNull,
+		CreatedAt:     params.TimeNow,
+		UpdatedAt:     params.TimeIsNull,
 	}
 }
 

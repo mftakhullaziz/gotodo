@@ -18,7 +18,7 @@ func init() {
 // GenerateTokenToCache Generate a new token for the user and store it in the cache
 func GenerateTokenToCache(userID string, token string, expirationTime time.Time) error {
 	log := helpers.LoggerParent()
-	log.Infoln("caching token expire at count down: ", expirationTime.Sub(time.Now()))
+	log.Infoln("cache token expire_at countdown: ", expirationTime.Sub(time.Now()))
 
 	err := c.Add(token, userID, expirationTime.Sub(time.Now()))
 	if err != nil {

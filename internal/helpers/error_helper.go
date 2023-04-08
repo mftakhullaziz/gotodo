@@ -39,3 +39,9 @@ func LoggerIfError(err error) {
 		log.Errorln("Logger : ", err.Error())
 	}
 }
+
+func LoggerIfErrorWithCustomMessage(err error, log *logrus.Logger, str string) {
+	if err != nil {
+		log.Errorln(err.Error(), str)
+	}
+}

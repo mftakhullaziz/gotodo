@@ -23,19 +23,19 @@ func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http
 	helpers.ReadFromRequestBody(requests, &loginRequest)
 
 	loginHandler, errLogin := l.LoginUsecase.LoginAccountUseCase(requests.Context(), loginRequest)
-	if errLogin != nil {
-		log.Info("User login not success please check username or password!")
-	}
+	helpers.LoggerIfErrorWithCustomMessage(
+		errLogin, log, "user login not success please check username or password!")
 
+	messageIsSuccess := "login account successfully!"
+	messageNotSuccess := "username and password not valid please check again!"
 	responses := helpers.CreateResponses(
-		loginHandler,
-		http.StatusCreated,
-		"Login account successfully",
-		"Username and password not valid please check again!")
+		loginHandler, http.StatusCreated, messageIsSuccess, messageNotSuccess)
 
 	helpers.WriteToResponseBody(writer, &responses)
 }
 
 func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request) {
-	panic("Implement me")
+	// Delete the Authorization header from the user's requests
+	requests.Header.Del("Authorization")
+
 }

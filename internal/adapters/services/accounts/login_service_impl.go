@@ -29,55 +29,54 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	helpers.PanicIfError(validate)
 
 	credentialAccount, err := l.AccountRepository.VerifyCredential(ctx, request.Username)
-	helpers.PanicIfErrorWithCustomMessage(err, "username not found")
-	log.Info("verify credential: ", credentialAccount)
-
-	comparedPassword, errCompare := helpers.ComparedPassword(credentialAccount.Password, []byte(request.Password))
-	if comparedPassword != true && errCompare != nil {
-		log.Info("password not matched")
-		return dto.AccountDTO{}, "", errCompare
-	} else {
-		log.Info("user and password is validate")
-
-		findUserAccount, errUserAccount := l.AccountRepository.FindAccountUser(ctx, credentialAccount.Username)
-		if errUserAccount != nil {
-			log.Error("error find user account not found", errUserAccount.Error())
-		}
-		log.Info("user account find: ", findUserAccount)
-
-		userRecord := findUserAccount.Users
-		accountRecord := findUserAccount.Accounts
-		log.Infoln("account record: ", accountRecord)
-
-		tokenGenerate, expireTokenGenerate, errToken := middleware.GenerateJWTToken()
-		helpers.LoggerIfError(errToken)
-
-		// Add token to cache
-		errCache := middleware.GenerateTokenToCache(strconv.Itoa(int(findUserAccount.Users.UserID)),
-			tokenGenerate, expireTokenGenerate)
-		helpers.LoggerIfError(errCache)
-
-		// Add token authorization header
-		header, errHeader := middleware.MakeAuthenticatedRequest(tokenGenerate)
-		helpers.LoggerIfError(errHeader)
-		log.Info("add to header authorization: ", header)
-
-		optionalUserLoginHistory := helpers.NewOptionalColumnParams{
-			Token:   tokenGenerate,
-			TimeAt:  time.Now(),
-			TimeOut: time.Time{},
-		}
-
-		userLoginHistory := helpers.UserAndAccountRecordToAccountLoginHistoryRecord(
-			userRecord, accountRecord, optionalUserLoginHistory)
-		log.Info("user login histories: ", userLoginHistory)
-
-		saveLoginHistory := l.AccountRepository.SaveLoginHistories(ctx, userLoginHistory)
-		helpers.LoggerIfError(saveLoginHistory)
-
-		userAccounts := helpers.RecordToAccountDTO(accountRecord)
-		log.Info("user accounts record to dto: ", userAccounts)
-
-		return userAccounts, optionalUserLoginHistory.Token, nil
+	if err != nil {
+		log.Info("username not found")
+		return dto.AccountDTO{}, "", err
 	}
+	log.Info("credential: ", credentialAccount.Username, ", ", credentialAccount.Password)
+
+	comparedPassword, errPassword := helpers.
+		ComparedPassword(credentialAccount.Password, []byte(request.Password))
+
+	// validate password is matched
+	if comparedPassword != true && errPassword != nil {
+		log.Info("password not matched")
+		return dto.AccountDTO{}, "", errPassword
+	}
+	// if validate password and username
+	findUserAccount, errUserAccount := l.AccountRepository.FindAccountUser(ctx, credentialAccount.Username)
+	if errUserAccount != nil {
+		log.Error("error find user account not found", errUserAccount.Error())
+	}
+	log.Info("user account find: ", findUserAccount)
+
+	userRecord := findUserAccount.Users
+	accountRecord := findUserAccount.Accounts
+	log.Infoln("account record: ", accountRecord)
+
+	tokenGenerate, expireTokenGenerate, errToken := middleware.GenerateJWTToken()
+	helpers.LoggerIfError(errToken)
+
+	// Add token to cache
+	errCache := middleware.GenerateTokenToCache(strconv.Itoa(int(findUserAccount.Users.UserID)),
+		tokenGenerate, expireTokenGenerate)
+	helpers.LoggerIfError(errCache)
+
+	// Add token authorization header
+	err = middleware.MakeAuthenticatedRequest(tokenGenerate)
+	helpers.LoggerIfError(err)
+
+	optionalLoginHistory := helpers.NewOptionalColumnParams{
+		BearerToken: tokenGenerate, TimeNow: time.Now(), TimeIsNull: time.Time{},
+	}
+
+	userLoginHistory := helpers.UserAndAccountRecordToAccountLoginHistoryRecord(
+		userRecord, accountRecord, optionalLoginHistory, expireTokenGenerate)
+
+	saveLoginHistory := l.AccountRepository.SaveLoginHistories(ctx, userLoginHistory)
+	helpers.LoggerIfError(saveLoginHistory)
+
+	userAccounts := helpers.RecordToAccountDTO(accountRecord)
+
+	return userAccounts, optionalLoginHistory.BearerToken, nil
 }

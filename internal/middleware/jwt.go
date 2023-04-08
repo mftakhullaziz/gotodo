@@ -10,7 +10,7 @@ import (
 func GenerateJWTToken() (string, time.Time, error) {
 	// Set the expiration time of the token
 	expirationTime := time.Now().Add(1 * time.Hour) // 1 day
-
+	helpers.LoggerParent().Infoln("expire token time at: ", expirationTime)
 	// Create a new JWT token with the claims
 	claims := &jwt.StandardClaims{
 		ExpiresAt: expirationTime.Unix(),
@@ -27,8 +27,8 @@ func GenerateJWTToken() (string, time.Time, error) {
 	return tokenString, expirationTime, nil
 }
 
-// AuthenticateWithInTokenToken function to check token if available or not using JWT and check token if expire or not
-func AuthenticateWithInTokenToken(tokenString string) (bool, error) {
+// AuthenticateWithInToken function to check token if available or not using JWT and check token if expire or not
+func AuthenticateWithInToken(tokenString string) (bool, error) {
 	log := helpers.LoggerParent()
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Here you should return the key used to sign the token
@@ -52,17 +52,19 @@ func AuthenticateWithInTokenToken(tokenString string) (bool, error) {
 	return false, nil
 }
 
-func MakeAuthenticatedRequest(token string) (*http.Response, error) {
+func MakeAuthenticatedRequest(token string) error {
 	req, err := http.NewRequest("GET", "http://localhost:3000/api/v1/", nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
-
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return nil
+	/*
+		client := http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
+		}
+		return nil
+	*/
 }

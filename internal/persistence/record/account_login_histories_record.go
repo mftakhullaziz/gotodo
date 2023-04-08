@@ -9,10 +9,11 @@ type AccountLoginHistoriesRecord struct {
 	Username              string    `gorm:"default:null;"`
 	Password              string    `gorm:"default:null;"`
 	Token                 string    `gorm:"default:null;"`
-	LoginAt               time.Time `gorm:"default:null;"`
-	LoginOutAt            time.Time `gorm:"default:null;"`
-	CreatedAt             time.Time `gorm:"default:null;"`
-	UpdatedAt             time.Time `gorm:"default:null;"`
+	TokenExpireAt         time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05;"`
+	LoginAt               time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05;"`
+	LoginOutAt            time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05;"`
+	CreatedAt             time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05;"`
+	UpdatedAt             time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05;"`
 }
 
 func (AccountLoginHistoriesRecord) TableName() string {

@@ -5,21 +5,23 @@ import (
 	"net/http"
 )
 
-func CreateResponses(handler interface{}, statusCode int, message string, errMessage string) response.DefaultServiceResponse {
+func CreateResponses(handler interface{},
+	statusCode int, message1 string, message2 string) response.DefaultServiceResponse {
 	if HasValue(handler) {
 		return response.DefaultServiceResponse{
 			StatusCode: statusCode,
-			Message:    message,
+			Message:    message1,
 			IsSuccess:  true,
-			Data:       handler}
+			Data:       handler,
+		}
 	}
-
-	var emptyInterface interface{}
+	var null interface{}
 	return response.DefaultServiceResponse{
-		StatusCode: http.StatusInternalServerError,
-		Message:    errMessage,
+		StatusCode: http.StatusBadRequest,
+		Message:    message2,
 		IsSuccess:  false,
-		Data:       emptyInterface}
+		Data:       null,
+	}
 }
 
 func BuildResponseWithAuthorization(

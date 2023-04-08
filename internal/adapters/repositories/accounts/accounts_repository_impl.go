@@ -123,8 +123,7 @@ func (a AccountRepositoryImpl) VerifyCredential(ctx context.Context, username st
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
-			return record.AccountRecord{}, ErrRecordNotFound
+			return record.AccountRecord{}, errors.New("error record not found")
 		}
 		return record.AccountRecord{}, result.Error
 	} else if result.RowsAffected == 0 {
