@@ -21,20 +21,23 @@ However, hexagonal architecture can also be more complex to implement than tradi
 ![pattern](https://github.com/mftakhullaziz/gotodos/blob/main/docs/hexago-pattern.png)
 
 ### makefile
-How running using makefile
+how to use makefile 'make <target>' where <target> is one of the following:
+    
+    - build/service  [builds the executable]
+    - run/test       [runs unit tests]
+    - run/service    [builds and runs the program]
+    - clean          [cleans the build directory]
+    - clean/cache    [cleans the cache]
+    - run/download   [download go package from already project]
 
-How to use makefile 'make <target>' where <target> is one of the following:
-- build/service  [builds the executable]
-- run/test       [runs unit tests]
-- run/service    [builds and runs the program]
-- clean          [cleans the build directory]
-- clean/test     [cleans the cache tests]
+use the command:
 
-How to use command :
-- make build/service
-- make run/test
-- make run/service
-- make clean
-- make clean/test
+    - make build/service
+    - make run/test
+    - make run/service
+    - make clean
+    - make clean/cache
+    - make run/download
+
 
 
