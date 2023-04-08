@@ -20,7 +20,7 @@ func NewLoginUsecaseImpl(loginService accounts.LoginService, validate *validator
 	return &LoginUsecaseImpl{LoginService: loginService, Validate: validate}
 }
 
-func (l LoginUsecaseImpl) LoginAccountUseCase(ctx context.Context, request request.LoginRequest) (response.LoginResponse, error) {
+func (l LoginUsecaseImpl) LoginAccountUsecase(ctx context.Context, request request.LoginRequest) (response.LoginResponse, error) {
 	err := l.Validate.Struct(request)
 	helpers.PanicIfError(err)
 
@@ -37,4 +37,14 @@ func (l LoginUsecaseImpl) LoginAccountUseCase(ctx context.Context, request reque
 		Token:     token,
 	}
 	return responseUsecase, nil
+}
+
+func (l LoginUsecaseImpl) LogoutAccountUsecase(ctx context.Context, userId int, token string) error {
+	err := helpers.ValidateIntValue(userId)
+	helpers.LoggerIfError(err)
+
+	logoutUsecase := l.LoginService.LogoutAccountService(ctx, int64(userId), token)
+	helpers.LoggerIfError(logoutUsecase)
+
+	return nil
 }

@@ -79,3 +79,13 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 
 	return userAccounts, optionalLoginHistory.BearerToken, nil
 }
+
+func (l LoginServiceImpl) LogoutAccountService(ctx context.Context, userId int64, token string) error {
+	err := helpers.ValidateIntValue(int(userId))
+	helpers.LoggerIfError(err)
+
+	logoutService := l.AccountRepository.UpdateLogoutAt(ctx, userId, token)
+	helpers.LoggerIfError(logoutService)
+
+	return nil
+}

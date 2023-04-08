@@ -17,4 +17,5 @@ type AccountRecordRepository interface {
 	VerifyCredential(ctx context.Context, username string) (record.AccountRecord, error)
 	FindAccountUser(ctx context.Context, username string) (helpers.UserAccounts, error)
 	SaveLoginHistories(ctx context.Context, historiesRecord record.AccountLoginHistoriesRecord) error
+	UpdateLogoutAt(ctx context.Context, userId int64, token string) error
 }

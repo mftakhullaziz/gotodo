@@ -20,23 +20,23 @@ help:
 
 # Targets
 build/service:
-	@echo "Building $(PACKAGE_NAME) ..."
+	@echo "Building $(PACKAGE_NAME)"
 	go build -o $(BUILD_DIR)/$(PACKAGE_NAME) main.go
 
 run/build:
-	@echo "Running from building $(PACKAGE_NAME) ..."
+	@echo "Running from building $(PACKAGE_NAME)"
 	./$(BUILD_DIR)/$(PACKAGE_NAME) main.go
 
 run/test:
-	@echo "Running unit tests for $(PACKAGE_NAME) ..."
+	@echo "Running unit tests for $(PACKAGE_NAME)"
 	go test -v ./tests/...
 
 run/service:
-	@echo "Building and running $(PACKAGE_NAME) ..."
+	@echo "Building and running $(PACKAGE_NAME)"
 	go run main.go
 
 clean:
-	@echo "Cleaning build directory..."
+	@echo "Cleaning build directory"
 	rm -rf $(BUILD_DIR)
 
 clean/test:

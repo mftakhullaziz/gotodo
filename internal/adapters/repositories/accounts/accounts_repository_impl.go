@@ -8,6 +8,7 @@ import (
 	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/accounts"
+	"time"
 )
 
 type AccountRepositoryImpl struct {
@@ -157,5 +158,27 @@ func (a AccountRepositoryImpl) SaveLoginHistories(ctx context.Context, histories
 	if result.Error != nil {
 		return result.Error
 	}
+	return nil
+}
+
+func (a AccountRepositoryImpl) UpdateLogoutAt(ctx context.Context, userId int64, token string) error {
+	var historiesAccount record.AccountLoginHistoriesRecord
+
+	// Check if the record exists
+	err := a.SQL.WithContext(ctx).Where("user_id = ? AND token = ?", userId, token).First(&historiesAccount).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ErrRecordNotFound := errors.New("error task record not found")
+			return ErrRecordNotFound
+		}
+		return err
+	}
+
+	historiesAccount.LoginOutAt = time.Now()
+	saveHistoriesLogin := a.SQL.WithContext(ctx).Save(&historiesAccount)
+	if saveHistoriesLogin.Error != nil {
+		return saveHistoriesLogin.Error
+	}
+
 	return nil
 }

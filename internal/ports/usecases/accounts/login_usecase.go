@@ -7,5 +7,6 @@ import (
 )
 
 type LoginUsecase interface {
-	LoginAccountUseCase(ctx context.Context, request request.LoginRequest) (response.LoginResponse, error)
+	LoginAccountUsecase(ctx context.Context, request request.LoginRequest) (response.LoginResponse, error)
+	LogoutAccountUsecase(ctx context.Context, userId int, token string) error
 }
