@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"errors"
 	"github.com/sirupsen/logrus"
 )
 import "gorm.io/gorm"
@@ -44,4 +45,12 @@ func LoggerIfErrorWithCustomMessage(err error, log *logrus.Logger, str string) {
 	if err != nil {
 		log.Errorln(err.Error(), str)
 	}
+}
+
+func ValidateIntValue(val int) error {
+	if val <= 0 {
+		err := errors.New("int value not validate")
+		return err
+	}
+	return nil
 }

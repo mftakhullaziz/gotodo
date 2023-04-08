@@ -157,7 +157,8 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 		http.StatusAccepted,
 		int(findTaskHandler.TaskID),
 		authorized,
-		"request find task successful!")
+		"request find task successful!",
+	)
 
 	helpers.WriteToResponseBody(writer, findTaskHandlerResponse)
 }
