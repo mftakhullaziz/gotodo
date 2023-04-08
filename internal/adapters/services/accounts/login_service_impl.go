@@ -58,9 +58,8 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	helpers.LoggerIfError(errToken)
 
 	// Add token to cache
-	errCache := middleware.GenerateTokenToCache(strconv.Itoa(int(findUserAccount.Users.UserID)),
-		tokenGenerate, expireTokenGenerate)
-	helpers.LoggerIfError(errCache)
+	err = middleware.GenerateTokenToCache(strconv.Itoa(int(findUserAccount.Users.UserID)), tokenGenerate, expireTokenGenerate)
+	helpers.LoggerIfError(err)
 
 	// Add token authorization header
 	err = middleware.MakeAuthenticatedRequest(tokenGenerate)

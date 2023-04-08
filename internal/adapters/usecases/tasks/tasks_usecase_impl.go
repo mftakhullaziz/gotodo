@@ -67,8 +67,12 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 }
 
 func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error) {
-	//err := t.Validate.StructPartial(taskId)
-	//helpers.LoggerIfError(err)
+	log := helpers.LoggerParent()
+	err := t.Validate.StructPartial(&taskId)
+	if err != nil {
+		log.Info(err.Error())
+	}
+	helpers.LoggerIfError(err)
 
 	findTaskUsecase, errUsecase := t.TaskService.FindTaskByIdService(ctx, taskId, int64(userId))
 	helpers.LoggerIfError(errUsecase)
@@ -102,8 +106,8 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 			TaskStatus:  task.TaskStatus,
 			CompletedAt: task.CompletedAt.Format(formatDatetime),
 			UpdatedAt:   task.UpdatedAt.Format(formatDatetime),
-			CreatedAt:   task.CreatedAt.Format(formatDatetime)}
-
+			CreatedAt:   task.CreatedAt.Format(formatDatetime),
+		}
 		findAllTaskResponse = append(findAllTaskResponse, responses)
 	}
 
@@ -138,7 +142,7 @@ func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int
 		TaskStatus:  updateTaskUsecase.TaskStatus,
 		CompletedAt: completedTime,
 		CreatedAt:   updateTaskUsecase.CreatedAt.Format(formatDatetime),
-		UpdatedAt:   updateTime}
-
+		UpdatedAt:   updateTime,
+	}
 	return updateTaskResult, nil
 }
