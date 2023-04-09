@@ -130,3 +130,18 @@ func TaskRecordsToTaskDTOs(tasks []record.TaskRecord) []dto.TasksDTO {
 
 	return tasksDto
 }
+
+func UserDetailRecordToUserDetailDTO(detailRecord record.UserDetailRecord) dto.UserDetailDTO {
+	return dto.UserDetailDTO{
+		UserID:      detailRecord.UserID,
+		Username:    detailRecord.Username,
+		Password:    detailRecord.Password,
+		Email:       detailRecord.Email,
+		Name:        detailRecord.Name,
+		MobilePhone: detailRecord.MobilePhone,
+		Address:     detailRecord.Address,
+		Status:      detailRecord.Status,
+		CreatedAt:   detailRecord.CreatedAt,
+		UpdatedAt:   detailRecord.UpdatedAt,
+	}
+}

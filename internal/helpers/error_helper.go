@@ -47,10 +47,13 @@ func LoggerIfErrorWithCustomMessage(err error, log *logrus.Logger, str string) {
 	}
 }
 
-func ValidateIntValue(val int) error {
-	if val <= 0 {
-		err := errors.New("int value not validate")
-		return err
+func ValidateIntValue(val ...int) error {
+	log := LoggerParent()
+	for _, v := range val {
+		if v <= 0 {
+			log.Errorln("Invalid value: %d is not a positive integer", v)
+			return errors.New("invalid int value")
+		}
 	}
 	return nil
 }

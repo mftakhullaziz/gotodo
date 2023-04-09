@@ -27,9 +27,9 @@ func (u UserDetailRepositoryImpl) SaveUser(ctx context.Context, userRecord recor
 	return userRecord, nil
 }
 
-func (u UserDetailRepositoryImpl) FindUserById(ctx context.Context, id int64) (record.UserDetailRecord, error) {
+func (u UserDetailRepositoryImpl) FindUserById(ctx context.Context, userid int64) (record.UserDetailRecord, error) {
 	var userRecord record.UserDetailRecord
-	result := u.SQL.WithContext(ctx).First(&userRecord, id)
+	result := u.SQL.WithContext(ctx).First(&userRecord, userid)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")
@@ -40,11 +40,11 @@ func (u UserDetailRepositoryImpl) FindUserById(ctx context.Context, id int64) (r
 	return userRecord, nil
 }
 
-func (u UserDetailRepositoryImpl) UpdateUser(ctx context.Context, id int64, userRecord record.UserDetailRecord) (record.UserDetailRecord, error) {
+func (u UserDetailRepositoryImpl) UpdateUser(ctx context.Context, userId int64, userRecord record.UserDetailRecord) (record.UserDetailRecord, error) {
 	var existingUser record.UserDetailRecord
 
 	// Check if the record exists
-	err := u.SQL.WithContext(ctx).First(&existingUser, id).Error
+	err := u.SQL.WithContext(ctx).First(&existingUser, userId).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")
@@ -62,8 +62,8 @@ func (u UserDetailRepositoryImpl) UpdateUser(ctx context.Context, id int64, user
 	return existingUser, nil
 }
 
-func (u UserDetailRepositoryImpl) DeleteUserById(ctx context.Context, id int64) error {
-	result := u.SQL.WithContext(ctx).Delete(&record.UserDetailRecord{}, id)
+func (u UserDetailRepositoryImpl) DeleteUserById(ctx context.Context, userId int64) error {
+	result := u.SQL.WithContext(ctx).Delete(&record.UserDetailRecord{}, userId)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("error Record Not Found")

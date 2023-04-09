@@ -59,6 +59,11 @@ func main() {
 	loginUsecase := accountsUsecase.NewLoginUsecaseImpl(loginService, validate)
 	loginHandler := accountsHandler.NewLoginHandlerAPI(loginUsecase)
 
+	// User Detail Handler
+	userDetailService := accountsService.NewUserDetailServiceImpl(userRepository, accountRepository, validate)
+	userDetailUsecase := accountsUsecase.NewUserDetailUsecaseImpl(userDetailService, validate)
+	userDetailHandler := accountsHandler.NewUserDetailHandlerAPI(userDetailUsecase)
+
 	// Initiate Go Mux Router
 	router := mux.NewRouter()
 	router.Use(helpers.LoggingMiddleware)
@@ -68,6 +73,9 @@ func main() {
 	authentications.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
 	authentications.HandleFunc("/login", loginHandler.LoginHandler).Methods(http.MethodPost)
 	authentications.HandleFunc("/logout", loginHandler.LogoutHandler).Methods(http.MethodPost)
+
+	users := router.PathPrefix("/api/v1/users/").Subrouter()
+	users.HandleFunc("/findUser", userDetailHandler.FindDataUserDetailHandler).Methods(http.MethodGet)
 
 	tasks := router.PathPrefix("/api/v1/task/").Subrouter()
 	tasks.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)

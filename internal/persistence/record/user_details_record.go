@@ -10,9 +10,9 @@ type UserDetailRecord struct {
 	Name        string    `gorm:"not null"`
 	MobilePhone int       `gorm:"not null"`
 	Address     string    `gorm:"not null"`
-	Status      string    `gorm:"not null"`
-	CreatedAt   time.Time `gorm:"not null"`
-	UpdatedAt   time.Time `gorm:"not null"`
+	Status      string    `gorm:"default:null;"`
+	CreatedAt   time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05"`
+	UpdatedAt   time.Time `gorm:"type:datetime;default:null;format:2006-01-02 15:04:05"`
 }
 
 func (UserDetailRecord) TableName() string {
