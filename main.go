@@ -69,15 +69,15 @@ func main() {
 	router.Use(helpers.LoggingMiddleware)
 
 	// Initiate prefix url endpoint
-	authentications := router.PathPrefix("/api/v1/account/").Subrouter()
+	authentications := router.PathPrefix("/api/v1/account").Subrouter()
 	authentications.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
 	authentications.HandleFunc("/login", loginHandler.LoginHandler).Methods(http.MethodPost)
 	authentications.HandleFunc("/logout", loginHandler.LogoutHandler).Methods(http.MethodPost)
 
-	users := router.PathPrefix("/api/v1/users/").Subrouter()
+	users := router.PathPrefix("/api/v1/users").Subrouter()
 	users.HandleFunc("/findUser", userDetailHandler.FindDataUserDetailHandler).Methods(http.MethodGet)
 
-	tasks := router.PathPrefix("/api/v1/task/").Subrouter()
+	tasks := router.PathPrefix("/api/v1/task").Subrouter()
 	tasks.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
 	tasks.HandleFunc("/updateTask/{taskId}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
 	tasks.HandleFunc("/findTaskId/{taskId}", taskHandler.FindTaskHandlerById).Methods(http.MethodGet)
