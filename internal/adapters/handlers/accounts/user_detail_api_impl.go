@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"gotodo/internal/domain/models/request"
 	"gotodo/internal/helpers"
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
@@ -54,8 +55,36 @@ func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWrit
 }
 
 func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	log := helpers.LoggerParent()
+
+	token := requests.Header.Get(authHeaderKey)
+	authorized, err := middleware.AuthenticateUser(token)
+	helpers.LoggerIfError(err)
+
+	if authorized == "" {
+		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		helpers.WriteToResponseBody(writer, &responses)
+		return
+	}
+
+	userIsAuthorize, err := strconv.Atoi(authorized)
+	helpers.LoggerIfError(err)
+
+	userUpdateRequest := request.UserRequest{}
+	helpers.ReadFromRequestBody(requests, &userUpdateRequest)
+	log.Infoln("update user request: ", userUpdateRequest)
+
+	updateUserDetailHandler, err := u.UserUsecase.UpdateUserByUserIdUsecase(requests.Context(), int64(userIsAuthorize), userUpdateRequest)
+
+	updateUserDetailHandlerRes := helpers.BuildResponseWithAuthorization(
+		updateUserDetailHandler,
+		http.StatusCreated,
+		int(updateUserDetailHandler.UserID),
+		authorized,
+		"",
+	)
+
+	helpers.WriteToResponseBody(writer, &updateUserDetailHandlerRes)
 }
 
 func (u UserDetailHandlerAPI) DeleteUserHandler(writer http.ResponseWriter, requests *http.Request) {

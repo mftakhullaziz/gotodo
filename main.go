@@ -76,6 +76,7 @@ func main() {
 
 	users := router.PathPrefix("/api/v1/users").Subrouter()
 	users.HandleFunc("/findUser", userDetailHandler.FindDataUserDetailHandler).Methods(http.MethodGet)
+	users.HandleFunc("/editUser", userDetailHandler.UpdateUserDetailHandler).Methods(http.MethodPost)
 
 	tasks := router.PathPrefix("/api/v1/task").Subrouter()
 	tasks.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
