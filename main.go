@@ -18,7 +18,7 @@ import (
 	accountsUsecase "gotodo/internal/adapters/usecases/accounts"
 	tasksUsecase "gotodo/internal/adapters/usecases/tasks"
 	"gotodo/internal/persistence/record"
-	error2 "gotodo/internal/utils/errors"
+	errs "gotodo/internal/utils/errors"
 	"gotodo/internal/utils/logger"
 	"net/http"
 )
@@ -31,18 +31,18 @@ func main() {
 	envName := config.LoadEnv(".env")
 
 	// Do function database connection
-	db, errs := database.NewDatabaseConnection(ctx, envName)
-	error2.PanicIfErrorWithCustomMessage(errs, "new database connection is failed")
+	db, err := database.NewDatabaseConnection(ctx, envName)
+	errs.PanicIfErrorWithCustomMessage(err, "new database connection is failed")
 	logger.LoggerQueryInit(db)
 
 	// Do migration database
-	err := database.MigrateDatabase(db,
+	err = database.MigrateDatabase(db,
 		&record.TaskRecord{},
 		&record.AccountRecord{},
 		&record.UserDetailRecord{},
 		&record.AccountLoginHistoriesRecord{},
 	)
-	error2.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Initiate validator
 	validate := validator.New()
@@ -97,7 +97,7 @@ func main() {
 	}
 
 	ok := server.ListenAndServe()
-	error2.PanicIfError(ok)
+	errs.PanicIfError(ok)
 }
 
 // RegisterEndpoint function to register all endpoint on service http router
