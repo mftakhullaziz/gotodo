@@ -5,22 +5,24 @@ BUILD_DIR=./build
 # Helper message lists
 help:
 	@echo "how to use makefile 'make <target>' where <target> is one of the following:"
-	@echo "- build/service  [builds the executable]"
-	@echo "- run/test       [runs unit tests]"
-	@echo "- run/service    [builds and runs the program]"
-	@echo "- clean          [cleans the build directory]"
-	@echo "- clean/cache    [cleans the cache]"
-	@echo "- run/download   [download go package from already project]"
-	@echo "- clean/package  [remove unused go package from already project]"
+	@echo " build/service  [builds the executable]"
+	@echo " build/clean    [cleans the build directory]"
+	@echo " run/unittest   [runs unit tests]"
+	@echo " run/benchmark  [runs unit tests with bench]"
+	@echo " run/service    [builds and runs the program]"
+	@echo " run/download   [download go package from already project]"
+	@echo " clean/package  [remove unused go package from already project]"
+	@echo " clean/cache    [cleans the cache]"
 	@echo ""
 	@echo "use the command:"
-	@echo "- make build/service"
-	@echo "- make run/test"
-	@echo "- make run/service"
-	@echo "- make clean"
-	@echo "- make clean/cache"
-	@echo "- make run/download"
-	@echo "- make clean/package"
+	@echo " make build/service"
+	@echo " make build/clean"
+	@echo " make run/unittest"
+	@echo " make run/benchmark"
+	@echo " make run/service"
+	@echo " make run/download"
+	@echo " make clean/package"
+	@echo " make clean/cache"
 
 # Targets
 build/service:
@@ -31,15 +33,19 @@ run/build:
 	@echo "running from build $(PACKAGE_NAME)"
 	./$(BUILD_DIR)/$(PACKAGE_NAME) main.go
 
-run/test:
+run/unittest:
 	@echo "running unit tests for $(PACKAGE_NAME)"
 	go test -v ./config/... ./internal/...
+
+run/benchmark:
+	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
+	go test -bench=. ./config/... ./internal/...
 
 run/service:
 	@echo "building and running $(PACKAGE_NAME)"
 	go run main.go
 
-clean:
+build/clean:
 	@echo "cleaning build directory"
 	rm -rf $(BUILD_DIR)
 
