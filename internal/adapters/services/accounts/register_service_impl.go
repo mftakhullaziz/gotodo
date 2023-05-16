@@ -48,6 +48,7 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 			Email:     request.Email,
 			Status:    "active",
 			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		}
 		userRecord := helpers.UserDTOToRecord(userCreate)
 		createUser, err := r.UserRepository.SaveUser(ctx, userRecord)

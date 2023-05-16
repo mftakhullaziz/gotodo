@@ -139,7 +139,7 @@ func (a AccountRepositoryImpl) FindAccountUser(ctx context.Context, username str
 
 	resultAccount := a.SQL.WithContext(ctx).
 		Joins("inner join user_details ud on accounts.user_id = ud.user_id and accounts.username = ud.username").
-		Where("accounts.username = ?", username).
+		Where("accounts.username = ? and accounts.status = ?", username, "active").
 		First(&userAccount.Accounts)
 
 	helpers.ErrorStructJoinUserAccountRecord(resultAccount)

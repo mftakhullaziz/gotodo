@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
+	"github.com/julienschmidt/httprouter"
 	"gotodo/config"
 	"gotodo/config/database"
 	accountsHandler "gotodo/internal/adapters/handlers/accounts"
@@ -19,6 +20,28 @@ import (
 	"gotodo/internal/persistence/record"
 	"net/http"
 )
+
+type EndpointPrefix struct {
+	authenticate string
+	account      string
+	task         string
+}
+
+type Endpoint struct {
+	authenticateRegister string
+	authenticateLogin    string
+	authenticateLogout   string
+	accountUserFind      string
+	accountUserEdit      string
+	taskCreate           string
+	taskUpdate           string
+	taskUpdateStatus     string
+	taskFindByID         string
+	taskFind             string
+	taskDelete           string
+}
+
+var endpoints []string
 
 func main() {
 	// Initiate context
@@ -64,33 +87,80 @@ func main() {
 	userDetailUsecase := accountsUsecase.NewUserDetailUsecaseImpl(userDetailService, validate)
 	userDetailHandler := accountsHandler.NewUserDetailHandlerAPI(userDetailUsecase)
 
-	// Initiate Go Mux Router
-	router := mux.NewRouter()
-	router.Use(helpers.LoggingMiddleware)
+	router := httprouter.New()
 
-	// Initiate prefix url endpoint
-	authentications := router.PathPrefix("/api/v1/account").Subrouter()
-	authentications.HandleFunc("/register", accountHandler.RegisterHandler).Methods(http.MethodPost)
-	authentications.HandleFunc("/login", loginHandler.LoginHandler).Methods(http.MethodPost)
-	authentications.HandleFunc("/logout", loginHandler.LogoutHandler).Methods(http.MethodPost)
+	apiRoute := EndpointPrefix{
+		authenticate: "/api/v1/authenticate/",
+		account:      "/api/v1/user/",
+		task:         "/api/v1/task/",
+	}
 
-	users := router.PathPrefix("/api/v1/users").Subrouter()
-	users.HandleFunc("/findUser", userDetailHandler.FindDataUserDetailHandler).Methods(http.MethodGet)
-	users.HandleFunc("/editUser", userDetailHandler.UpdateUserDetailHandler).Methods(http.MethodPost)
+	api := Endpoint{
+		authenticateRegister: apiRoute.authenticate + "register",
+		authenticateLogin:    apiRoute.authenticate + "login",
+		authenticateLogout:   apiRoute.authenticate + "logout",
+		accountUserFind:      apiRoute.account + "find",
+		accountUserEdit:      apiRoute.account + "edit",
+		taskCreate:           apiRoute.task + "create",
+		taskUpdate:           apiRoute.task + "update/:task_id",
+		taskFindByID:         apiRoute.task + "find/:task_id",
+		taskFind:             apiRoute.task + "find",
+		taskDelete:           apiRoute.task + "delete",
+		taskUpdateStatus:     apiRoute.task + "update_status",
+	}
 
-	tasks := router.PathPrefix("/api/v1/task").Subrouter()
-	tasks.HandleFunc("/createTask", taskHandler.CreateTaskHandler).Methods(http.MethodPost)
-	tasks.HandleFunc("/updateTask/{taskId}", taskHandler.UpdateTaskHandler).Methods(http.MethodPut)
-	tasks.HandleFunc("/findTaskId/{taskId}", taskHandler.FindTaskHandlerById).Methods(http.MethodGet)
-	tasks.HandleFunc("/findTask", taskHandler.FindTaskHandler).Methods(http.MethodGet)
-	tasks.HandleFunc("/deleteTask", taskHandler.DeleteTaskHandler).Methods(http.MethodDelete)
-	tasks.HandleFunc("/updateCompletedTask", taskHandler.UpdateTaskStatusHandler).Methods(http.MethodPut)
+	RegisterEndpoint(http.MethodPost, api.authenticateRegister, accountHandler.RegisterHandler, router)
+	RegisterEndpoint(http.MethodPost, api.authenticateLogin, loginHandler.LoginHandler, router)
+	RegisterEndpoint(http.MethodPost, api.authenticateLogout, loginHandler.LogoutHandler, router)
+	RegisterEndpoint(http.MethodGet, api.accountUserFind, userDetailHandler.FindDataUserDetailHandler, router)
+	RegisterEndpoint(http.MethodPost, api.accountUserEdit, userDetailHandler.UpdateUserDetailHandler, router)
 
-	// Added logger mux router
-	helpers.LogRoutes(router)
+	RegisterEndpoint(http.MethodPost, api.taskCreate, taskHandler.CreateTaskHandler, router)
+	RegisterEndpoint(http.MethodPut, api.taskUpdate, taskHandler.UpdateTaskHandler, router)
+	RegisterEndpoint(http.MethodGet, api.taskFindByID, taskHandler.FindTaskHandlerById, router)
+	RegisterEndpoint(http.MethodGet, api.taskFind, taskHandler.FindTaskHandler, router)
+	RegisterEndpoint(http.MethodDelete, api.taskDelete, taskHandler.DeleteTaskHandler, router)
+	RegisterEndpoint(http.MethodPut, api.taskUpdateStatus, taskHandler.UpdateTaskStatusHandler, router)
+
+	// Logger endpoint list
+	EndpointList()
+	loggedRouter := loggingMiddleware(router)
 
 	// Server listener
-	server := http.Server{Addr: "127.0.0.1:3000", Handler: router}
-	err = server.ListenAndServe()
-	helpers.PanicIfError(err)
+	server := http.Server{
+		Addr:    "127.0.0.1:3000",
+		Handler: loggedRouter,
+	}
+
+	ok := server.ListenAndServe()
+	helpers.PanicIfError(ok)
+}
+
+// RegisterEndpoint function to register all endpoint on service http router
+func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, requests *http.Request), router *httprouter.Router) {
+	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
+	router.HandlerFunc(method, path, handler)
+}
+
+func EndpointList() {
+	loggerParent := helpers.LoggerParent()
+	loggerParent.Infoln("Registered endpoints:")
+	for _, endpoint := range endpoints {
+		loggerParent.Infoln(endpoint)
+	}
+}
+
+// Middleware function to log requests and responses
+func loggingMiddleware(next http.Handler) http.Handler {
+	loggerParent := helpers.LoggerParent()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Log request details
+		loggerParent.Infof("Received request: %s %s", r.Method, r.URL.Path)
+
+		// Call the next handler
+		next.ServeHTTP(w, r)
+
+		// Log response details
+		loggerParent.Infof("Sent response: %s %s", r.Method, r.URL.Path)
+	})
 }

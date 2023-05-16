@@ -11,6 +11,7 @@ help:
 	@echo "- clean          [cleans the build directory]"
 	@echo "- clean/cache    [cleans the cache]"
 	@echo "- run/download   [download go package from already project]"
+	@echo "- clean/package  [remove unused go package from already project]"
 	@echo ""
 	@echo "use the command:"
 	@echo "- make build/service"
@@ -19,6 +20,7 @@ help:
 	@echo "- make clean"
 	@echo "- make clean/cache"
 	@echo "- make run/download"
+	@echo "- make clean/package"
 
 # Targets
 build/service:
@@ -48,3 +50,7 @@ clean/cache:
 run/download:
 	@echo "download all package from go mod"
 	go mod download
+
+clean/package:
+	@echo "remove unused package"
+	go mod tidy

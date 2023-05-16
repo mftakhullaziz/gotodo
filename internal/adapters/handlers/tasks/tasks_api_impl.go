@@ -95,7 +95,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
-	idTaskVar := vars["taskId"]
+	idTaskVar := vars["task_id"]
 	idTask, err := strconv.Atoi(idTaskVar)
 	helpers.LoggerIfError(err)
 
@@ -142,7 +142,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
-	idTaskVar := vars["taskId"]
+	idTaskVar := vars["task_id"]
 	idTask, err := strconv.Atoi(idTaskVar)
 	helpers.LoggerIfError(err)
 	log.Infoln("find task by id_task: ", idTask)
@@ -220,7 +220,7 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 
 	// Define to get idTask from param
 	params := requests.URL.Query()
-	taskIdParam := params.Get("taskId")
+	taskIdParam := params.Get("task_id")
 	taskId, err := strconv.Atoi(taskIdParam)
 	helpers.LoggerIfError(err)
 
