@@ -8,6 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"gotodo/config"
 	"gotodo/config/database"
+	"gotodo/endpoint"
 	accountsHandler "gotodo/internal/adapters/handlers/accounts"
 	tasksHandler "gotodo/internal/adapters/handlers/tasks"
 	accountsRepository "gotodo/internal/adapters/repositories/accounts"
@@ -20,26 +21,6 @@ import (
 	"gotodo/internal/persistence/record"
 	"net/http"
 )
-
-type EndpointPrefix struct {
-	authenticate string
-	account      string
-	task         string
-}
-
-type Endpoint struct {
-	authenticateRegister string
-	authenticateLogin    string
-	authenticateLogout   string
-	accountUserFind      string
-	accountUserEdit      string
-	taskCreate           string
-	taskUpdate           string
-	taskUpdateStatus     string
-	taskFindByID         string
-	taskFind             string
-	taskDelete           string
-}
 
 var endpoints []string
 
@@ -58,7 +39,8 @@ func main() {
 		&record.TaskRecord{},
 		&record.AccountRecord{},
 		&record.UserDetailRecord{},
-		&record.AccountLoginHistoriesRecord{})
+		&record.AccountLoginHistoriesRecord{},
+	)
 	helpers.LoggerIfError(err)
 
 	// Initiate validator
@@ -69,67 +51,48 @@ func main() {
 	taskService := tasksService.NewTaskServiceImpl(taskRepository, validate)
 	taskUsecase := tasksUsecase.NewTaskUseCaseImpl(taskService, validate)
 	taskHandler := tasksHandler.NewTaskHandlerAPI(taskUsecase)
-
 	// Init Register Handler
 	userRepository := accountsRepository.NewUserDetailRepositoryImpl(db, validate)
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
 	accountService := accountsService.NewRegisterServiceImpl(accountRepository, userRepository, validate)
 	accountUsecase := accountsUsecase.NewRegisterUseCaseImpl(accountService, validate)
 	accountHandler := accountsHandler.NewRegisterHandlerAPI(accountUsecase)
-
 	// Login Handler
 	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)
 	loginUsecase := accountsUsecase.NewLoginUsecaseImpl(loginService, validate)
 	loginHandler := accountsHandler.NewLoginHandlerAPI(loginUsecase)
-
 	// User Detail Handler
 	userDetailService := accountsService.NewUserDetailServiceImpl(userRepository, accountRepository, validate)
 	userDetailUsecase := accountsUsecase.NewUserDetailUsecaseImpl(userDetailService, validate)
 	userDetailHandler := accountsHandler.NewUserDetailHandlerAPI(userDetailUsecase)
 
+	// Init Http Router
 	router := httprouter.New()
+	// Call endpoint
+	api := endpoint.Rest()
 
-	apiRoute := EndpointPrefix{
-		authenticate: "/api/v1/authenticate/",
-		account:      "/api/v1/user/",
-		task:         "/api/v1/task/",
-	}
-
-	api := Endpoint{
-		authenticateRegister: apiRoute.authenticate + "register",
-		authenticateLogin:    apiRoute.authenticate + "login",
-		authenticateLogout:   apiRoute.authenticate + "logout",
-		accountUserFind:      apiRoute.account + "find",
-		accountUserEdit:      apiRoute.account + "edit",
-		taskCreate:           apiRoute.task + "create",
-		taskUpdate:           apiRoute.task + "update/:task_id",
-		taskFindByID:         apiRoute.task + "find/:task_id",
-		taskFind:             apiRoute.task + "find",
-		taskDelete:           apiRoute.task + "delete",
-		taskUpdateStatus:     apiRoute.task + "update_status",
-	}
-
-	RegisterEndpoint(http.MethodPost, api.authenticateRegister, accountHandler.RegisterHandler, router)
-	RegisterEndpoint(http.MethodPost, api.authenticateLogin, loginHandler.LoginHandler, router)
-	RegisterEndpoint(http.MethodPost, api.authenticateLogout, loginHandler.LogoutHandler, router)
-	RegisterEndpoint(http.MethodGet, api.accountUserFind, userDetailHandler.FindDataUserDetailHandler, router)
-	RegisterEndpoint(http.MethodPost, api.accountUserEdit, userDetailHandler.UpdateUserDetailHandler, router)
-
-	RegisterEndpoint(http.MethodPost, api.taskCreate, taskHandler.CreateTaskHandler, router)
-	RegisterEndpoint(http.MethodPut, api.taskUpdate, taskHandler.UpdateTaskHandler, router)
-	RegisterEndpoint(http.MethodGet, api.taskFindByID, taskHandler.FindTaskHandlerById, router)
-	RegisterEndpoint(http.MethodGet, api.taskFind, taskHandler.FindTaskHandler, router)
-	RegisterEndpoint(http.MethodDelete, api.taskDelete, taskHandler.DeleteTaskHandler, router)
-	RegisterEndpoint(http.MethodPut, api.taskUpdateStatus, taskHandler.UpdateTaskStatusHandler, router)
+	// Register all endpoint
+	RegisterEndpoint(http.MethodPost, api.AuthenticateRegister, accountHandler.RegisterHandler, router)
+	RegisterEndpoint(http.MethodPost, api.AuthenticateLogin, loginHandler.LoginHandler, router)
+	RegisterEndpoint(http.MethodPost, api.AuthenticateLogout, loginHandler.LogoutHandler, router)
+	RegisterEndpoint(http.MethodGet, api.AccountUserFind, userDetailHandler.FindDataUserDetailHandler, router)
+	RegisterEndpoint(http.MethodPost, api.AccountUserEdit, userDetailHandler.UpdateUserDetailHandler, router)
+	RegisterEndpoint(http.MethodPost, api.TaskCreate, taskHandler.CreateTaskHandler, router)
+	RegisterEndpoint(http.MethodPut, api.TaskUpdate, taskHandler.UpdateTaskHandler, router)
+	RegisterEndpoint(http.MethodGet, api.TaskFindByID, taskHandler.FindTaskHandlerById, router)
+	RegisterEndpoint(http.MethodGet, api.TaskFind, taskHandler.FindTaskHandler, router)
+	RegisterEndpoint(http.MethodDelete, api.TaskDelete, taskHandler.DeleteTaskHandler, router)
+	RegisterEndpoint(http.MethodPut, api.TaskUpdateStatus, taskHandler.UpdateTaskStatusHandler, router)
 
 	// Logger endpoint list
-	EndpointList()
-	loggedRouter := loggingMiddleware(router)
+	ListEndpoints()
+	// Init Router in Logger
+	LoggerRouter := helpers.LoggerMiddleware(router)
 
 	// Server listener
 	server := http.Server{
 		Addr:    "127.0.0.1:3000",
-		Handler: loggedRouter,
+		Handler: LoggerRouter,
 	}
 
 	ok := server.ListenAndServe()
@@ -137,30 +100,19 @@ func main() {
 }
 
 // RegisterEndpoint function to register all endpoint on service http router
-func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, requests *http.Request), router *httprouter.Router) {
+func RegisterEndpoint(method, path string,
+	handler func(writer http.ResponseWriter, requests *http.Request),
+	router *httprouter.Router) {
+
 	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
 	router.HandlerFunc(method, path, handler)
 }
 
-func EndpointList() {
-	loggerParent := helpers.LoggerParent()
-	loggerParent.Infoln("Registered endpoints:")
-	for _, endpoint := range endpoints {
-		loggerParent.Infoln(endpoint)
+// ListEndpoints function to show all registered endpoint
+func ListEndpoints() {
+	log := helpers.LoggerParent()
+	log.Infoln("Registered endpoints:")
+	for _, e := range endpoints {
+		log.Infoln(e)
 	}
-}
-
-// Middleware function to log requests and responses
-func loggingMiddleware(next http.Handler) http.Handler {
-	loggerParent := helpers.LoggerParent()
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Log request details
-		loggerParent.Infof("Received request: %s %s", r.Method, r.URL.Path)
-
-		// Call the next handler
-		next.ServeHTTP(w, r)
-
-		// Log response details
-		loggerParent.Infof("Sent response: %s %s", r.Method, r.URL.Path)
-	})
 }

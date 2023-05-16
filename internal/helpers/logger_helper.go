@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -37,30 +36,6 @@ func LoggerParent() *logrus.Logger {
 	return log
 }
 
-func LoggingMiddleware(next http.Handler) http.Handler {
-	log := LoggerParent()
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Request Handler: %s %s %s", r.Host, r.Method, r.URL.Path)
-		next.ServeHTTP(w, r)
-	})
-}
-
-func LogRoutes(router *mux.Router) {
-	log := LoggerParent()
-	log.Infoln("Registered Handler Router:")
-	// Walk through all the registered routes and log their respective URLs
-	err := router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		methods, _ := route.GetMethods()
-		path, _ := route.GetPathTemplate()
-		log.Println(methods, path)
-		return nil
-	})
-
-	if err != nil {
-		log.Infoln("Error Walking Routes:", err)
-	}
-}
-
 func LoggerQueryInit(db *gorm.DB) {
 	log := LoggerParent()
 	// Set up a logger to print SQL statements
@@ -71,4 +46,17 @@ func LoggerQueryInit(db *gorm.DB) {
 		Colorful:                  true,        // Enable colorful output
 	})
 	db.Logger = newLogger
+}
+
+// LoggerMiddleware function to log requests and responses
+func LoggerMiddleware(next http.Handler) http.Handler {
+	log := LoggerParent()
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Log request details
+		log.Infof("Received request: %s %s", r.Method, r.URL.Path)
+		// Call the next handler
+		next.ServeHTTP(w, r)
+		// Log response details
+		log.Infof("Sent response: %s %s", r.Method, r.URL.Path)
+	})
 }
