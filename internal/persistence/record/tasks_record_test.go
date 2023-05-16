@@ -1,8 +1,7 @@
-package persistence
+package record
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gotodo/internal/persistence/record"
 	"reflect"
 	"testing"
 	"time"
@@ -10,17 +9,18 @@ import (
 
 func TestTaskRecord(t *testing.T) {
 	t.Run("Test Task Record TableName", func(t *testing.T) {
-		var task record.TaskRecord
+		var task TaskRecord
 		assert.NotNil(t, task)
 		assert.Equal(t, "tasks", task.TableName())
 	})
 
 	t.Run("Test Task Record Struct Field Values", func(t *testing.T) {
 		now := time.Now().UTC()
-		task := record.TaskRecord{
+		task := TaskRecord{
 			UserID:      1,
 			Title:       "Test Task",
 			Description: "This is a test task",
+			TaskStatus:  "active",
 			Completed:   false,
 			CompletedAt: now,
 			CreatedAt:   now,
@@ -28,10 +28,11 @@ func TestTaskRecord(t *testing.T) {
 		}
 
 		// Test struct field values
-		assert.Equal(t, uint(0), task.ID) // should be initialized to 0 by default
+		assert.Equal(t, uint(0), task.TaskID) // should be initialized to 0 by default
 		assert.Equal(t, 1, task.UserID)
 		assert.Equal(t, "Test Task", task.Title)
 		assert.Equal(t, "This is a test task", task.Description)
+		assert.Equal(t, "active", task.TaskStatus)
 		assert.False(t, task.Completed)
 		assert.Equal(t, now, task.CompletedAt)
 		assert.Equal(t, now, task.CreatedAt)
@@ -39,9 +40,9 @@ func TestTaskRecord(t *testing.T) {
 	})
 
 	t.Run("Test Task Record DataType", func(t *testing.T) {
-		var task record.TaskRecord
+		var task TaskRecord
 
-		idType := reflect.TypeOf(task.ID).Kind().String()
+		idType := reflect.TypeOf(task.TaskID).Kind().String()
 		assert.Equal(t, "uint", idType)
 
 		userIdType := reflect.TypeOf(task.UserID).Kind().String()
@@ -52,6 +53,9 @@ func TestTaskRecord(t *testing.T) {
 
 		descriptionType := reflect.TypeOf(task.Description).Kind().String()
 		assert.Equal(t, "string", descriptionType)
+
+		taskStatus := reflect.TypeOf(task.TaskStatus).Kind().String()
+		assert.Equal(t, "string", taskStatus)
 
 		completedType := reflect.TypeOf(task.Completed).Kind().String()
 		assert.Equal(t, "bool", completedType)

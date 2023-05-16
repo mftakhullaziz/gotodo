@@ -1,8 +1,7 @@
-package persistence
+package record
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gotodo/internal/persistence/record"
 	"reflect"
 	"testing"
 	"time"
@@ -11,7 +10,7 @@ import (
 func TestUserDetail(t *testing.T) {
 	t.Run("Test User Detail Record TableName", func(t *testing.T) {
 		// Test TableName() function
-		var userDetail record.UserDetailRecord
+		var userDetail UserDetailRecord
 		assert.NotNil(t, userDetail)
 		assert.Equal(t, "user_details", userDetail.TableName(), "Matcher")
 	})
@@ -20,7 +19,7 @@ func TestUserDetail(t *testing.T) {
 		now := time.Now().UTC()
 		assert.NotNil(t, now)
 
-		userDetail := record.UserDetailRecord{
+		userDetail := UserDetailRecord{
 			Username:    "username",
 			Password:    "password",
 			Email:       "test@email.com",
@@ -45,7 +44,7 @@ func TestUserDetail(t *testing.T) {
 	})
 
 	t.Run("Test User Detail DataType", func(t *testing.T) {
-		var userDetail record.UserDetailRecord
+		var userDetail UserDetailRecord
 
 		idType := reflect.TypeOf(userDetail.UserID).Kind().String()
 		assert.Equal(t, "uint", idType)

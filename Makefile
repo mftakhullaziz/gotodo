@@ -33,7 +33,7 @@ run/build:
 
 run/test:
 	@echo "running unit tests for $(PACKAGE_NAME)"
-	go test -v ./config/...
+	go test -v ./config/... ./internal/...
 
 run/service:
 	@echo "building and running $(PACKAGE_NAME)"
