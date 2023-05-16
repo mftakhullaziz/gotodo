@@ -6,3 +6,6 @@ go/*
 
 # exclude idea directory
 .idea/*
+
+# exclude log directory
+log/*
