@@ -1,11 +1,10 @@
-package database_test
+package database
 
 import (
 	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gotodo/config"
-	"gotodo/config/database"
 	"testing"
 )
 
@@ -14,7 +13,7 @@ func TestNewDatabaseConnection(t *testing.T) {
 	assert.NotNil(t, nameEnv)
 
 	// Call the function being tested
-	db, err := database.NewDatabaseConnection(context.Background(), nameEnv)
+	db, err := NewDatabaseConnection(context.Background(), nameEnv)
 
 	// Make assertions on the results
 	assert.NoError(t, err, "Unexpected error creating database connection")

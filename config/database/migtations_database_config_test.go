@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"gotodo/config"
-	"gotodo/config/database"
 	"gotodo/internal/persistence/record"
 	"testing"
 )
@@ -14,7 +13,7 @@ func TestMigrationsDatabaseConfig(t *testing.T) {
 		nameEnv := config.LoadEnv(".env.test")
 		assert.NotNil(t, nameEnv)
 
-		gdb, err := database.NewDatabaseConnection(context.Background(), nameEnv)
+		gdb, err := NewDatabaseConnection(context.Background(), nameEnv)
 		assert.NoError(t, err)
 
 		// Init record
@@ -22,7 +21,7 @@ func TestMigrationsDatabaseConfig(t *testing.T) {
 		account := &record.AccountRecord{}
 		user := &record.UserDetailRecord{}
 
-		err = database.MigrateDatabase(gdb, task, account, user)
+		err = MigrateDatabase(gdb, task, account, user)
 		assert.NoError(t, err)
 	})
 
@@ -35,7 +34,7 @@ func TestMigrationsDatabaseConfig(t *testing.T) {
 		nameEnv := config.LoadEnv(".env.test")
 		assert.NotNil(t, nameEnv)
 
-		gdb, err := database.NewDatabaseConnection(context.Background(), nameEnv)
+		gdb, err := NewDatabaseConnection(context.Background(), nameEnv)
 		assert.NoError(t, err)
 
 		migrate := gdb.AutoMigrate(task, account, user)
@@ -45,15 +44,16 @@ func TestMigrationsDatabaseConfig(t *testing.T) {
 			t.Errorf("expected table 'tasks' to be created")
 		}
 
-		if !gdb.Migrator().HasColumn(task, "id") ||
+		if !gdb.Migrator().HasColumn(task, "task_id") ||
 			!gdb.Migrator().HasColumn(task, "user_id") ||
 			!gdb.Migrator().HasColumn(task, "title") ||
 			!gdb.Migrator().HasColumn(task, "description") ||
+			!gdb.Migrator().HasColumn(task, "task_status") ||
 			!gdb.Migrator().HasColumn(task, "completed") ||
 			!gdb.Migrator().HasColumn(task, "completed_at") ||
 			!gdb.Migrator().HasColumn(task, "created_at") ||
 			!gdb.Migrator().HasColumn(task, "updated_at") {
-			t.Errorf("expected columns 'id','user_id','title','description'," +
+			t.Errorf("expected columns 'id','user_id','title','description', 'task_status'" +
 				"'completed','completed_at','create_at','update_at' to be created in table 'tasks'")
 		}
 
