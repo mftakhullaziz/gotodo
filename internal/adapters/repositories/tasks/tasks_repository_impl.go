@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/tasks"
-	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils"
 	"time"
 )
 
@@ -46,7 +46,7 @@ func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, taskId int64, user
 }
 
 func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRecord record.TaskRecord) (record.TaskRecord, error) {
-	logger := logger.LoggerParent()
+	logger := utils.LoggerParent()
 	var existingTask record.TaskRecord
 
 	// Check if the record exists

@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils"
 	"net/http"
 	"time"
 )
@@ -10,7 +10,7 @@ import (
 func GenerateJWTToken() (string, time.Time, error) {
 	// Set the expiration time of the token
 	expirationTime := time.Now().Add(1 * time.Hour) // 1 day
-	logger.LoggerParent().Infoln("expire token time at: ", expirationTime)
+	utils.LoggerParent().Infoln("expire token time at: ", expirationTime)
 	// Create a new JWT token with the claims
 	claims := &jwt.StandardClaims{
 		ExpiresAt: expirationTime.Unix(),
@@ -29,7 +29,7 @@ func GenerateJWTToken() (string, time.Time, error) {
 
 // AuthenticateWithInToken function to check token if available or not using JWT and check token if expire or not
 func AuthenticateWithInToken(tokenString string) (bool, error) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Here you should return the key used to sign the token
 		// For example, you can return a []byte containing a secret key

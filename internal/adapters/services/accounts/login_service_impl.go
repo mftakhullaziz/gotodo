@@ -8,11 +8,7 @@ import (
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/repositories/accounts"
 	account "gotodo/internal/ports/services/accounts"
-	"gotodo/internal/utils/converter"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
-	"gotodo/internal/utils/password"
-	validate "gotodo/internal/utils/validator"
+	"gotodo/internal/utils"
 	"strconv"
 	"time"
 )
@@ -27,10 +23,10 @@ func NewLoginServiceImpl(accountRepository accounts.AccountRecordRepository, val
 }
 
 func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request request.LoginRequest) (dto.AccountDTO, string, error) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
 	validate := l.Validate.Struct(request)
-	errs.PanicIfError(validate)
+	utils.PanicIfError(validate)
 
 	credentialAccount, err := l.AccountRepository.VerifyCredential(ctx, request.Username)
 	if err != nil {
@@ -39,7 +35,7 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	}
 	log.Info("credential: ", credentialAccount.Username, ", ", credentialAccount.Password)
 
-	comparedPassword, errPassword := password.ComparedPassword(credentialAccount.Password, []byte(request.Password))
+	comparedPassword, errPassword := utils.ComparedPassword(credentialAccount.Password, []byte(request.Password))
 
 	// validate password is matched
 	if comparedPassword != true && errPassword != nil {
@@ -58,37 +54,37 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	log.Infoln("account record: ", accountRecord)
 
 	tokenGenerate, expireTokenGenerate, errToken := middleware.GenerateJWTToken()
-	errs.LoggerIfError(errToken)
+	utils.LoggerIfError(errToken)
 
 	// Add token to cache
 	err = middleware.GenerateTokenToCache(strconv.Itoa(int(findUserAccount.Users.UserID)), tokenGenerate, expireTokenGenerate)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// Add token authorization header
 	err = middleware.MakeAuthenticatedRequest(tokenGenerate)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
-	optionalLoginHistory := converter.NewOptionalColumnParams{
+	optionalLoginHistory := utils.NewOptionalColumnParams{
 		BearerToken: tokenGenerate, TimeNow: time.Now(), TimeIsNull: time.Time{},
 	}
 
-	userLoginHistory := converter.UserAndAccountRecordToAccountLoginHistoryRecord(
+	userLoginHistory := utils.UserAndAccountRecordToAccountLoginHistoryRecord(
 		userRecord, accountRecord, optionalLoginHistory, expireTokenGenerate)
 
 	saveLoginHistory := l.AccountRepository.SaveLoginHistories(ctx, userLoginHistory)
-	errs.LoggerIfError(saveLoginHistory)
+	utils.LoggerIfError(saveLoginHistory)
 
-	userAccounts := converter.RecordToAccountDTO(accountRecord)
+	userAccounts := utils.RecordToAccountDTO(accountRecord)
 
 	return userAccounts, optionalLoginHistory.BearerToken, nil
 }
 
 func (l LoginServiceImpl) LogoutAccountService(ctx context.Context, userId int64, token string) error {
-	err := validate.ValidateIntValue(int(userId))
-	errs.LoggerIfError(err)
+	err := utils.ValidateIntValue(int(userId))
+	utils.LoggerIfError(err)
 
 	logoutService := l.AccountRepository.UpdateLogoutAt(ctx, userId, token)
-	errs.LoggerIfError(logoutService)
+	utils.LoggerIfError(logoutService)
 
 	return nil
 }

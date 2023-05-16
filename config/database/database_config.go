@@ -6,17 +6,16 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils"
 	"os"
 	"time"
 )
 
 func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, error error) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
 	err := godotenv.Load(path)
-	errs.FatalIfErrorWithCustomMessage(err, log, "Error loading .env.test file: %v")
+	utils.FatalIfErrorWithCustomMessage(err, log, "Error loading .env.test file: %v")
 
 	// Do get from environment file
 	username := os.Getenv("MYSQL_USER")
@@ -28,7 +27,7 @@ func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, error
 		username, password, hostname, databaseName)
 
 	connection, err := gorm.Open(mysql.Open(databaseConnection), &gorm.Config{})
-	errs.PanicIfErrorWithCustomMessage(err, "Failed to create connection to database")
+	utils.PanicIfErrorWithCustomMessage(err, "Failed to create connection to database")
 
 	sqlDB, err := connection.DB()
 

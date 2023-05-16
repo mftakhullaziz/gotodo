@@ -5,10 +5,7 @@ import (
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/accounts"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
-	"gotodo/internal/utils/payload"
-	"gotodo/internal/utils/response"
+	"gotodo/internal/utils"
 	"net/http"
 	"strconv"
 )
@@ -34,52 +31,52 @@ func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWrit
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := response.BuildEmptyResponse(messageUserNotAuthorized)
+		responses := utils.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		payload.WriteToResponseBody(writer, &responses)
+		utils.WriteToResponseBody(writer, &responses)
 		return
 	}
 
 	authorizedUserId, err := strconv.Atoi(authorized)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	findUserDetailHandler, err := u.UserUsecase.FindUserByUserIdUsecase(requests.Context(), int64(authorizedUserId))
 
-	responses := response.CreateResponses(findUserDetailHandler, http.StatusOK,
+	responses := utils.CreateResponses(findUserDetailHandler, http.StatusOK,
 		"find user detail successfully!",
 		"find user detail not success please check your username or email or password again!",
 	)
 
-	payload.WriteToResponseBody(writer, &responses)
+	utils.WriteToResponseBody(writer, &responses)
 }
 
 func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	if authorized == "" {
-		responses := response.BuildEmptyResponse(messageUserNotAuthorized)
-		payload.WriteToResponseBody(writer, &responses)
+		responses := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		utils.WriteToResponseBody(writer, &responses)
 		return
 	}
 
 	userIsAuthorize, err := strconv.Atoi(authorized)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	userUpdateRequest := request.UserRequest{}
-	payload.ReadFromRequestBody(requests, &userUpdateRequest)
+	utils.ReadFromRequestBody(requests, &userUpdateRequest)
 	log.Infoln("update user request: ", userUpdateRequest)
 
 	updateUserDetailHandler, err := u.UserUsecase.UpdateUserByUserIdUsecase(requests.Context(), int64(userIsAuthorize), userUpdateRequest)
 
-	updateUserDetailHandlerRes := response.BuildResponseWithAuthorization(
+	updateUserDetailHandlerRes := utils.BuildResponseWithAuthorization(
 		updateUserDetailHandler,
 		http.StatusCreated,
 		int(updateUserDetailHandler.UserID),
@@ -87,7 +84,7 @@ func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter
 		"",
 	)
 
-	payload.WriteToResponseBody(writer, &updateUserDetailHandlerRes)
+	utils.WriteToResponseBody(writer, &updateUserDetailHandlerRes)
 }
 
 func (u UserDetailHandlerAPI) DeleteUserHandler(writer http.ResponseWriter, requests *http.Request) {

@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
-	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils"
 	"time"
 )
 
@@ -27,7 +27,7 @@ func NewRedisClient(ctx context.Context) (*redis.Client, error) {
 func NewSaveTokenRedis(token string, userId int64, ctx context.Context) error {
 	// create a new Redis client
 	client, err := NewRedisClient(ctx)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// save the token in Redis with an expiration time of 1 hour
 	err = client.Set(ctx, token, userId, time.Hour).Err()
@@ -41,7 +41,7 @@ func NewSaveTokenRedis(token string, userId int64, ctx context.Context) error {
 func NewGetUserIDByToken(token string, ctx context.Context) (int64, error) {
 	// create a new Redis client
 	client, err := NewRedisClient(ctx)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// retrieve the userID from Redis
 	userID, err := client.Get(ctx, token).Int64()

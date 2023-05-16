@@ -7,8 +7,7 @@ import (
 	"gorm.io/gorm"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/accounts"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/struct"
+	"gotodo/internal/utils"
 	"time"
 )
 
@@ -135,21 +134,21 @@ func (a AccountRepositoryImpl) VerifyCredential(ctx context.Context, username st
 	return accountRecord, nil
 }
 
-func (a AccountRepositoryImpl) FindAccountUser(ctx context.Context, username string) (_struct.UserAccounts, error) {
-	userAccount := _struct.UserAccounts{}
+func (a AccountRepositoryImpl) FindAccountUser(ctx context.Context, username string) (utils.UserAccounts, error) {
+	userAccount := utils.UserAccounts{}
 
 	resultAccount := a.SQL.WithContext(ctx).
 		Joins("inner join user_details ud on accounts.user_id = ud.user_id and accounts.username = ud.username").
 		Where("accounts.username = ? and accounts.status = ?", username, "active").
 		First(&userAccount.Accounts)
 
-	errs.StructJoinUserAccountRecordErrorUtils(resultAccount)
+	utils.StructJoinUserAccountRecordErrorUtils(resultAccount)
 
 	resultUser := a.SQL.WithContext(ctx).Table("user_details").
 		Where("user_id = ?", userAccount.Accounts.UserID).
 		First(&userAccount.Users)
 
-	errs.StructJoinUserAccountRecordErrorUtils(resultUser)
+	utils.StructJoinUserAccountRecordErrorUtils(resultUser)
 
 	return userAccount, nil
 }

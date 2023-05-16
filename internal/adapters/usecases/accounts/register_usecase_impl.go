@@ -7,7 +7,7 @@ import (
 	"gotodo/internal/domain/models/response"
 	"gotodo/internal/ports/services/accounts"
 	account "gotodo/internal/ports/usecases/accounts"
-	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils"
 )
 
 type RegisterUseCaseImpl struct {
@@ -21,7 +21,7 @@ func NewRegisterUseCaseImpl(register accounts.RegisterService, validate *validat
 
 func (r RegisterUseCaseImpl) CreateAccountUseCase(ctx context.Context, request request.RegisterRequest) (response.RegisterResponse, error) {
 	err := r.Validate.Struct(request)
-	errs.PanicIfError(err)
+	utils.PanicIfError(err)
 
 	registerUseCase, errRegister := r.Register.CreateNewAccount(ctx, request)
 	if errRegister != nil {

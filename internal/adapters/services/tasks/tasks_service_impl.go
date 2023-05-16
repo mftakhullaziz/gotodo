@@ -7,10 +7,7 @@ import (
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/ports/repositories/tasks"
 	service "gotodo/internal/ports/services/tasks"
-	"gotodo/internal/utils/converter"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
-	validate "gotodo/internal/utils/validator"
+	"gotodo/internal/utils"
 	"time"
 )
 
@@ -26,7 +23,7 @@ func NewTaskServiceImpl(taskRepository tasks.TaskRecordRepository, validate *val
 func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.TaskRequest, authorizedId int) (dto.TasksDTO, error) {
 	// log := utils.LoggerParent()
 	err := t.Validate.Struct(request)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	createTaskDTO := dto.TasksDTO{
 		UserID:      authorizedId,
@@ -39,17 +36,17 @@ func (t TaskServiceImpl) CreateTaskService(ctx context.Context, request request.
 		UpdatedAt:   time.Time{},
 	}
 
-	taskRecord := converter.ConvertTaskDtoToTaskRecord(createTaskDTO)
+	taskRecord := utils.ConvertTaskDtoToTaskRecord(createTaskDTO)
 	createTaskService, err := t.TaskRepository.SaveTask(ctx, taskRecord)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
-	taskDtoResponse := converter.ConvertTaskRecordToTaskDto(createTaskService)
+	taskDtoResponse := utils.ConvertTaskRecordToTaskDto(createTaskService)
 	return taskDtoResponse, nil
 }
 
 func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, taskId int, request request.TaskRequest) (dto.TasksDTO, error) {
 	err := t.Validate.Struct(request)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// Update record Title, Description, UpdateAt
 	updateTask := dto.TasksDTO{
@@ -59,54 +56,54 @@ func (t TaskServiceImpl) UpdateTaskService(ctx context.Context, taskId int, requ
 		UpdatedAt:   time.Time{},
 	}
 
-	taskRecord := converter.ConvertTaskDtoToTaskRecord(updateTask)
+	taskRecord := utils.ConvertTaskDtoToTaskRecord(updateTask)
 	updateService, err := t.TaskRepository.UpdateTask(ctx, int64(taskId), taskRecord)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
-	taskDtoResponse := converter.ConvertTaskRecordToTaskDto(updateService)
+	taskDtoResponse := utils.ConvertTaskRecordToTaskDto(updateService)
 	return taskDtoResponse, nil
 }
 
 func (t TaskServiceImpl) FindTaskByIdService(ctx context.Context, taskId int, userId int64) (dto.TasksDTO, error) {
 	// validate task id and user id
-	errIntId := validate.ValidateIntValue(taskId, int(userId))
-	errs.LoggerIfError(errIntId)
+	errIntId := utils.ValidateIntValue(taskId, int(userId))
+	utils.LoggerIfError(errIntId)
 
 	findTaskService, err := t.TaskRepository.FindTaskById(ctx, int64(taskId), userId)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
-	findTaskResponse := converter.ConvertTaskRecordToTaskDto(findTaskService)
+	findTaskResponse := utils.ConvertTaskRecordToTaskDto(findTaskService)
 	return findTaskResponse, nil
 }
 
 func (t TaskServiceImpl) FindTaskAllService(ctx context.Context, userId int) ([]dto.TasksDTO, error) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
 	findAllTaskService, err := t.TaskRepository.FindTaskAll(ctx, int64(userId))
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 	log.Infoln("list tasks: ", findAllTaskService)
 
-	findAllTaskResponse := converter.TaskRecordsToTaskDTOs(findAllTaskService)
+	findAllTaskResponse := utils.TaskRecordsToTaskDTOs(findAllTaskService)
 	return findAllTaskResponse, nil
 }
 
 func (t TaskServiceImpl) DeleteTaskService(ctx context.Context, taskId int, userId int) error {
 	err := t.Validate.StructPartial(taskId)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	deleteTask := t.TaskRepository.DeleteTaskById(ctx, int64(taskId), int64(userId))
-	errs.LoggerIfError(deleteTask)
+	utils.LoggerIfError(deleteTask)
 
 	return deleteTask
 }
 
 func (t TaskServiceImpl) UpdateTaskStatusService(ctx context.Context, taskId int, userId int, completed string) (dto.TasksDTO, error) {
 	err := t.Validate.StructPartial(taskId)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	updateTaskStatus, errStatus := t.TaskRepository.UpdateTaskStatus(ctx, int64(taskId), int64(userId), completed)
-	errs.LoggerIfError(errStatus)
+	utils.LoggerIfError(errStatus)
 
-	taskDtoResponse := converter.ConvertTaskRecordToTaskDto(updateTaskStatus)
+	taskDtoResponse := utils.ConvertTaskRecordToTaskDto(updateTaskStatus)
 	return taskDtoResponse, nil
 }

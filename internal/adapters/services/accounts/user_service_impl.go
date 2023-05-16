@@ -7,11 +7,7 @@ import (
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/ports/repositories/accounts"
 	account "gotodo/internal/ports/services/accounts"
-	"gotodo/internal/utils/converter"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
-	"gotodo/internal/utils/password"
-	validate "gotodo/internal/utils/validator"
+	"gotodo/internal/utils"
 )
 
 type UserServiceImpl struct {
@@ -32,29 +28,29 @@ func NewUserDetailServiceImpl(
 }
 
 func (u UserServiceImpl) FindUserByUserIdService(ctx context.Context, userId int64) (dto.UserDetailDTO, error) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
-	err := validate.ValidateIntValue(int(userId))
+	err := utils.ValidateIntValue(int(userId))
 	if err != nil {
 		log.Warn("validate int is not valid: ", err.Error())
 	}
 
 	findUserDetail, err := u.UserDetailRepository.FindUserById(ctx, userId)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
-	findUserDetailResponse := converter.UserDetailRecordToUserDetailDTO(findUserDetail)
+	findUserDetailResponse := utils.UserDetailRecordToUserDetailDTO(findUserDetail)
 
 	return findUserDetailResponse, nil
 }
 
 func (u UserServiceImpl) UpdateUserByUserIdService(ctx context.Context, userId int64, request request.UserRequest) (dto.UserDetailDTO, error) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
 	err := u.Validate.Struct(request)
 	if err != nil {
 		log.Warn("validate update request is errors: ", err.Error())
 	}
-	hashPassword := password.HashPasswordAndSalt([]byte(request.Password))
+	hashPassword := utils.HashPasswordAndSalt([]byte(request.Password))
 
 	userUpdate := dto.UserDetailDTO{
 		Email:       request.Email,
@@ -65,19 +61,19 @@ func (u UserServiceImpl) UpdateUserByUserIdService(ctx context.Context, userId i
 		Status:      request.Status,
 	}
 
-	userRecord := converter.UserDTOToRecord(userUpdate)
+	userRecord := utils.UserDTOToRecord(userUpdate)
 	updateUser, err := u.UserDetailRepository.UpdateUser(ctx, userId, userRecord)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	accountService := dto.AccountDTO{
 		Password: updateUser.Password,
 		Status:   updateUser.Status,
 	}
 
-	accountRecord := converter.AccountDtoToRecord(accountService)
+	accountRecord := utils.AccountDtoToRecord(accountService)
 	accountUser, err := u.AccountRepository.UpdateAccount(ctx, userId, accountRecord)
 	log.Infoln("account is updated: ", accountUser)
 
-	userUpdateResponse := converter.RecordToUserDTO(updateUser)
+	userUpdateResponse := utils.RecordToUserDTO(updateUser)
 	return userUpdateResponse, nil
 }

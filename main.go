@@ -18,8 +18,7 @@ import (
 	accountsUsecase "gotodo/internal/adapters/usecases/accounts"
 	tasksUsecase "gotodo/internal/adapters/usecases/tasks"
 	"gotodo/internal/persistence/record"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils"
 	"net/http"
 )
 
@@ -32,17 +31,18 @@ func main() {
 
 	// Do function database connection
 	db, err := database.NewDatabaseConnection(ctx, envName)
-	errs.PanicIfErrorWithCustomMessage(err, "new database connection is failed")
-	logger.LoggerQueryInit(db)
+	utils.PanicIfErrorWithCustomMessage(err, "new database connection is failed")
+	utils.LoggerQueryInit(db)
 
 	// Do migration database
-	err = database.MigrateDatabase(db,
+	err = database.MigrateDatabase(
+		db,
 		&record.TaskRecord{},
 		&record.AccountRecord{},
 		&record.UserDetailRecord{},
 		&record.AccountLoginHistoriesRecord{},
 	)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// Initiate validator
 	validate := validator.New()
@@ -88,7 +88,7 @@ func main() {
 	// Logger endpoint list
 	ListEndpoints()
 	// Init Router in Logger
-	LoggerRouter := logger.LoggerMiddleware(router)
+	LoggerRouter := utils.LoggerMiddleware(router)
 
 	// Server listener
 	server := http.Server{
@@ -97,7 +97,7 @@ func main() {
 	}
 
 	ok := server.ListenAndServe()
-	errs.PanicIfError(ok)
+	utils.PanicIfError(ok)
 }
 
 // RegisterEndpoint function to register all endpoint on service http router
@@ -111,7 +111,7 @@ func RegisterEndpoint(method, path string,
 
 // ListEndpoints function to show all registered endpoint
 func ListEndpoints() {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 	log.Infoln("Registered endpoints:")
 	for _, e := range endpoints {
 		log.Infoln(e)

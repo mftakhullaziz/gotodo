@@ -6,10 +6,7 @@ import (
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/accounts"
-	errs "gotodo/internal/utils/errors"
-	"gotodo/internal/utils/logger"
-	"gotodo/internal/utils/payload"
-	responses "gotodo/internal/utils/response"
+	"gotodo/internal/utils"
 	"net/http"
 	"strconv"
 )
@@ -23,35 +20,35 @@ func NewLoginHandlerAPI(loginUsecase accounts.LoginUsecase) api.LoginHandlerAPI 
 }
 
 func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http.Request) {
-	log := logger.LoggerParent()
+	log := utils.LoggerParent()
 
 	loginRequest := request.LoginRequest{}
-	payload.ReadFromRequestBody(requests, &loginRequest)
+	utils.ReadFromRequestBody(requests, &loginRequest)
 
 	loginHandler, errLogin := l.LoginUsecase.LoginAccountUsecase(requests.Context(), loginRequest)
-	errs.LoggerIfErrorWithCustomMessage(
+	utils.LoggerIfErrorWithCustomMessage(
 		errLogin, log, "user login not success please check username or password!")
 
 	messageIsSuccess := "login account successfully!"
 	messageNotSuccess := "username and password not valid please check again!"
-	result := responses.CreateResponses(
+	result := utils.CreateResponses(
 		loginHandler, http.StatusCreated, messageIsSuccess, messageNotSuccess)
 
-	payload.WriteToResponseBody(writer, &result)
+	utils.WriteToResponseBody(writer, &result)
 }
 
 func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request) {
 	token := requests.Header.Get("Authorization")
 	userId, err := middleware.AuthenticateUser(token)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// Do convert string authorized to integer
 	authorizedUser, err := strconv.Atoi(userId)
-	errs.LoggerIfError(err)
+	utils.LoggerIfError(err)
 
 	// Update logout at time
 	logoutHandler := l.LoginUsecase.LogoutAccountUsecase(requests.Context(), authorizedUser, token)
-	errs.LoggerIfError(logoutHandler)
+	utils.LoggerIfError(logoutHandler)
 
 	// If update logout at time success then remove authorization and logout
 	// Delete the Authorization header from the user's requests
@@ -64,5 +61,5 @@ func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *htt
 		Data:       nil,
 	}
 
-	payload.WriteToResponseBody(writer, result)
+	utils.WriteToResponseBody(writer, result)
 }
