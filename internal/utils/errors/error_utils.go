@@ -1,8 +1,11 @@
-package helpers
+package errors
 
 import (
-	"errors"
 	"github.com/sirupsen/logrus"
+	res "gotodo/internal/domain/models/response"
+	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils/payload"
+	"net/http"
 )
 import "gorm.io/gorm"
 
@@ -24,8 +27,8 @@ func FatalIfErrorWithCustomMessage(err error, log *logrus.Logger, str string) {
 	}
 }
 
-func ErrorStructJoinUserAccountRecord(gdb *gorm.DB) {
-	log := LoggerParent()
+func StructJoinUserAccountRecordErrorUtils(gdb *gorm.DB) {
+	log := logger.LoggerParent()
 	var emptyInterface interface{}
 	if gdb.Error != nil {
 		log.Errorln("Error fetch gorm record: ", emptyInterface, gdb.Error)
@@ -35,7 +38,7 @@ func ErrorStructJoinUserAccountRecord(gdb *gorm.DB) {
 }
 
 func LoggerIfError(err error) {
-	log := LoggerParent()
+	log := logger.LoggerParent()
 	if err != nil {
 		log.Errorln("Logger : ", err.Error())
 	}
@@ -47,13 +50,16 @@ func LoggerIfErrorWithCustomMessage(err error, log *logrus.Logger, str string) {
 	}
 }
 
-func ValidateIntValue(val ...int) error {
-	log := LoggerParent()
-	for _, v := range val {
-		if v <= 0 {
-			log.Errorln(v)
-			return errors.New("invalid int value")
-		}
+func InternalServerError(w http.ResponseWriter, r *http.Request, err interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+
+	response := res.DefaultServiceResponse{
+		StatusCode: http.StatusInternalServerError,
+		Message:    "INTERNAL SERVER ERROR",
+		IsSuccess:  false,
+		Data:       err,
 	}
-	return nil
+
+	payload.WriteToResponseBody(w, response)
 }

@@ -4,10 +4,13 @@ import (
 	"github.com/gorilla/mux"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
-	"gotodo/internal/helpers"
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/tasks"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils/payload"
+	responses "gotodo/internal/utils/response"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,7 +19,7 @@ import (
 const (
 	// formatDatetime is the format string for datetime values.
 	formatDatetime = "2006-01-02 15:04:05"
-	// messageUserNotAuthorized is the error message for unauthorized user.
+	// messageUserNotAuthorized is the errors message for unauthorized user.
 	messageUserNotAuthorized = "user account not authorized, please login or sign up!"
 	// authHeaderKey is the key for the Authorization header.
 	authHeaderKey = "Authorization"
@@ -33,37 +36,37 @@ func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlerAPI {
 // CreateTaskHandler : do update task based on user authorized
 // Params : http.ResponseWriter, *http.Request
 func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
-	// Define logger helpers
-	log := helpers.LoggerParent()
+	// Define logger utils
+	log := logger.LoggerParent()
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		result := responses.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		helpers.WriteToResponseBody(writer, &responses)
+		payload.WriteToResponseBody(writer, &result)
 		return
 	}
 
 	// Do convert string authorized to integer
 	authorizedUserId, err := strconv.Atoi(authorized)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do createRequest transform to request body as json
 	taskRequest := request.TaskRequest{}
-	helpers.ReadFromRequestBody(requests, &taskRequest)
+	payload.ReadFromRequestBody(requests, &taskRequest)
 	log.Info("task request body: ", taskRequest)
 
 	// Do get usecase createTask function with param context, updateRequest, userId
 	createHandler, err := t.TaskUseCase.CreateTaskUseCase(requests.Context(), taskRequest, authorizedUserId)
-	helpers.PanicIfError(err)
+	errs.PanicIfError(err)
 
 	// Do build response handler
-	responses := helpers.BuildResponseWithAuthorization(
+	result := responses.BuildResponseWithAuthorization(
 		createHandler,
 		http.StatusCreated,
 		int(createHandler.TaskID),
@@ -71,25 +74,25 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 		"create task successful")
 
 	// Do build write response to response body
-	helpers.WriteToResponseBody(writer, &responses)
+	payload.WriteToResponseBody(writer, &result)
 }
 
 // UpdateTaskHandler : do update task based on user authorized and idTask
 // Params : http.ResponseWriter, *http.Request
 func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
-	// Define logger helpers
-	log := helpers.LoggerParent()
+	// Define logger utils
+	log := logger.LoggerParent()
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		result := responses.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		helpers.WriteToResponseBody(writer, &responses)
+		payload.WriteToResponseBody(writer, &result)
 		return
 	}
 
@@ -97,19 +100,19 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	vars := mux.Vars(requests)
 	idTaskVar := vars["task_id"]
 	idTask, err := strconv.Atoi(idTaskVar)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do updateRequest transform to request body as json
 	updateRequest := request.TaskRequest{}
-	helpers.ReadFromRequestBody(requests, &updateRequest)
+	payload.ReadFromRequestBody(requests, &updateRequest)
 	log.Infoln("update task request: ", updateRequest)
 
 	// Do get usecase updateTask function with param context, updateRequest, idTask
 	updateTaskHandler, err := t.TaskUseCase.UpdateTaskUseCase(requests.Context(), updateRequest, idTask)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do build response handler
-	updateTaskResponse := helpers.BuildResponseWithAuthorization(
+	updateTaskResponse := responses.BuildResponseWithAuthorization(
 		updateTaskHandler,
 		http.StatusCreated,
 		int(updateTaskHandler.TaskID),
@@ -117,42 +120,42 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 		"update task successfully")
 
 	// Do build write response to response body
-	helpers.WriteToResponseBody(writer, &updateTaskResponse)
+	payload.WriteToResponseBody(writer, &updateTaskResponse)
 }
 
 func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request) {
-	// Define logger helpers
-	log := helpers.LoggerParent()
+	// Define logger utils
+	log := logger.LoggerParent()
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		result := responses.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		helpers.WriteToResponseBody(writer, &responses)
+		payload.WriteToResponseBody(writer, &result)
 		return
 	}
 
 	authorizedUserId, err := strconv.Atoi(authorized)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Define to get idTask from param
 	vars := mux.Vars(requests)
 	idTaskVar := vars["task_id"]
 	idTask, err := strconv.Atoi(idTaskVar)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 	log.Infoln("find task by id_task: ", idTask)
 
 	// Do get usecase updateTask function with param context, updateRequest, idTask
 	findTaskHandler, err := t.TaskUseCase.FindTaskByIdUseCase(requests.Context(), idTask, authorizedUserId)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 	log.Infoln("find task handler: ", findTaskHandler)
 
-	findTaskHandlerResponse := helpers.BuildResponseWithAuthorization(
+	findTaskHandlerResponse := responses.BuildResponseWithAuthorization(
 		findTaskHandler,
 		http.StatusAccepted,
 		int(findTaskHandler.TaskID),
@@ -160,69 +163,69 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 		"request find task successful!",
 	)
 
-	helpers.WriteToResponseBody(writer, findTaskHandlerResponse)
+	payload.WriteToResponseBody(writer, findTaskHandlerResponse)
 }
 
 func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *http.Request) {
-	// Define logger helpers
-	log := helpers.LoggerParent()
+	// Define logger utils
+	log := logger.LoggerParent()
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		result := responses.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		helpers.WriteToResponseBody(writer, &responses)
+		payload.WriteToResponseBody(writer, &result)
 		return
 	}
 
 	authorizedUserId, err := strconv.Atoi(authorized)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	findAllTaskHandler, err := t.TaskUseCase.FindTaskAllUseCase(requests.Context(), authorizedUserId)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	tasksSlice := []interface{}{findAllTaskHandler}
 	log.Infoln("Tasks: ", tasksSlice)
 
-	findAllTaskHandlerResponse := helpers.BuildAllResponseWithAuthorization(
+	findAllTaskHandlerResponse := responses.BuildAllResponseWithAuthorization(
 		tasksSlice[0],
 		"request find task successful!",
 		len(findAllTaskHandler),
 		time.Now().Format(formatDatetime))
 
-	helpers.WriteToResponseBody(writer, findAllTaskHandlerResponse)
+	payload.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
 
 func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request) {
-	// Define logger helpers
-	log := helpers.LoggerParent()
+	// Define logger utils
+	log := logger.LoggerParent()
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		result := responses.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		helpers.WriteToResponseBody(writer, &responses)
+		payload.WriteToResponseBody(writer, &result)
 		return
 	}
 
 	authorizedUserId, err := strconv.Atoi(authorized)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Define to get idTask from param
 	params := requests.URL.Query()
 	taskIdParam := params.Get("task_id")
 	taskId, err := strconv.Atoi(taskIdParam)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	deleteHandler := t.TaskUseCase.DeleteTaskUseCase(requests.Context(), taskId, authorizedUserId)
 	if deleteHandler != nil {
@@ -235,43 +238,43 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 		IsSuccess:  true,
 		Data:       "delete task is success"}
 
-	helpers.WriteToResponseBody(writer, res)
+	payload.WriteToResponseBody(writer, res)
 }
 
 func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request) {
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(authHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := helpers.BuildEmptyResponse(messageUserNotAuthorized)
+		result := responses.BuildEmptyResponse(messageUserNotAuthorized)
 		// Do build write response to response body
-		helpers.WriteToResponseBody(writer, &responses)
+		payload.WriteToResponseBody(writer, &result)
 		return
 	}
 
 	authorizedUserId, err := strconv.Atoi(authorized)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Define to get idTask from param
 	params := requests.URL.Query()
 	completedParam := params.Get("isCompleted")
 	taskIds := params.Get("taskId")
 	taskIdParam, err := strconv.Atoi(taskIds)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	completedCompletedHandler, err := t.TaskUseCase.UpdateTaskStatusUseCase(
 		requests.Context(), taskIdParam, authorizedUserId, completedParam)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
-	completedHandlerResponse := helpers.BuildResponseWithAuthorization(
+	completedHandlerResponse := responses.BuildResponseWithAuthorization(
 		completedCompletedHandler,
 		http.StatusAccepted,
 		int(completedCompletedHandler.TaskID),
 		authorized,
 		"update completed task successful!")
 
-	helpers.WriteToResponseBody(writer, completedHandlerResponse)
+	payload.WriteToResponseBody(writer, completedHandlerResponse)
 }

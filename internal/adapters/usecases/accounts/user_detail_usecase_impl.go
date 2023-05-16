@@ -5,9 +5,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
-	"gotodo/internal/helpers"
 	"gotodo/internal/ports/services/accounts"
 	account "gotodo/internal/ports/usecases/accounts"
+	errs "gotodo/internal/utils/errors"
 )
 
 type UserDetailUsecaseImpl struct {
@@ -23,7 +23,7 @@ const formatDatetime = "2006-01-02 15:04:05"
 
 func (u UserDetailUsecaseImpl) FindUserByUserIdUsecase(ctx context.Context, userId int64) (response.UserDetailResponse, error) {
 	userDetailUsecase, err := u.UserDetail.FindUserByUserIdService(ctx, userId)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	createTime := userDetailUsecase.CreatedAt.Format(formatDatetime)
 	updateTime := userDetailUsecase.UpdatedAt.Format(formatDatetime)
@@ -46,10 +46,10 @@ func (u UserDetailUsecaseImpl) FindUserByUserIdUsecase(ctx context.Context, user
 
 func (u UserDetailUsecaseImpl) UpdateUserByUserIdUsecase(ctx context.Context, userId int64, request request.UserRequest) (response.UserDetailResponse, error) {
 	err := u.Validate.Struct(request)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	updateUser, errUsecase := u.UserDetail.UpdateUserByUserIdService(ctx, userId, request)
-	helpers.LoggerIfError(errUsecase)
+	errs.LoggerIfError(errUsecase)
 
 	createTime := updateUser.CreatedAt.Format(formatDatetime)
 	updateTime := updateUser.UpdatedAt.Format(formatDatetime)

@@ -1,4 +1,4 @@
-package helpers
+package converter
 
 import (
 	"gotodo/internal/domain/dto"

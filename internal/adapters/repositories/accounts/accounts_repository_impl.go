@@ -5,9 +5,10 @@ import (
 	"errors"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
-	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/accounts"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/struct"
 	"time"
 )
 
@@ -34,7 +35,7 @@ func (a AccountRepositoryImpl) FindAccountById(ctx context.Context, id int64) (r
 	result := a.SQL.WithContext(ctx).First(&accountRecord, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.AccountRecord{}, ErrRecordNotFound
 		}
 		return record.AccountRecord{}, result.Error
@@ -49,7 +50,7 @@ func (a AccountRepositoryImpl) UpdateAccount(ctx context.Context, id int64, acco
 	err := a.SQL.WithContext(ctx).First(&existingAccount, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.AccountRecord{}, ErrRecordNotFound
 		}
 		return record.AccountRecord{}, err
@@ -68,7 +69,7 @@ func (a AccountRepositoryImpl) DeleteAccountById(ctx context.Context, id int64) 
 	result := a.SQL.WithContext(ctx).Delete(&record.AccountRecord{}, id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return ErrRecordNotFound
 		}
 		return result.Error
@@ -124,7 +125,7 @@ func (a AccountRepositoryImpl) VerifyCredential(ctx context.Context, username st
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return record.AccountRecord{}, errors.New("error record not found")
+			return record.AccountRecord{}, errors.New("errors record not found")
 		}
 		return record.AccountRecord{}, result.Error
 	} else if result.RowsAffected == 0 {
@@ -134,21 +135,21 @@ func (a AccountRepositoryImpl) VerifyCredential(ctx context.Context, username st
 	return accountRecord, nil
 }
 
-func (a AccountRepositoryImpl) FindAccountUser(ctx context.Context, username string) (helpers.UserAccounts, error) {
-	userAccount := helpers.UserAccounts{}
+func (a AccountRepositoryImpl) FindAccountUser(ctx context.Context, username string) (_struct.UserAccounts, error) {
+	userAccount := _struct.UserAccounts{}
 
 	resultAccount := a.SQL.WithContext(ctx).
 		Joins("inner join user_details ud on accounts.user_id = ud.user_id and accounts.username = ud.username").
 		Where("accounts.username = ? and accounts.status = ?", username, "active").
 		First(&userAccount.Accounts)
 
-	helpers.ErrorStructJoinUserAccountRecord(resultAccount)
+	errs.StructJoinUserAccountRecordErrorUtils(resultAccount)
 
 	resultUser := a.SQL.WithContext(ctx).Table("user_details").
 		Where("user_id = ?", userAccount.Accounts.UserID).
 		First(&userAccount.Users)
 
-	helpers.ErrorStructJoinUserAccountRecord(resultUser)
+	errs.StructJoinUserAccountRecordErrorUtils(resultUser)
 
 	return userAccount, nil
 }
@@ -168,7 +169,7 @@ func (a AccountRepositoryImpl) UpdateLogoutAt(ctx context.Context, userId int64,
 	err := a.SQL.WithContext(ctx).Where("user_id = ? AND token = ?", userId, token).First(&historiesAccount).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error task record not found")
+			ErrRecordNotFound := errors.New("errors task record not found")
 			return ErrRecordNotFound
 		}
 		return err

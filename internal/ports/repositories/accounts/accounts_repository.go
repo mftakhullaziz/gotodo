@@ -2,8 +2,8 @@ package accounts
 
 import (
 	"context"
-	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
+	"gotodo/internal/utils/struct"
 )
 
 type AccountRecordRepository interface {
@@ -15,7 +15,7 @@ type AccountRecordRepository interface {
 	IsExistAccountEmail(ctx context.Context, email string) bool
 	IsExistUsername(ctx context.Context, username string) bool
 	VerifyCredential(ctx context.Context, username string) (record.AccountRecord, error)
-	FindAccountUser(ctx context.Context, username string) (helpers.UserAccounts, error)
+	FindAccountUser(ctx context.Context, username string) (_struct.UserAccounts, error)
 	SaveLoginHistories(ctx context.Context, historiesRecord record.AccountLoginHistoriesRecord) error
 	UpdateLogoutAt(ctx context.Context, userId int64, token string) error
 }

@@ -8,9 +8,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"gotodo/internal/helpers"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/ports/repositories/tasks"
+	"gotodo/internal/utils/logger"
 	"time"
 )
 
@@ -37,7 +37,7 @@ func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, taskId int64, user
 	result := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
 		return record.TaskRecord{}, result.Error
@@ -46,14 +46,14 @@ func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, taskId int64, user
 }
 
 func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRecord record.TaskRecord) (record.TaskRecord, error) {
-	logger := helpers.LoggerParent()
+	logger := logger.LoggerParent()
 	var existingTask record.TaskRecord
 
 	// Check if the record exists
 	err := t.SQL.WithContext(ctx).First(&existingTask, taskId).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
 		return record.TaskRecord{}, err
@@ -78,7 +78,7 @@ func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, taskId int64, us
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error Record Not Found")
+			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return ErrRecordNotFound
 		}
 		return result.Error
@@ -111,7 +111,7 @@ func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, 
 	err := t.SQL.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ErrRecordNotFound := errors.New("error task record not found")
+			ErrRecordNotFound := errors.New("errors task record not found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
 		return record.TaskRecord{}, err

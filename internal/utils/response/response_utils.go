@@ -1,13 +1,14 @@
-package helpers
+package response
 
 import (
 	"gotodo/internal/domain/models/response"
+	"gotodo/internal/utils/struct"
 	"net/http"
 )
 
 func CreateResponses(handler interface{},
 	statusCode int, message1 string, message2 string) response.DefaultServiceResponse {
-	if HasValue(handler) {
+	if _struct.HasValue(handler) {
 		return response.DefaultServiceResponse{
 			StatusCode: statusCode,
 			Message:    message1,
@@ -30,7 +31,7 @@ func BuildResponseWithAuthorization(
 	taskId int,
 	userId string,
 	message1 string) response.DefaultServiceResponse {
-	if HasValue(handler) && userId != "" && taskId != 0 {
+	if _struct.HasValue(handler) && userId != "" && taskId != 0 {
 		return response.DefaultServiceResponse{
 			StatusCode: statusCode,
 			Message:    message1,
@@ -57,7 +58,7 @@ func BuildEmptyResponse(messages string) response.DefaultServiceResponse {
 
 func BuildAllResponseWithAuthorization(handler interface{},
 	message string, totalData int, requestAt string) response.DefaultServiceAllResponse {
-	if HasValueSlice(handler) {
+	if _struct.HasValueSlice(handler) {
 		return response.DefaultServiceAllResponse{
 			StatusCode: http.StatusOK,
 			Message:    message,

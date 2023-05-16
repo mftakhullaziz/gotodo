@@ -5,9 +5,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/dto"
 	"gotodo/internal/domain/models/request"
-	"gotodo/internal/helpers"
 	"gotodo/internal/ports/repositories/accounts"
 	account "gotodo/internal/ports/services/accounts"
+	"gotodo/internal/utils/converter"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils/password"
 	"time"
 )
 
@@ -29,10 +32,10 @@ func NewRegisterServiceImpl(
 }
 
 func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error) {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 
 	err := r.Validate.Struct(request)
-	helpers.PanicIfError(err)
+	errs.PanicIfError(err)
 
 	existingUsername := r.AccountRepository.IsExistUsername(ctx, request.Username)
 	existingEmail := r.AccountRepository.IsExistAccountEmail(ctx, request.Email)
@@ -41,7 +44,7 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 		log.Info("Email already registered")
 		return dto.AccountDTO{}, nil
 	} else {
-		hashPassword := helpers.HashPasswordAndSalt([]byte(request.Password))
+		hashPassword := password.HashPasswordAndSalt([]byte(request.Password))
 		userCreate := dto.UserDetailDTO{
 			Username:  request.Username,
 			Password:  hashPassword,
@@ -50,9 +53,9 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
-		userRecord := helpers.UserDTOToRecord(userCreate)
+		userRecord := converter.UserDTOToRecord(userCreate)
 		createUser, err := r.UserRepository.SaveUser(ctx, userRecord)
-		helpers.PanicIfError(err)
+		errs.PanicIfError(err)
 
 		accountService := dto.AccountDTO{
 			UserID:    int(createUser.UserID),
@@ -62,11 +65,11 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
-		accountRecord := helpers.AccountDtoToRecord(accountService)
+		accountRecord := converter.AccountDtoToRecord(accountService)
 		createAccount, err := r.AccountRepository.SaveAccount(ctx, accountRecord)
-		helpers.PanicIfError(err)
+		errs.PanicIfError(err)
 
-		accountDTO := helpers.RecordToAccountDTO(createAccount)
+		accountDTO := converter.RecordToAccountDTO(createAccount)
 		log.Info("Account created successfully")
 		return accountDTO, nil
 	}

@@ -1,10 +1,11 @@
-package helpers
+package logger
 
 import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	error2 "gotodo/internal/utils/errors"
 	"net/http"
 	"os"
 	"time"
@@ -19,7 +20,7 @@ func LoggerParent() *logrus.Logger {
 	log.SetOutput(os.Stdout)
 
 	dir, err := os.Getwd()
-	PanicIfError(err)
+	error2.PanicIfError(err)
 
 	logPath := dir + "/logs/application.log"
 	fileHook := lfshook.NewHook(lfshook.PathMap{

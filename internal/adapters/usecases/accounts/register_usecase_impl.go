@@ -5,9 +5,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
-	"gotodo/internal/helpers"
 	"gotodo/internal/ports/services/accounts"
 	account "gotodo/internal/ports/usecases/accounts"
+	errs "gotodo/internal/utils/errors"
 )
 
 type RegisterUseCaseImpl struct {
@@ -21,7 +21,7 @@ func NewRegisterUseCaseImpl(register accounts.RegisterService, validate *validat
 
 func (r RegisterUseCaseImpl) CreateAccountUseCase(ctx context.Context, request request.RegisterRequest) (response.RegisterResponse, error) {
 	err := r.Validate.Struct(request)
-	helpers.PanicIfError(err)
+	errs.PanicIfError(err)
 
 	registerUseCase, errRegister := r.Register.CreateNewAccount(ctx, request)
 	if errRegister != nil {

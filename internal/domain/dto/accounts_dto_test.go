@@ -34,7 +34,7 @@ package dto
 //
 //		actualJSON, err := json.Marshal(createAccountDTO)
 //		if err != nil {
-//			t.Errorf("Unexpected error marshalling CreateAccountDTO: %v", err)
+//			t.Errorf("Unexpected errors marshalling CreateAccountDTO: %v", err)
 //		}
 //		assert.NoError(t, err)
 //		assert.NotEmptyf(t, actualJSON, "actual JSON Not Empty")
@@ -59,7 +59,7 @@ package dto
 //		var actualCreateAccountDTO dto.CreateAccountDTO
 //		err := json.Unmarshal([]byte(jsonStr), &actualCreateAccountDTO)
 //		if err != nil {
-//			t.Errorf("Unexpected error unmarshalling JSON: %v", err)
+//			t.Errorf("Unexpected errors unmarshalling JSON: %v", err)
 //		}
 //		assert.NoError(t, err)
 //		assert.NotEmptyf(t, actualCreateAccountDTO, "actual Create Account DTO Not Empty")

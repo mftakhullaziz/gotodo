@@ -3,10 +3,13 @@ package accounts
 import (
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
-	"gotodo/internal/helpers"
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/accounts"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils/payload"
+	responses "gotodo/internal/utils/response"
 	"net/http"
 	"strconv"
 )
@@ -20,46 +23,46 @@ func NewLoginHandlerAPI(loginUsecase accounts.LoginUsecase) api.LoginHandlerAPI 
 }
 
 func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http.Request) {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 
 	loginRequest := request.LoginRequest{}
-	helpers.ReadFromRequestBody(requests, &loginRequest)
+	payload.ReadFromRequestBody(requests, &loginRequest)
 
 	loginHandler, errLogin := l.LoginUsecase.LoginAccountUsecase(requests.Context(), loginRequest)
-	helpers.LoggerIfErrorWithCustomMessage(
+	errs.LoggerIfErrorWithCustomMessage(
 		errLogin, log, "user login not success please check username or password!")
 
 	messageIsSuccess := "login account successfully!"
 	messageNotSuccess := "username and password not valid please check again!"
-	responses := helpers.CreateResponses(
+	result := responses.CreateResponses(
 		loginHandler, http.StatusCreated, messageIsSuccess, messageNotSuccess)
 
-	helpers.WriteToResponseBody(writer, &responses)
+	payload.WriteToResponseBody(writer, &result)
 }
 
 func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request) {
 	token := requests.Header.Get("Authorization")
 	userId, err := middleware.AuthenticateUser(token)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Do convert string authorized to integer
 	authorizedUser, err := strconv.Atoi(userId)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Update logout at time
 	logoutHandler := l.LoginUsecase.LogoutAccountUsecase(requests.Context(), authorizedUser, token)
-	helpers.LoggerIfError(logoutHandler)
+	errs.LoggerIfError(logoutHandler)
 
 	// If update logout at time success then remove authorization and logout
 	// Delete the Authorization header from the user's requests
 	requests.Header.Del("Authorization")
 
-	res := response.DefaultServiceResponse{
+	result := response.DefaultServiceResponse{
 		StatusCode: http.StatusAccepted,
 		Message:    "logout user account is successfully!",
 		IsSuccess:  true,
 		Data:       nil,
 	}
 
-	helpers.WriteToResponseBody(writer, res)
+	payload.WriteToResponseBody(writer, result)
 }

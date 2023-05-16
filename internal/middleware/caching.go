@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/patrickmn/go-cache"
-	"gotodo/internal/helpers"
+	"gotodo/internal/utils/logger"
 	"time"
 )
 
@@ -17,7 +17,7 @@ func init() {
 
 // GenerateTokenToCache Generate a new token for the user and store it in the cache
 func GenerateTokenToCache(userID string, token string, expirationTime time.Time) error {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 	log.Infoln("cache token expire_at countdown: ", expirationTime.Sub(time.Now()))
 
 	err := c.Add(token, userID, expirationTime.Sub(time.Now()))

@@ -1,6 +1,9 @@
-package helpers
+package password
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"gotodo/internal/utils/logger"
+)
 
 func HashPassword(password string) string {
 	// Generate the bcrypt hash from the password string
@@ -13,7 +16,7 @@ func HashPassword(password string) string {
 }
 
 func HashPasswordAndSalt(pwd []byte) string {
-	log := LoggerParent()
+	log := logger.LoggerParent()
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
 		log.Println(err)
@@ -23,7 +26,7 @@ func HashPasswordAndSalt(pwd []byte) string {
 }
 
 func ComparedPassword(hashedPwd string, plainPassword []byte) (bool, error) {
-	log := LoggerParent()
+	log := logger.LoggerParent()
 	byteHash := []byte(hashedPwd)
 	err := bcrypt.CompareHashAndPassword(byteHash, plainPassword)
 	if err != nil {

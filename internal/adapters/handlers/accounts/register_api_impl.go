@@ -2,9 +2,12 @@ package accounts
 
 import (
 	"gotodo/internal/domain/models/request"
-	"gotodo/internal/helpers"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/accounts"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils/payload"
+	"gotodo/internal/utils/response"
 	"net/http"
 )
 
@@ -17,21 +20,21 @@ func NewRegisterHandlerAPI(registerUseCase accounts.RegisterUseCase) api.Registe
 }
 
 func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests *http.Request) {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 
 	registerRequest := request.RegisterRequest{}
-	helpers.ReadFromRequestBody(requests, &registerRequest)
+	payload.ReadFromRequestBody(requests, &registerRequest)
 	log.Info("account request: ", registerRequest)
 
 	registerHandler, err := r.RegisterUseCase.CreateAccountUseCase(requests.Context(), registerRequest)
-	helpers.LoggerIfErrorWithCustomMessage(err, log, "account already created please using another 'email'")
+	errs.LoggerIfErrorWithCustomMessage(err, log, "account already created please using another 'email'")
 
-	responses := helpers.CreateResponses(registerHandler, http.StatusCreated,
+	responses := response.CreateResponses(registerHandler, http.StatusCreated,
 		"create account successfully!",
 		"create account not success please check your username or email or password again!",
 	)
 
-	helpers.WriteToResponseBody(writer, &responses)
+	payload.WriteToResponseBody(writer, &responses)
 }
 
 func (r RegisterHandlerAPI) ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request) {

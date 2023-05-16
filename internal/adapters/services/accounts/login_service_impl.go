@@ -5,10 +5,14 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/dto"
 	"gotodo/internal/domain/models/request"
-	"gotodo/internal/helpers"
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/repositories/accounts"
 	account "gotodo/internal/ports/services/accounts"
+	"gotodo/internal/utils/converter"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/logger"
+	"gotodo/internal/utils/password"
+	validate "gotodo/internal/utils/validator"
 	"strconv"
 	"time"
 )
@@ -23,10 +27,10 @@ func NewLoginServiceImpl(accountRepository accounts.AccountRecordRepository, val
 }
 
 func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request request.LoginRequest) (dto.AccountDTO, string, error) {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 
 	validate := l.Validate.Struct(request)
-	helpers.PanicIfError(validate)
+	errs.PanicIfError(validate)
 
 	credentialAccount, err := l.AccountRepository.VerifyCredential(ctx, request.Username)
 	if err != nil {
@@ -35,8 +39,7 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	}
 	log.Info("credential: ", credentialAccount.Username, ", ", credentialAccount.Password)
 
-	comparedPassword, errPassword := helpers.
-		ComparedPassword(credentialAccount.Password, []byte(request.Password))
+	comparedPassword, errPassword := password.ComparedPassword(credentialAccount.Password, []byte(request.Password))
 
 	// validate password is matched
 	if comparedPassword != true && errPassword != nil {
@@ -46,7 +49,7 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	// if validate password and username
 	findUserAccount, errUserAccount := l.AccountRepository.FindAccountUser(ctx, credentialAccount.Username)
 	if errUserAccount != nil {
-		log.Error("error find user account not found", errUserAccount.Error())
+		log.Error("errors find user account not found", errUserAccount.Error())
 	}
 	log.Info("user account find: ", findUserAccount)
 
@@ -55,37 +58,37 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	log.Infoln("account record: ", accountRecord)
 
 	tokenGenerate, expireTokenGenerate, errToken := middleware.GenerateJWTToken()
-	helpers.LoggerIfError(errToken)
+	errs.LoggerIfError(errToken)
 
 	// Add token to cache
 	err = middleware.GenerateTokenToCache(strconv.Itoa(int(findUserAccount.Users.UserID)), tokenGenerate, expireTokenGenerate)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	// Add token authorization header
 	err = middleware.MakeAuthenticatedRequest(tokenGenerate)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
-	optionalLoginHistory := helpers.NewOptionalColumnParams{
+	optionalLoginHistory := converter.NewOptionalColumnParams{
 		BearerToken: tokenGenerate, TimeNow: time.Now(), TimeIsNull: time.Time{},
 	}
 
-	userLoginHistory := helpers.UserAndAccountRecordToAccountLoginHistoryRecord(
+	userLoginHistory := converter.UserAndAccountRecordToAccountLoginHistoryRecord(
 		userRecord, accountRecord, optionalLoginHistory, expireTokenGenerate)
 
 	saveLoginHistory := l.AccountRepository.SaveLoginHistories(ctx, userLoginHistory)
-	helpers.LoggerIfError(saveLoginHistory)
+	errs.LoggerIfError(saveLoginHistory)
 
-	userAccounts := helpers.RecordToAccountDTO(accountRecord)
+	userAccounts := converter.RecordToAccountDTO(accountRecord)
 
 	return userAccounts, optionalLoginHistory.BearerToken, nil
 }
 
 func (l LoginServiceImpl) LogoutAccountService(ctx context.Context, userId int64, token string) error {
-	err := helpers.ValidateIntValue(int(userId))
-	helpers.LoggerIfError(err)
+	err := validate.ValidateIntValue(int(userId))
+	errs.LoggerIfError(err)
 
 	logoutService := l.AccountRepository.UpdateLogoutAt(ctx, userId, token)
-	helpers.LoggerIfError(logoutService)
+	errs.LoggerIfError(logoutService)
 
 	return nil
 }

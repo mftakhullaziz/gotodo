@@ -5,9 +5,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
-	"gotodo/internal/helpers"
 	"gotodo/internal/ports/services/accounts"
 	account "gotodo/internal/ports/usecases/accounts"
+	errs "gotodo/internal/utils/errors"
+	validate "gotodo/internal/utils/validator"
 	"time"
 )
 
@@ -22,7 +23,7 @@ func NewLoginUsecaseImpl(loginService accounts.LoginService, validate *validator
 
 func (l LoginUsecaseImpl) LoginAccountUsecase(ctx context.Context, request request.LoginRequest) (response.LoginResponse, error) {
 	err := l.Validate.Struct(request)
-	helpers.PanicIfError(err)
+	errs.PanicIfError(err)
 
 	loginUsecase, token, errLogin := l.LoginService.VerifyCredentialAccount(ctx, request)
 	if errLogin != nil {
@@ -40,11 +41,11 @@ func (l LoginUsecaseImpl) LoginAccountUsecase(ctx context.Context, request reque
 }
 
 func (l LoginUsecaseImpl) LogoutAccountUsecase(ctx context.Context, userId int, token string) error {
-	err := helpers.ValidateIntValue(userId)
-	helpers.LoggerIfError(err)
+	err := validate.ValidateIntValue(userId)
+	errs.LoggerIfError(err)
 
 	logoutUsecase := l.LoginService.LogoutAccountService(ctx, int64(userId), token)
-	helpers.LoggerIfError(logoutUsecase)
+	errs.LoggerIfError(logoutUsecase)
 
 	return nil
 }

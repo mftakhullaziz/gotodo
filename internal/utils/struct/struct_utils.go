@@ -1,4 +1,4 @@
-package helpers
+package _struct
 
 import (
 	"gotodo/internal/persistence/record"

@@ -6,9 +6,10 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
-	"gotodo/internal/helpers"
 	service "gotodo/internal/ports/services/tasks"
 	"gotodo/internal/ports/usecases/tasks"
+	errs "gotodo/internal/utils/errors"
+	"gotodo/internal/utils/logger"
 )
 
 const formatDatetime = "2006-01-02 15:04:05"
@@ -24,10 +25,10 @@ func NewTaskUseCaseImpl(taskService service.TaskService, validate *validator.Val
 
 func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.TaskRequest, userId int) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
-	helpers.PanicIfError(err)
+	errs.PanicIfError(err)
 
 	createTaskUsecase, err := t.TaskService.CreateTaskService(ctx, request, userId)
-	helpers.PanicIfError(err)
+	errs.PanicIfError(err)
 
 	createTaskResponse := response.TaskResponse{
 		TaskID:      createTaskUsecase.TaskID,
@@ -45,10 +46,10 @@ func (t TaskUseCaseImpl) CreateTaskUseCase(ctx context.Context, request request.
 
 func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.TaskRequest, taskId int) (response.TaskResponse, error) {
 	err := t.Validate.Struct(request)
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	updateTaskUsecase, errUsecase := t.TaskService.UpdateTaskService(ctx, taskId, request)
-	helpers.LoggerIfError(errUsecase)
+	errs.LoggerIfError(errUsecase)
 	completedTime := updateTaskUsecase.CompletedAt.Format(formatDatetime)
 	updateTime := updateTaskUsecase.UpdatedAt.Format(formatDatetime)
 
@@ -67,15 +68,15 @@ func (t TaskUseCaseImpl) UpdateTaskUseCase(ctx context.Context, request request.
 }
 
 func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, taskId int, userId int) (response.TaskResponse, error) {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 	err := t.Validate.StructPartial(&taskId)
 	if err != nil {
 		log.Info(err.Error())
 	}
-	helpers.LoggerIfError(err)
+	errs.LoggerIfError(err)
 
 	findTaskUsecase, errUsecase := t.TaskService.FindTaskByIdService(ctx, taskId, int64(userId))
-	helpers.LoggerIfError(errUsecase)
+	errs.LoggerIfError(errUsecase)
 
 	findTaskResponse := response.TaskResponse{
 		TaskID:      findTaskUsecase.TaskID,
@@ -94,7 +95,7 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 	var findAllTaskResponse []response.TaskResponse
 
 	findAllTaskUsecase, errUsecase := t.TaskService.FindTaskAllService(ctx, userId)
-	helpers.LoggerIfError(errUsecase)
+	errs.LoggerIfError(errUsecase)
 
 	for _, task := range findAllTaskUsecase {
 		responses := response.TaskResponse{
@@ -115,7 +116,7 @@ func (t TaskUseCaseImpl) FindTaskAllUseCase(ctx context.Context, userId int) ([]
 }
 
 func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, userId int) error {
-	log := helpers.LoggerParent()
+	log := logger.LoggerParent()
 	if taskId == 0 || userId == 0 {
 		return errors.New("taskId or userId must be greater than 0")
 	}
@@ -128,7 +129,7 @@ func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, user
 
 func (t TaskUseCaseImpl) UpdateTaskStatusUseCase(ctx context.Context, taskId int, userId int, completedParam string) (response.TaskResponse, error) {
 	updateTaskUsecase, errUsecase := t.TaskService.UpdateTaskStatusService(ctx, taskId, userId, completedParam)
-	helpers.LoggerIfError(errUsecase)
+	errs.LoggerIfError(errUsecase)
 
 	completedTime := updateTaskUsecase.CompletedAt.Format(formatDatetime)
 	updateTime := updateTaskUsecase.UpdatedAt.Format(formatDatetime)
