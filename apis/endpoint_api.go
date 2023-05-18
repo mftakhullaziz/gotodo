@@ -1,4 +1,4 @@
-package endpoint
+package apis
 
 type Prefix struct {
 	Authenticate string

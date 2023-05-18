@@ -6,9 +6,9 @@ import (
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
+	"gotodo/apis"
 	"gotodo/config"
 	"gotodo/config/database"
-	"gotodo/endpoint"
 	accountsHandler "gotodo/internal/adapters/handlers/accounts"
 	tasksHandler "gotodo/internal/adapters/handlers/tasks"
 	accountsRepository "gotodo/internal/adapters/repositories/accounts"
@@ -69,10 +69,10 @@ func main() {
 
 	// Init Http Router
 	router := httprouter.New()
-	// Call endpoint
-	api := endpoint.Rest()
+	// Call apis
+	api := apis.Rest()
 
-	// Register all endpoint
+	// Register all apis
 	RegisterEndpoint(http.MethodPost, api.AuthenticateRegister, accountHandler.RegisterHandler, router)
 	RegisterEndpoint(http.MethodPost, api.AuthenticateLogin, loginHandler.LoginHandler, router)
 	RegisterEndpoint(http.MethodPost, api.AuthenticateLogout, loginHandler.LogoutHandler, router)
@@ -85,8 +85,8 @@ func main() {
 	RegisterEndpoint(http.MethodDelete, api.TaskDelete, taskHandler.DeleteTaskHandler, router)
 	RegisterEndpoint(http.MethodPut, api.TaskUpdateStatus, taskHandler.UpdateTaskStatusHandler, router)
 
-	// Logger endpoint list
-	ListEndpoints()
+	// Logger apis list
+	utils.ListEndpoints(endpoints)
 	// Init Router in Logger
 	LoggerRouter := utils.LoggerMiddleware(router)
 
@@ -100,20 +100,11 @@ func main() {
 	utils.PanicIfError(ok)
 }
 
-// RegisterEndpoint function to register all endpoint on service http router
+// RegisterEndpoint function to register all apis on service http router
 func RegisterEndpoint(method, path string,
 	handler func(writer http.ResponseWriter, requests *http.Request),
 	router *httprouter.Router) {
 
 	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
 	router.HandlerFunc(method, path, handler)
-}
-
-// ListEndpoints function to show all registered endpoint
-func ListEndpoints() {
-	log := utils.LoggerParent()
-	log.Infoln("Registered endpoints:")
-	for _, e := range endpoints {
-		log.Infoln(e)
-	}
 }
