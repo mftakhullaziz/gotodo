@@ -35,7 +35,7 @@ run/build:
 
 run/unittest:
 	@echo "running unit tests for $(PACKAGE_NAME)"
-	go test -v ./config/... ./internal/...
+	go test -v ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
 
 run/benchmark:
 	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
