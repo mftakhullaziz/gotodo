@@ -91,20 +91,12 @@ func main() {
 	LoggerRouter := utils.LoggerMiddleware(router)
 
 	// Server listener
-	server := http.Server{
-		Addr:    "127.0.0.1:3000",
-		Handler: LoggerRouter,
-	}
-
-	ok := server.ListenAndServe()
+	ok := http.ListenAndServe(":3000", LoggerRouter)
 	utils.PanicIfError(ok)
 }
 
 // RegisterEndpoint function to register all apis on service http router
-func RegisterEndpoint(method, path string,
-	handler func(writer http.ResponseWriter, requests *http.Request),
-	router *httprouter.Router) {
-
+func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, requests *http.Request), router *httprouter.Router) {
 	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
 	router.HandlerFunc(method, path, handler)
 }

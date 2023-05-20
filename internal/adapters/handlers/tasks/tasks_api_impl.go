@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/gorilla/mux"
+	"gotodo/internal/adapters/handlers"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
 	"gotodo/internal/middleware"
@@ -11,15 +12,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-)
-
-const (
-	// formatDatetime is the format string for datetime values.
-	formatDatetime = "2006-01-02 15:04:05"
-	// messageUserNotAuthorized is the errors message for unauthorized user.
-	messageUserNotAuthorized = "user account not authorized, please login or sign up!"
-	// authHeaderKey is the key for the Authorization header.
-	authHeaderKey = "Authorization"
 )
 
 type TaskHandlerAPI struct {
@@ -37,13 +29,13 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 	log := utils.LoggerParent()
 
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		result := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		result := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &result)
 		return
@@ -81,13 +73,13 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	log := utils.LoggerParent()
 
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		result := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		result := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &result)
 		return
@@ -125,13 +117,13 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	log := utils.LoggerParent()
 
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		result := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		result := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &result)
 		return
@@ -168,13 +160,13 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 	log := utils.LoggerParent()
 
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		result := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		result := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &result)
 		return
@@ -193,7 +185,7 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 		tasksSlice[0],
 		"request find task successful!",
 		len(findAllTaskHandler),
-		time.Now().Format(formatDatetime))
+		time.Now().Format(handlers.FormatDatetime))
 
 	utils.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
@@ -203,13 +195,13 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 	log := utils.LoggerParent()
 
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		result := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		result := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &result)
 		return
@@ -240,13 +232,13 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 
 func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request) {
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		result := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		result := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &result)
 		return

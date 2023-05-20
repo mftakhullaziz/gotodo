@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"gotodo/internal/adapters/handlers"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/middleware"
 	"gotodo/internal/ports/handlers/api"
@@ -8,15 +9,6 @@ import (
 	"gotodo/internal/utils"
 	"net/http"
 	"strconv"
-)
-
-const (
-	// formatDatetime is the format string for datetime values.
-	formatDatetime = "2006-01-02 15:04:05"
-	// messageUserNotAuthorized is the errors message for unauthorized user.
-	messageUserNotAuthorized = "user account not authorized, please login or sign up!"
-	// authHeaderKey is the key for the Authorization header.
-	authHeaderKey = "Authorization"
 )
 
 type UserDetailHandlerAPI struct {
@@ -29,13 +21,13 @@ func NewUserDetailHandlerAPI(userUsecase accounts.UserDetailUsecase) api.UserHan
 
 func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWriter, requests *http.Request) {
 	// Do get authorization token if any from user login
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	// Do check if user account not authorized return empty response
 	if authorized == "" {
-		responses := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		responses := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		// Do build write response to response body
 		utils.WriteToResponseBody(writer, &responses)
 		return
@@ -57,12 +49,12 @@ func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWrit
 func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request) {
 	log := utils.LoggerParent()
 
-	token := requests.Header.Get(authHeaderKey)
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
 	if authorized == "" {
-		responses := utils.BuildEmptyResponse(messageUserNotAuthorized)
+		responses := utils.BuildEmptyResponse(handlers.MessageUserNotAuthorized)
 		utils.WriteToResponseBody(writer, &responses)
 		return
 	}

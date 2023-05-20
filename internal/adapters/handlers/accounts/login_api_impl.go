@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"gotodo/internal/adapters/handlers"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
 	"gotodo/internal/middleware"
@@ -38,7 +39,7 @@ func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http
 }
 
 func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request) {
-	token := requests.Header.Get("Authorization")
+	token := requests.Header.Get(handlers.AuthHeaderKey)
 	userId, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
 
@@ -52,7 +53,7 @@ func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *htt
 
 	// If update logout at time success then remove authorization and logout
 	// Delete the Authorization header from the user's requests
-	requests.Header.Del("Authorization")
+	requests.Header.Del(handlers.AuthHeaderKey)
 
 	result := response.DefaultServiceResponse{
 		StatusCode: http.StatusAccepted,
