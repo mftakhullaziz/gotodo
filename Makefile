@@ -35,11 +35,11 @@ run/build:
 
 run/unittest:
 	@echo "running unit tests for $(PACKAGE_NAME)"
-	go test -v ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
+	go test -v ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
 
 run/benchmark:
 	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
-	go test -bench=. ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
+	go test -bench=. ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
 
 run/service:
 	@echo "building and running $(PACKAGE_NAME)"
