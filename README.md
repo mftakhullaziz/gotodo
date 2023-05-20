@@ -18,7 +18,7 @@ Hexagonal architecture provides several benefits, including:
 However, hexagonal architecture can also be more complex to implement than traditional layered architectures. It requires careful planning and design to ensure that the interfaces between the layers are well-defined and flexible enough to support future changes to the application.
 
 ### structure hexagonal
-![pattern](https://github.com/mftakhullaziz/gotodos/blob/main/docs/hexago-pattern.png)
+![pattern](https://github.com/mftakhullaziz/gotodo/blob/main/docs/hexagonalpattern.png)
 
 ### makefile
     how to use makefile 'make <target>' where <target> is one of the following:
