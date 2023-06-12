@@ -7,8 +7,9 @@ help:
 	@echo "how to use makefile 'make <target>' where <target> is one of the following:"
 	@echo " build/service  [builds the executable]"
 	@echo " build/clean    [cleans the build directory]"
-	@echo " run/unittest   [runs unit tests]"
-	@echo " run/benchmark  [runs unit tests with bench]"
+	@echo " run/unittest   [run unit testing default]"
+	@echo " run/benchmark  [run unit testing with benchmark]"
+	@echo " run/coverage   [run unit testing with coverage]"	
 	@echo " run/service    [builds and runs the program]"
 	@echo " run/download   [download go package from already project]"
 	@echo " clean/package  [remove unused go package from already project]"
@@ -19,6 +20,7 @@ help:
 	@echo " make build/clean"
 	@echo " make run/unittest"
 	@echo " make run/benchmark"
+	@echo " make run/coverage"
 	@echo " make run/service"
 	@echo " make run/download"
 	@echo " make clean/package"
@@ -40,6 +42,10 @@ run/unittest:
 run/benchmark:
 	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
 	go test -bench=. ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
+
+run/coverage:
+	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
+	go test -cover ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
 
 run/service:
 	@echo "building and running $(PACKAGE_NAME)"

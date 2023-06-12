@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"github.com/gorilla/mux"
+	"github.com/julienschmidt/httprouter"
 	"gotodo/internal/adapters/handlers"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
@@ -68,7 +68,7 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 
 // UpdateTaskHandler : do update task based on user authorized and idTask
 // Params : http.ResponseWriter, *http.Request
-func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
+func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request, ps httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -86,8 +86,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	}
 
 	// Define to get idTask from param
-	vars := mux.Vars(requests)
-	idTaskVar := vars["task_id"]
+	idTaskVar := ps.ByName("task_id")
 	idTask, err := strconv.Atoi(idTaskVar)
 	utils.LoggerIfError(err)
 
@@ -112,7 +111,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	utils.WriteToResponseBody(writer, &updateTaskResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request) {
+func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request, ps httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -133,8 +132,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	utils.LoggerIfError(err)
 
 	// Define to get idTask from param
-	vars := mux.Vars(requests)
-	idTaskVar := vars["task_id"]
+	idTaskVar := ps.ByName("task_id")
 	idTask, err := strconv.Atoi(idTaskVar)
 	utils.LoggerIfError(err)
 	log.Infoln("find task by id_task: ", idTask)

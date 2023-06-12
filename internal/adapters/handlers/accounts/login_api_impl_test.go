@@ -1,79 +1,84 @@
 package accounts
 
 import (
-	"gotodo/internal/ports/handlers/api"
-	"gotodo/internal/ports/usecases/accounts"
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"gotodo/internal/domain/models/request"
+	"gotodo/internal/domain/models/response"
 	"net/http"
-	"reflect"
+	"net/http/httptest"
 	"testing"
 )
 
+type mockLoginUsecase struct {
+	loginResponse response.LoginResponse
+	loginError    error
+	logoutError   error
+}
+
+func (m *mockLoginUsecase) LoginAccountUsecase(ctx context.Context, loginRequest request.LoginRequest) (response.LoginResponse, error) {
+	return m.loginResponse, m.loginError
+}
+
+func (m *mockLoginUsecase) LogoutAccountUsecase(ctx context.Context, userID int, token string) error {
+	return m.logoutError
+}
+
 func TestLoginHandlerAPI_LoginHandler(t *testing.T) {
-	type fields struct {
-		LoginUsecase accounts.LoginUsecase
+	// Create a mock LoginUsecase
+	loginUsecase := &mockLoginUsecase{
+		loginResponse: response.LoginResponse{
+			AccountID: 1,
+			Username:  "test_user",
+			Password:  "test_pass",
+		},
+		loginError: nil,
 	}
-	type args struct {
-		writer   http.ResponseWriter
-		requests *http.Request
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			l := LoginHandlerAPI{
-				LoginUsecase: tt.fields.LoginUsecase,
-			}
-			l.LoginHandler(tt.args.writer, tt.args.requests)
-		})
-	}
-}
 
-func TestLoginHandlerAPI_LogoutHandler(t *testing.T) {
-	type fields struct {
-		LoginUsecase accounts.LoginUsecase
-	}
-	type args struct {
-		writer   http.ResponseWriter
-		requests *http.Request
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			l := LoginHandlerAPI{
-				LoginUsecase: tt.fields.LoginUsecase,
-			}
-			l.LogoutHandler(tt.args.writer, tt.args.requests)
-		})
-	}
-}
+	// Create a new LoginHandlerAPI instance
+	loginHandler := NewLoginHandlerAPI(loginUsecase)
 
-func TestNewLoginHandlerAPI(t *testing.T) {
-	type args struct {
-		loginUsecase accounts.LoginUsecase
+	// Create a test request with a JSON payload
+	loginReq := request.LoginRequest{
+		Username: "test_user",
+		Password: "test_pass",
 	}
-	tests := []struct {
-		name string
-		args args
-		want api.LoginHandlerAPI
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewLoginHandlerAPI(tt.args.loginUsecase); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewLoginHandlerAPI() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	body, _ := json.Marshal(loginReq)
+	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(body))
+
+	// Create a test response recorder
+	recorder := httptest.NewRecorder()
+
+	// Call the LoginHandler method
+	loginHandler.LoginHandler(recorder, req)
+
+	// Check the response status code
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	fmt.Println(recorder.Body)
+
+	// Parse the response body
+	var responseBody response.DefaultServiceResponse
+	err := json.NewDecoder(recorder.Body).Decode(&responseBody)
+	assert.NoError(t, err)
+
+	// Verify the response
+	assert.True(t, responseBody.IsSuccess)
+	assert.Equal(t, "login account successfully!", responseBody.Message)
+	assert.NotNil(t, responseBody.Data)
+
+	fmt.Println(responseBody.Data)
+
+	loginResponse, ok := responseBody.Data.(response.LoginResponse)
+
+	fmt.Println(loginResponse.AccountID)
+
+	assert.True(t, ok, "response.Data is not of type response.LoginResponse")
+
+	//
+	//assert.Equal(t, 1, loginResponse.AccountID)
+	//assert.Equal(t, "testuser", loginResponse.Username)
+	//assert.Equal(t, "testtoken", loginResponse.Token)
 }
