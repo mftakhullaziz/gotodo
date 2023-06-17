@@ -61,7 +61,7 @@ func main() {
 	// Login Handler
 	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)
 	loginUsecase := accountsUsecase.NewLoginUsecaseImpl(loginService, validate)
-	loginHandler := loginsHandler.NewLoginHandlerAPI(loginUsecase)
+	loginHandler := loginsHandler.NewLoginHandlers(loginUsecase)
 
 	// User Detail Handler
 	userDetailService := accountsService.NewUserDetailServiceImpl(userRepository, accountRepository, validate)

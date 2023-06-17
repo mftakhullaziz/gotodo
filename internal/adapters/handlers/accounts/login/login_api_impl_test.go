@@ -40,7 +40,7 @@ func InitRouter(db *gorm.DB) *httprouter.Router {
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
 	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)
 	loginUsecase := accountsUsecase.NewLoginUsecaseImpl(loginService, validate)
-	loginHandler := NewLoginHandlerAPI(loginUsecase)
+	loginHandler := NewLoginHandlers(loginUsecase)
 
 	r := router.NewRouter(&loginHandler, nil, nil, nil)
 	return r

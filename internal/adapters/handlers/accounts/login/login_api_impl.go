@@ -17,7 +17,7 @@ type Handlers struct {
 	LoginUsecase accounts.LoginUsecase
 }
 
-func NewLoginHandlerAPI(loginUsecase accounts.LoginUsecase) api.LoginHandlers {
+func NewLoginHandlers(loginUsecase accounts.LoginUsecase) api.LoginHandlers {
 	return &Handlers{LoginUsecase: loginUsecase}
 }
 
