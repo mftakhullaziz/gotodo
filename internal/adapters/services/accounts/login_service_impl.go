@@ -23,7 +23,8 @@ func NewLoginServiceImpl(accountRepository accounts.AccountRecordRepository, val
 }
 
 func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request request.LoginRequest) (dto.AccountDTO, string, error) {
-	log := utils.LoggerParent()
+	logger := utils.LoggerParent()
+	log := logger.Log
 
 	validate := l.Validate.Struct(request)
 	utils.PanicIfError(validate)
@@ -33,7 +34,6 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 		log.Info("username not found")
 		return dto.AccountDTO{}, "", err
 	}
-	log.Info("credential: ", credentialAccount.Username, ", ", credentialAccount.Password)
 
 	comparedPassword, errPassword := utils.ComparedPassword(credentialAccount.Password, []byte(request.Password))
 
@@ -47,11 +47,9 @@ func (l LoginServiceImpl) VerifyCredentialAccount(ctx context.Context, request r
 	if errUserAccount != nil {
 		log.Error("errors find user account not found", errUserAccount.Error())
 	}
-	log.Info("user account find: ", findUserAccount)
 
 	userRecord := findUserAccount.Users
 	accountRecord := findUserAccount.Accounts
-	log.Infoln("account record: ", accountRecord)
 
 	tokenGenerate, expireTokenGenerate, errToken := middleware.GenerateJWTToken()
 	utils.LoggerIfError(errToken)

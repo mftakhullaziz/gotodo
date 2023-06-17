@@ -29,7 +29,7 @@ func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http
 
 	loginHandler, errLogin := l.LoginUsecase.LoginAccountUsecase(requests.Context(), loginRequest)
 	utils.LoggerIfErrorWithCustomMessage(
-		errLogin, log, "user login not success please check username or password!")
+		errLogin, log.Log, "user login not success please check username or password!")
 
 	messageIsSuccess := "login account successfully!"
 	messageNotSuccess := "username and password not valid please check again!"

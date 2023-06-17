@@ -68,11 +68,13 @@ func main() {
 	userDetailHandler := accountsHandler.NewUserDetailHandlerAPI(userDetailUsecase)
 
 	// Call http router
-	app := router.NewRouter(loginHandler, accountHandler, userDetailHandler, taskHandler)
+	app := router.NewRouter(&loginHandler, &accountHandler, &userDetailHandler, &taskHandler)
 
 	// Init Router in Logger
 	LoggerRouter := utils.LoggerMiddleware(app)
 
+	Logger := utils.LoggerParent()
+	Logger.ConsoleLog.Info("HTTP server listening on port 3000")
 	// Server listener
 	ok := http.ListenAndServe(":3000", LoggerRouter)
 	utils.PanicIfError(ok)

@@ -12,10 +12,12 @@ import (
 )
 
 func NewDatabaseConnection(ctx context.Context, path string) (db *gorm.DB, error error) {
-	log := utils.LoggerParent()
-
 	err := godotenv.Load(path)
-	utils.FatalIfErrorWithCustomMessage(err, log, "Error loading .env.test file: %v")
+	if err != nil {
+		panic(err.Error())
+	}
+	//utils.LoggerIfError(err)
+	//utils.FatalIfErrorWithCustomMessage(err, log, "Error loading .env or .env.test file: %v")
 
 	// Do get from environment file
 	username := os.Getenv("MYSQL_USER")

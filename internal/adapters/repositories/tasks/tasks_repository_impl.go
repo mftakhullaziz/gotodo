@@ -65,7 +65,7 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRe
 		}
 		return record.TaskRecord{}, query
 	}
-	logger.Infoln("Find Record Based On Task Id: ", existingTask)
+	logger.Log.Infoln("Find Record Based On Task Id: ", existingTask)
 
 	// Update the fields of the existing record with the fields of the taskRecord argument
 	qUpdate := tx.WithContext(ctx).Model(&existingTask).Updates(taskRecord).Error
@@ -73,7 +73,7 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRe
 		tx.Rollback()
 		return record.TaskRecord{}, qUpdate
 	}
-	logger.Infoln("Find Record Based On Task Id After Update: ", existingTask)
+	logger.Log.Infoln("Find Record Based On Task Id After Update: ", existingTask)
 	tx.Commit()
 
 	return existingTask, nil

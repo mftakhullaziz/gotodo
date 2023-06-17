@@ -28,7 +28,7 @@ func NewUserDetailServiceImpl(
 }
 
 func (u UserServiceImpl) FindUserByUserIdService(ctx context.Context, userId int64) (dto.UserDetailDTO, error) {
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	err := utils.ValidateIntValue(int(userId))
 	if err != nil {
@@ -44,7 +44,7 @@ func (u UserServiceImpl) FindUserByUserIdService(ctx context.Context, userId int
 }
 
 func (u UserServiceImpl) UpdateUserByUserIdService(ctx context.Context, userId int64, request request.UserRequest) (dto.UserDetailDTO, error) {
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	err := u.Validate.Struct(request)
 	if err != nil {

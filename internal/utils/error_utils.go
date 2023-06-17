@@ -30,17 +30,17 @@ func StructJoinUserAccountRecordErrorUtils(gdb *gorm.DB) {
 	var emptyInterface interface{}
 	if gdb.Error != nil {
 		gdb.Rollback()
-		log.Errorln("Error fetch gorm record: ", emptyInterface, gdb.Error)
+		log.Log.Errorln("Error fetch gorm record: ", emptyInterface, gdb.Error)
 	} else if gdb.RowsAffected == 0 {
 		gdb.Rollback()
-		log.Errorln("Row affected record is zero: ", emptyInterface)
+		log.Log.Errorln("Row affected record is zero: ", emptyInterface)
 	}
 }
 
 func LoggerIfError(err error) {
 	log := LoggerParent()
 	if err != nil {
-		log.Errorln("Logger : ", err.Error())
+		log.Log.Errorln("Logger : ", err.Error())
 	}
 }
 

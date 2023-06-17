@@ -18,7 +18,7 @@ func NewRegisterHandlerAPI(registerUseCase accounts.RegisterUseCase) api.Registe
 }
 
 func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	registerRequest := request.RegisterRequest{}
 	utils.ReadFromRequestBody(requests, &registerRequest)

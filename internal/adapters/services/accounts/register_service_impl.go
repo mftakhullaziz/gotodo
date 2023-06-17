@@ -29,7 +29,8 @@ func NewRegisterServiceImpl(
 }
 
 func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error) {
-	log := utils.LoggerParent()
+	logger := utils.LoggerParent()
+	log := logger.Log
 
 	err := r.Validate.Struct(request)
 	utils.PanicIfError(err)

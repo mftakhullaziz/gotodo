@@ -70,7 +70,7 @@ func (t TaskUseCaseImpl) FindTaskByIdUseCase(ctx context.Context, taskId int, us
 	log := utils.LoggerParent()
 	err := t.Validate.StructPartial(&taskId)
 	if err != nil {
-		log.Info(err.Error())
+		log.Log.Info(err.Error())
 	}
 	utils.LoggerIfError(err)
 
@@ -121,7 +121,7 @@ func (t TaskUseCaseImpl) DeleteTaskUseCase(ctx context.Context, taskId int, user
 	}
 	err := t.TaskService.DeleteTaskService(ctx, taskId, userId)
 	if err != nil {
-		log.Infoln("delete tasks data with task_id: ", taskId, " and user_id: ", userId, " is failed")
+		log.Log.Infoln("delete tasks data with task_id: ", taskId, " and user_id: ", userId, " is failed")
 	}
 	return nil
 }

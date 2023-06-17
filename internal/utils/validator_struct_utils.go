@@ -16,7 +16,7 @@ func ValidateIntValue(val ...int) error {
 	log := LoggerParent()
 	for _, v := range val {
 		if v <= 0 {
-			log.Errorln(v)
+			log.Log.Errorln(v)
 			return errors.New("invalid int value")
 		}
 	}

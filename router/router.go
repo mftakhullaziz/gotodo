@@ -11,7 +11,7 @@ import (
 
 var endpoints []string
 
-func NewRouter(login api.LoginHandlerAPI, register api.RegisterHandlerAPI, user api.UserHandlerAPI, tasks api.TaskHandlerAPI) *httprouter.Router {
+func NewRouter(login *api.LoginHandlerAPI, register *api.RegisterHandlerAPI, user *api.UserHandlerAPI, tasks *api.TaskHandlerAPI) *httprouter.Router {
 	// Init Http Router
 	router := httprouter.New()
 
@@ -19,10 +19,18 @@ func NewRouter(login api.LoginHandlerAPI, register api.RegisterHandlerAPI, user 
 	url := apis.Rest()
 
 	// Define all route endpoint
-	LoginRouter(login, url, router)
-	RegisterRouter(register, url, router)
-	UserRouter(user, url, router)
-	TasksRouter(tasks, url, router)
+	if login != nil {
+		LoginRouter(*login, url, router)
+	}
+	if register != nil {
+		RegisterRouter(*register, url, router)
+	}
+	if tasks != nil {
+		TasksRouter(*tasks, url, router)
+	}
+	if user != nil {
+		UserRouter(*user, url, router)
+	}
 
 	// Logger apis list
 	utils.ListEndpoints(endpoints)

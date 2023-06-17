@@ -48,7 +48,7 @@ func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWrit
 }
 
 func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)

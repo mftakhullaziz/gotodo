@@ -81,7 +81,7 @@ func (t TaskServiceImpl) FindTaskAllService(ctx context.Context, userId int) ([]
 
 	findAllTaskService, err := t.TaskRepository.FindTaskAll(ctx, int64(userId))
 	utils.LoggerIfError(err)
-	log.Infoln("list tasks: ", findAllTaskService)
+	log.Log.Infoln("list tasks: ", findAllTaskService)
 
 	findAllTaskResponse := utils.TaskRecordsToTaskDTOs(findAllTaskService)
 	return findAllTaskResponse, nil

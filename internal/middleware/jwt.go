@@ -10,7 +10,7 @@ import (
 func GenerateJWTToken() (string, time.Time, error) {
 	// Set the expiration time of the token
 	expirationTime := time.Now().Add(1 * time.Hour) // 1 day
-	utils.LoggerParent().Infoln("expire token time at: ", expirationTime)
+	//utils.LoggerParent().Log.Infoln("expire token time at: ", expirationTime)
 	// Create a new JWT token with the claims
 	claims := &jwt.StandardClaims{
 		ExpiresAt: expirationTime.Unix(),
@@ -42,7 +42,7 @@ func AuthenticateWithInToken(tokenString string) (bool, error) {
 	// Check if the token has expired
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		exp := claims["exp"].(float64)
-		log.Infoln("expiresAt: ", exp)
+		log.Log.Infoln("expiresAt: ", exp)
 		if exp < float64(time.Now().Unix()) {
 			return false, nil
 		}

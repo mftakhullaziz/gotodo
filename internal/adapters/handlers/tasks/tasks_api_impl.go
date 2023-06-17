@@ -26,7 +26,7 @@ func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlerAPI {
 // Params : http.ResponseWriter, *http.Request
 func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
@@ -70,7 +70,7 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 // Params : http.ResponseWriter, *http.Request
 func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
 	// Define logger utils
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
@@ -113,7 +113,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 
 func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
 	// Define logger utils
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
@@ -155,7 +155,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 
 func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
@@ -190,7 +190,7 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 
 func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
