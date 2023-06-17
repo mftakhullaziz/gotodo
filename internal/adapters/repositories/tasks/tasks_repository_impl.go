@@ -25,10 +25,10 @@ func NewTaskRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) tasks.Tas
 
 func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.TaskRecord) (record.TaskRecord, error) {
 	tx := t.SQL.Begin()
-	result := tx.WithContext(ctx).Create(&taskRecord)
-	if result.Error != nil {
+	query := tx.WithContext(ctx).Create(&taskRecord)
+	if query.Error != nil {
 		tx.Rollback()
-		return record.TaskRecord{}, result.Error
+		return record.TaskRecord{}, query.Error
 	}
 	tx.Commit()
 	fmt.Println("result: ", taskRecord)
@@ -38,14 +38,14 @@ func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.Task
 func (t TaskRepositoryImpl) FindTaskById(ctx context.Context, taskId int64, userId int64) (record.TaskRecord, error) {
 	var taskRecord record.TaskRecord
 	tx := t.SQL.Begin()
-	result := tx.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId)
-	if result.Error != nil {
+	query := tx.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId)
+	if query.Error != nil {
 		tx.Rollback()
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
-		return record.TaskRecord{}, result.Error
+		return record.TaskRecord{}, query.Error
 	}
 	tx.Commit()
 	return taskRecord, nil
@@ -56,22 +56,22 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRe
 	var existingTask record.TaskRecord
 	tx := t.SQL.Begin()
 	// Check if the record exists
-	err := tx.WithContext(ctx).First(&existingTask, taskId).Error
-	if err != nil {
+	query := tx.WithContext(ctx).First(&existingTask, taskId).Error
+	if query != nil {
 		tx.Rollback()
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(query, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
-		return record.TaskRecord{}, err
+		return record.TaskRecord{}, query
 	}
 	logger.Infoln("Find Record Based On Task Id: ", existingTask)
 
 	// Update the fields of the existing record with the fields of the taskRecord argument
-	err = tx.WithContext(ctx).Model(&existingTask).Updates(taskRecord).Error
-	if err != nil {
+	qUpdate := tx.WithContext(ctx).Model(&existingTask).Updates(taskRecord).Error
+	if qUpdate != nil {
 		tx.Rollback()
-		return record.TaskRecord{}, err
+		return record.TaskRecord{}, qUpdate
 	}
 	logger.Infoln("Find Record Based On Task Id After Update: ", existingTask)
 	tx.Commit()
@@ -82,26 +82,23 @@ func (t TaskRepositoryImpl) UpdateTask(ctx context.Context, taskId int64, taskRe
 func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, taskId int64, userId int64) error {
 	var taskRecord record.TaskRecord
 	tx := t.SQL.Begin()
-	result := tx.WithContext(ctx).
-		Where("user_id = ?", userId).
-		First(&taskRecord, taskId)
-
-	if result.Error != nil {
+	query := tx.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId)
+	if query.Error != nil {
 		tx.Rollback()
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return ErrRecordNotFound
 		}
-		return result.Error
+		return query.Error
 	}
 
 	// Set task status inactive
 	taskRecord.TaskStatus = "inactive"
 	// Update the fields of the existing record with the fields of the taskRecord argument
-	err := tx.WithContext(ctx).Save(&taskRecord)
-	if err != nil {
+	qSave := tx.WithContext(ctx).Save(&taskRecord)
+	if qSave != nil {
 		tx.Rollback()
-		return err.Error
+		return qSave.Error
 	}
 	tx.Commit()
 
@@ -111,10 +108,10 @@ func (t TaskRepositoryImpl) DeleteTaskById(ctx context.Context, taskId int64, us
 func (t TaskRepositoryImpl) FindTaskAll(ctx context.Context, userId int64) ([]record.TaskRecord, error) {
 	var taskRecords []record.TaskRecord
 	tx := t.SQL.Begin()
-	result := tx.WithContext(ctx).Where("user_id = ?", userId).Find(&taskRecords)
-	if result.Error != nil {
+	query := tx.WithContext(ctx).Where("user_id = ?", userId).Find(&taskRecords)
+	if query.Error != nil {
 		tx.Rollback()
-		return []record.TaskRecord{}, result.Error
+		return []record.TaskRecord{}, query.Error
 	}
 	tx.Commit()
 
@@ -125,14 +122,14 @@ func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, 
 	var taskRecord record.TaskRecord
 	tx := t.SQL.Begin()
 	// Check if the record exists
-	err := tx.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId).Error
-	if err != nil {
+	query := tx.WithContext(ctx).Where("user_id = ?", userId).First(&taskRecord, taskId).Error
+	if query != nil {
 		tx.Rollback()
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(query, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors task record not found")
 			return record.TaskRecord{}, ErrRecordNotFound
 		}
-		return record.TaskRecord{}, err
+		return record.TaskRecord{}, query
 	}
 
 	if completed == "" {
@@ -143,11 +140,11 @@ func (t TaskRepositoryImpl) UpdateTaskStatus(ctx context.Context, taskId int64, 
 	// Set task status inactive
 	taskRecord.Completed = true
 	taskRecord.CompletedAt = time.Now()
-	updateCompleted := tx.WithContext(ctx).Save(&taskRecord)
+	qUpdateCompleted := tx.WithContext(ctx).Save(&taskRecord)
 
-	if updateCompleted.Error != nil {
+	if qUpdateCompleted.Error != nil {
 		tx.Rollback()
-		return record.TaskRecord{}, updateCompleted.Error
+		return record.TaskRecord{}, qUpdateCompleted.Error
 	}
 	tx.Commit()
 
