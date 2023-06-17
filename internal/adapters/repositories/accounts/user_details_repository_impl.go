@@ -20,32 +20,41 @@ func NewUserDetailRepositoryImpl(SQL *gorm.DB, validate *validator.Validate) acc
 }
 
 func (u UserDetailRepositoryImpl) SaveUser(ctx context.Context, userRecord record.UserDetailRecord) (record.UserDetailRecord, error) {
-	result := u.SQL.WithContext(ctx).Create(&userRecord)
+	tx := u.SQL.Begin()
+	result := tx.WithContext(ctx).Create(&userRecord)
 	if result.Error != nil {
+		tx.Rollback()
 		return record.UserDetailRecord{}, result.Error
 	}
+	tx.Commit()
 	return userRecord, nil
 }
 
 func (u UserDetailRepositoryImpl) FindUserById(ctx context.Context, userid int64) (record.UserDetailRecord, error) {
 	var userRecord record.UserDetailRecord
-	result := u.SQL.WithContext(ctx).First(&userRecord, userid)
+	tx := u.SQL.Begin()
+	result := tx.WithContext(ctx).First(&userRecord, userid)
 	if result.Error != nil {
+		tx.Rollback()
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.UserDetailRecord{}, ErrRecordNotFound
 		}
 		return record.UserDetailRecord{}, result.Error
 	}
+	tx.Commit()
+
 	return userRecord, nil
 }
 
 func (u UserDetailRepositoryImpl) UpdateUser(ctx context.Context, userId int64, userRecord record.UserDetailRecord) (record.UserDetailRecord, error) {
 	var existingUser record.UserDetailRecord
+	tx := u.SQL.Begin()
 
 	// Check if the record exists
-	err := u.SQL.WithContext(ctx).First(&existingUser, userId).Error
+	err := tx.WithContext(ctx).First(&existingUser, userId).Error
 	if err != nil {
+		tx.Rollback()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return record.UserDetailRecord{}, ErrRecordNotFound
@@ -54,31 +63,40 @@ func (u UserDetailRepositoryImpl) UpdateUser(ctx context.Context, userId int64, 
 	}
 
 	// Update the fields of the existing record with the fields of the taskRecord argument
-	err = u.SQL.WithContext(ctx).Model(&existingUser).Updates(userRecord).Error
+	err = tx.WithContext(ctx).Model(&existingUser).Updates(userRecord).Error
 	if err != nil {
+		tx.Rollback()
 		return record.UserDetailRecord{}, err
 	}
+	tx.Commit()
 
 	return existingUser, nil
 }
 
 func (u UserDetailRepositoryImpl) DeleteUserById(ctx context.Context, userId int64) error {
-	result := u.SQL.WithContext(ctx).Delete(&record.UserDetailRecord{}, userId)
+	tx := u.SQL.Begin()
+	result := tx.WithContext(ctx).Delete(&record.UserDetailRecord{}, userId)
 	if result.Error != nil {
+		tx.Rollback()
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors Record Not Found")
 			return ErrRecordNotFound
 		}
 		return result.Error
 	}
+	tx.Commit()
 	return nil
 }
 
 func (u UserDetailRepositoryImpl) FindUserAll(ctx context.Context) ([]record.UserDetailRecord, error) {
 	var userRecords []record.UserDetailRecord
-	result := u.SQL.WithContext(ctx).Find(&userRecords)
+	tx := u.SQL.Begin()
+	result := tx.WithContext(ctx).Find(&userRecords)
 	if result.Error != nil {
+		tx.Rollback()
 		return []record.UserDetailRecord{}, result.Error
 	}
+	tx.Commit()
+
 	return userRecords, nil
 }

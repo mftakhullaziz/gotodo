@@ -19,7 +19,7 @@ type mockLoginUsecase struct {
 	logoutError   error
 }
 
-func (m *mockLoginUsecase) LoginAccountUsecase(ctx context.Context, loginRequest request.LoginRequest) (response.LoginResponse, error) {
+func (m *mockLoginUsecase) LoginAccountUsecase(_ context.Context, _ request.LoginRequest) (response.LoginResponse, error) {
 	return m.loginResponse, m.loginError
 }
 

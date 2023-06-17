@@ -9,3 +9,4 @@ go/*
 
 # exclude log directory
 log/*
+logs/*
