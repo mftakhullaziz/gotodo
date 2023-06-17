@@ -79,8 +79,8 @@ func main() {
 	RegisterEndpoint(http.MethodGet, api.AccountUserFind, userDetailHandler.FindDataUserDetailHandler, router)
 	RegisterEndpoint(http.MethodPost, api.AccountUserEdit, userDetailHandler.UpdateUserDetailHandler, router)
 	RegisterEndpoint(http.MethodPost, api.TaskCreate, taskHandler.CreateTaskHandler, router)
-	//RegisterEndpoint(http.MethodPut, api.TaskUpdate, taskHandler.UpdateTaskHandler, router)
-	//RegisterEndpoint(http.MethodGet, api.TaskFindByID, taskHandler.FindTaskHandlerById, router)
+	RegisterEndpoint(http.MethodPut, api.TaskUpdate, taskHandler.UpdateTaskHandler, router)
+	RegisterEndpoint(http.MethodGet, api.TaskFindByID, taskHandler.FindTaskHandlerById, router)
 	RegisterEndpoint(http.MethodGet, api.TaskFind, taskHandler.FindTaskHandler, router)
 	RegisterEndpoint(http.MethodDelete, api.TaskDelete, taskHandler.DeleteTaskHandler, router)
 	RegisterEndpoint(http.MethodPut, api.TaskUpdateStatus, taskHandler.UpdateTaskStatusHandler, router)
@@ -96,7 +96,14 @@ func main() {
 }
 
 // RegisterEndpoint function to register all apis on service http router
-func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, requests *http.Request), router *httprouter.Router) {
+//func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, requests *http.Request, ps httprouter.Params), router *httprouter.Router) {
+//	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
+//	router.HandlerFunc(method, path, handler)
+//}
+
+func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, request *http.Request, params httprouter.Params), router *httprouter.Router) {
 	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
-	router.HandlerFunc(method, path, handler)
+	router.Handle(method, path, func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+		handler(writer, request, params)
+	})
 }

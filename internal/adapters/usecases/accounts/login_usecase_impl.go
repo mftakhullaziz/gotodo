@@ -8,7 +8,6 @@ import (
 	"gotodo/internal/ports/services/accounts"
 	account "gotodo/internal/ports/usecases/accounts"
 	"gotodo/internal/utils"
-	"time"
 )
 
 type LoginUsecaseImpl struct {
@@ -30,10 +29,10 @@ func (l LoginUsecaseImpl) LoginAccountUsecase(ctx context.Context, request reque
 	}
 
 	responseUsecase := response.LoginResponse{
-		AccountID: loginUsecase.AccountID,
+		AccountID: int(loginUsecase.AccountID),
 		Username:  loginUsecase.Username,
 		Password:  loginUsecase.Password,
-		LoginAt:   time.Time{},
+		LoginAt:   loginUsecase.CreatedAt,
 		Token:     token,
 	}
 	return responseUsecase, nil

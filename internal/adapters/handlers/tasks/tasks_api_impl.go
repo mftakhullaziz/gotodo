@@ -24,7 +24,7 @@ func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlerAPI {
 
 // CreateTaskHandler : do update task based on user authorized
 // Params : http.ResponseWriter, *http.Request
-func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request) {
+func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -68,7 +68,7 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 
 // UpdateTaskHandler : do update task based on user authorized and idTask
 // Params : http.ResponseWriter, *http.Request
-func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request, ps httprouter.Params) {
+func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -86,7 +86,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	}
 
 	// Define to get idTask from param
-	idTaskVar := ps.ByName("task_id")
+	idTaskVar := param.ByName("task_id")
 	idTask, err := strconv.Atoi(idTaskVar)
 	utils.LoggerIfError(err)
 
@@ -111,7 +111,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	utils.WriteToResponseBody(writer, &updateTaskResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request, ps httprouter.Params) {
+func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -132,7 +132,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	utils.LoggerIfError(err)
 
 	// Define to get idTask from param
-	idTaskVar := ps.ByName("task_id")
+	idTaskVar := param.ByName("task_id")
 	idTask, err := strconv.Atoi(idTaskVar)
 	utils.LoggerIfError(err)
 	log.Infoln("find task by id_task: ", idTask)
@@ -153,7 +153,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	utils.WriteToResponseBody(writer, findTaskHandlerResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *http.Request) {
+func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -188,7 +188,7 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 	utils.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
 
-func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request) {
+func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent()
 
@@ -228,7 +228,7 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 	utils.WriteToResponseBody(writer, res)
 }
 
-func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request) {
+func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)

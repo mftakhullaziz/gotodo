@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"gotodo/internal/adapters/handlers"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
@@ -20,7 +21,7 @@ func NewLoginHandlerAPI(loginUsecase accounts.LoginUsecase) api.LoginHandlerAPI 
 	return &LoginHandlerAPI{LoginUsecase: loginUsecase}
 }
 
-func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http.Request) {
+func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	log := utils.LoggerParent()
 
 	loginRequest := request.LoginRequest{}
@@ -38,7 +39,7 @@ func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http
 	utils.WriteToResponseBody(writer, &result)
 }
 
-func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request) {
+func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	token := requests.Header.Get(handlers.AuthHeaderKey)
 	userId, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)

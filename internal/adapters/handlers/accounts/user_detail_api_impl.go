@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"gotodo/internal/adapters/handlers"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/middleware"
@@ -19,7 +20,7 @@ func NewUserDetailHandlerAPI(userUsecase accounts.UserDetailUsecase) api.UserHan
 	return &UserDetailHandlerAPI{UserUsecase: userUsecase}
 }
 
-func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWriter, requests *http.Request) {
+func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)
@@ -46,7 +47,7 @@ func (u UserDetailHandlerAPI) FindDataUserDetailHandler(writer http.ResponseWrit
 	utils.WriteToResponseBody(writer, &responses)
 }
 
-func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request) {
+func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	log := utils.LoggerParent()
 
 	token := requests.Header.Get(handlers.AuthHeaderKey)
@@ -79,7 +80,7 @@ func (u UserDetailHandlerAPI) UpdateUserDetailHandler(writer http.ResponseWriter
 	utils.WriteToResponseBody(writer, &updateUserDetailHandlerRes)
 }
 
-func (u UserDetailHandlerAPI) DeleteUserHandler(writer http.ResponseWriter, requests *http.Request) {
+func (u UserDetailHandlerAPI) DeleteUserHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	//TODO implement me
 	panic("implement me")
 }

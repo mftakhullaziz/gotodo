@@ -1,8 +1,11 @@
 package api
 
-import "net/http"
+import (
+	"github.com/julienschmidt/httprouter"
+	"net/http"
+)
 
 type RegisterHandlerAPI interface {
-	RegisterHandler(writer http.ResponseWriter, requests *http.Request)
-	ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request)
+	RegisterHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
+	ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
 }

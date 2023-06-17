@@ -1,8 +1,11 @@
 package api
 
-import "net/http"
+import (
+	"github.com/julienschmidt/httprouter"
+	"net/http"
+)
 
 type LoginHandlerAPI interface {
-	LoginHandler(writer http.ResponseWriter, requests *http.Request)
-	LogoutHandler(writer http.ResponseWriter, requests *http.Request)
+	LoginHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
+	LogoutHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
 }

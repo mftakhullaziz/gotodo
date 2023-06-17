@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/ports/handlers/api"
 	"gotodo/internal/ports/usecases/accounts"
@@ -16,7 +17,7 @@ func NewRegisterHandlerAPI(registerUseCase accounts.RegisterUseCase) api.Registe
 	return &RegisterHandlerAPI{RegisterUseCase: registerUseCase}
 }
 
-func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests *http.Request) {
+func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	log := utils.LoggerParent()
 
 	registerRequest := request.RegisterRequest{}
@@ -34,7 +35,7 @@ func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests
 	utils.WriteToResponseBody(writer, &responses)
 }
 
-func (r RegisterHandlerAPI) ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request) {
+func (r RegisterHandlerAPI) ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	//TODO implement me
 	panic("implement me")
 }
