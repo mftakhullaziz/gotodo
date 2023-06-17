@@ -49,7 +49,7 @@ func main() {
 	taskRepository := tasksRepository.NewTaskRepositoryImpl(db, validate)
 	taskService := tasksService.NewTaskServiceImpl(taskRepository, validate)
 	taskUsecase := tasksUsecase.NewTaskUseCaseImpl(taskService, validate)
-	taskHandler := tasksHandler.NewTaskHandlerAPI(taskUsecase)
+	taskHandler := tasksHandler.NewTaskHandlers(taskUsecase)
 
 	// Register Handler
 	userRepository := accountsRepository.NewUserDetailRepositoryImpl(db, validate)

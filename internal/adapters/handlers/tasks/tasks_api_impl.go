@@ -18,7 +18,7 @@ type Handlers struct {
 	TaskUseCase tasks.TaskUseCase
 }
 
-func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlers {
+func NewTaskHandlers(taskUseCase tasks.TaskUseCase) api.TaskHandlers {
 	return &Handlers{TaskUseCase: taskUseCase}
 }
 
