@@ -1,4 +1,4 @@
-package accounts
+package register
 
 import (
 	"github.com/julienschmidt/httprouter"
@@ -9,15 +9,15 @@ import (
 	"net/http"
 )
 
-type RegisterHandlerAPI struct {
+type Handlers struct {
 	RegisterUseCase accounts.RegisterUseCase
 }
 
-func NewRegisterHandlerAPI(registerUseCase accounts.RegisterUseCase) api.RegisterHandlerAPI {
-	return &RegisterHandlerAPI{RegisterUseCase: registerUseCase}
+func NewRegisterHandlerAPI(registerUseCase accounts.RegisterUseCase) api.RegisterHandlers {
+	return &Handlers{RegisterUseCase: registerUseCase}
 }
 
-func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (r Handlers) RegisterHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	log := utils.LoggerParent().Log
 
 	registerRequest := request.RegisterRequest{}
@@ -35,7 +35,7 @@ func (r RegisterHandlerAPI) RegisterHandler(writer http.ResponseWriter, requests
 	utils.WriteToResponseBody(writer, &responses)
 }
 
-func (r RegisterHandlerAPI) ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (r Handlers) ForgotPasswordHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	//TODO implement me
 	panic("implement me")
 }

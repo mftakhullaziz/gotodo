@@ -8,6 +8,7 @@ import (
 	"gotodo/config/database"
 	accountsHandler "gotodo/internal/adapters/handlers/accounts"
 	loginsHandler "gotodo/internal/adapters/handlers/accounts/login"
+	"gotodo/internal/adapters/handlers/accounts/register"
 	tasksHandler "gotodo/internal/adapters/handlers/tasks"
 	accountsRepository "gotodo/internal/adapters/repositories/accounts"
 	tasksRepository "gotodo/internal/adapters/repositories/tasks"
@@ -55,7 +56,7 @@ func main() {
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
 	accountService := accountsService.NewRegisterServiceImpl(accountRepository, userRepository, validate)
 	accountUsecase := accountsUsecase.NewRegisterUseCaseImpl(accountService, validate)
-	accountHandler := accountsHandler.NewRegisterHandlerAPI(accountUsecase)
+	accountHandler := register.NewRegisterHandlerAPI(accountUsecase)
 
 	// Login Handler
 	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)

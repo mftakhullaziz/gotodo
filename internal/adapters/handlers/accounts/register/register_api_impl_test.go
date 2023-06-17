@@ -1,4 +1,4 @@
-package accounts
+package register
 
 //import (
 //	"gotodo/internal/ports/handlers/api"
@@ -15,7 +15,7 @@ package accounts
 //	tests := []struct {
 //		name string
 //		args args
-//		want api.RegisterHandlerAPI
+//		want api.RegisterHandlers
 //	}{
 //		// TODO: Add test cases.
 //	}
@@ -45,7 +45,7 @@ package accounts
 //	}
 //	for _, tt := range tests {
 //		t.Run(tt.name, func(t *testing.T) {
-//			r := RegisterHandlerAPI{
+//			r := RegisterHandlers{
 //				RegisterUseCase: tt.fields.RegisterUseCase,
 //			}
 //			r.ForgotPasswordHandler(tt.args.writer, tt.args.requests)
@@ -70,7 +70,7 @@ package accounts
 //	}
 //	for _, tt := range tests {
 //		t.Run(tt.name, func(t *testing.T) {
-//			r := RegisterHandlerAPI{
+//			r := RegisterHandlers{
 //				RegisterUseCase: tt.fields.RegisterUseCase,
 //			}
 //			r.RegisterHandler(tt.args.writer, tt.args.requests)
