@@ -11,14 +11,13 @@ import (
 
 var endpoints []string
 
+// NewRouter function to define all router
 func NewRouter(login *api.LoginHandlers, register *api.RegisterHandlers, user *api.UserHandlers, tasks *api.TaskHandlers) *httprouter.Router {
 	// Init Http Router
 	router := httprouter.New()
-
-	// Call apis
+	// Call url api
 	url := apis.Rest()
-
-	// Define all route endpoint
+	// Define all route endpoint and check if nil
 	if login != nil {
 		LoginRouter(*login, url, router)
 	}
@@ -31,27 +30,30 @@ func NewRouter(login *api.LoginHandlers, register *api.RegisterHandlers, user *a
 	if user != nil {
 		UserRouter(*user, url, router)
 	}
-
-	// Logger apis list
+	// Logger url api list
 	utils.ListEndpoints(endpoints)
 
 	return router
 }
 
+// LoginRouter function to register endpoint login and logout
 func LoginRouter(handler api.LoginHandlers, endpoint apis.Endpoint, router *httprouter.Router) {
 	AddedRoute(http.MethodPost, endpoint.AuthenticateLogin, handler.LoginHandler, router)
 	AddedRoute(http.MethodPost, endpoint.AuthenticateLogout, handler.LogoutHandler, router)
 }
 
+// RegisterRouter function to register endpoint register new user
 func RegisterRouter(handler api.RegisterHandlers, endpoint apis.Endpoint, router *httprouter.Router) {
 	AddedRoute(http.MethodPost, endpoint.AuthenticateRegister, handler.RegisterHandler, router)
 }
 
+// UserRouter function to register endpoint user detail
 func UserRouter(handler api.UserHandlers, endpoint apis.Endpoint, router *httprouter.Router) {
 	AddedRoute(http.MethodGet, endpoint.AccountUserFind, handler.FindDataUserDetailHandler, router)
 	AddedRoute(http.MethodPost, endpoint.AccountUserEdit, handler.UpdateUserDetailHandler, router)
 }
 
+// TasksRouter function to register endpoint task
 func TasksRouter(handler api.TaskHandlers, endpoint apis.Endpoint, router *httprouter.Router) {
 	AddedRoute(http.MethodPost, endpoint.TaskCreate, handler.CreateTaskHandler, router)
 	AddedRoute(http.MethodPut, endpoint.TaskUpdate, handler.UpdateTaskHandler, router)
