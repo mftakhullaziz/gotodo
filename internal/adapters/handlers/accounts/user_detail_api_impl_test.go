@@ -45,7 +45,7 @@ package accounts
 //	}
 //	for _, tt := range tests {
 //		t.Run(tt.name, func(t *testing.T) {
-//			u := UserDetailHandlerAPI{
+//			u := Handlers{
 //				UserUsecase: tt.fields.UserUsecase,
 //			}
 //			u.DeleteUserHandler(tt.args.writer, tt.args.requests)
@@ -70,7 +70,7 @@ package accounts
 //	}
 //	for _, tt := range tests {
 //		t.Run(tt.name, func(t *testing.T) {
-//			u := UserDetailHandlerAPI{
+//			u := Handlers{
 //				UserUsecase: tt.fields.UserUsecase,
 //			}
 //			u.FindDataUserDetailHandler(tt.args.writer, tt.args.requests)
@@ -95,7 +95,7 @@ package accounts
 //	}
 //	for _, tt := range tests {
 //		t.Run(tt.name, func(t *testing.T) {
-//			u := UserDetailHandlerAPI{
+//			u := Handlers{
 //				UserUsecase: tt.fields.UserUsecase,
 //			}
 //			u.UpdateUserDetailHandler(tt.args.writer, tt.args.requests)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type UserHandlerAPI interface {
+type UserHandlers interface {
 	FindDataUserDetailHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
 	UpdateUserDetailHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
 	DeleteUserHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
