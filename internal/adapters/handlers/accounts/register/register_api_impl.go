@@ -13,7 +13,7 @@ type Handlers struct {
 	RegisterUseCase accounts.RegisterUseCase
 }
 
-func NewRegisterHandlerAPI(registerUseCase accounts.RegisterUseCase) api.RegisterHandlers {
+func NewRegisterHandlers(registerUseCase accounts.RegisterUseCase) api.RegisterHandlers {
 	return &Handlers{RegisterUseCase: registerUseCase}
 }
 

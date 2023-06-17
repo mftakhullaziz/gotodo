@@ -56,7 +56,7 @@ func main() {
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
 	accountService := accountsService.NewRegisterServiceImpl(accountRepository, userRepository, validate)
 	accountUsecase := accountsUsecase.NewRegisterUseCaseImpl(accountService, validate)
-	accountHandler := register.NewRegisterHandlerAPI(accountUsecase)
+	accountHandler := register.NewRegisterHandlers(accountUsecase)
 
 	// Login Handler
 	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)
