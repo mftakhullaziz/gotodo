@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type LoginHandlerAPI interface {
+type LoginHandlers interface {
 	LoginHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
 	LogoutHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params)
 }

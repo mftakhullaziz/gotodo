@@ -11,7 +11,7 @@ import (
 
 var endpoints []string
 
-func NewRouter(login *api.LoginHandlerAPI, register *api.RegisterHandlerAPI, user *api.UserHandlerAPI, tasks *api.TaskHandlerAPI) *httprouter.Router {
+func NewRouter(login *api.LoginHandlers, register *api.RegisterHandlerAPI, user *api.UserHandlerAPI, tasks *api.TaskHandlerAPI) *httprouter.Router {
 	// Init Http Router
 	router := httprouter.New()
 
@@ -38,7 +38,7 @@ func NewRouter(login *api.LoginHandlerAPI, register *api.RegisterHandlerAPI, use
 	return router
 }
 
-func LoginRouter(handler api.LoginHandlerAPI, endpoint apis.Endpoint, router *httprouter.Router) {
+func LoginRouter(handler api.LoginHandlers, endpoint apis.Endpoint, router *httprouter.Router) {
 	AddedRoute(http.MethodPost, endpoint.AuthenticateLogin, handler.LoginHandler, router)
 	AddedRoute(http.MethodPost, endpoint.AuthenticateLogout, handler.LogoutHandler, router)
 }

@@ -13,21 +13,21 @@ import (
 	"strconv"
 )
 
-type LoginHandlerAPI struct {
+type Handlers struct {
 	LoginUsecase accounts.LoginUsecase
 }
 
-func NewLoginHandlerAPI(loginUsecase accounts.LoginUsecase) api.LoginHandlerAPI {
-	return &LoginHandlerAPI{LoginUsecase: loginUsecase}
+func NewLoginHandlerAPI(loginUsecase accounts.LoginUsecase) api.LoginHandlers {
+	return &Handlers{LoginUsecase: loginUsecase}
 }
 
-func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (h Handlers) LoginHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	log := utils.LoggerParent()
 
 	loginRequest := request.LoginRequest{}
 	utils.ReadFromRequestBody(requests, &loginRequest)
 
-	loginHandler, errLogin := l.LoginUsecase.LoginAccountUsecase(requests.Context(), loginRequest)
+	loginHandler, errLogin := h.LoginUsecase.LoginAccountUsecase(requests.Context(), loginRequest)
 	utils.LoggerIfErrorWithCustomMessage(
 		errLogin, log.Log, "user login not success please check username or password!")
 
@@ -39,7 +39,7 @@ func (l LoginHandlerAPI) LoginHandler(writer http.ResponseWriter, requests *http
 	utils.WriteToResponseBody(writer, &result)
 }
 
-func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (h Handlers) LogoutHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	token := requests.Header.Get(handlers.AuthHeaderKey)
 	userId, err := middleware.AuthenticateUser(token)
 	utils.LoggerIfError(err)
@@ -49,7 +49,7 @@ func (l LoginHandlerAPI) LogoutHandler(writer http.ResponseWriter, requests *htt
 	utils.LoggerIfError(err)
 
 	// Update logout at time
-	logoutHandler := l.LoginUsecase.LogoutAccountUsecase(requests.Context(), authorizedUser, token)
+	logoutHandler := h.LoginUsecase.LogoutAccountUsecase(requests.Context(), authorizedUser, token)
 	utils.LoggerIfError(logoutHandler)
 
 	// If update logout at time success then remove authorization and logout
