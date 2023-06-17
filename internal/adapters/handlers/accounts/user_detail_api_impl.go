@@ -16,7 +16,7 @@ type Handlers struct {
 	UserUsecase accounts.UserDetailUsecase
 }
 
-func NewUserDetailHandlerAPI(userUsecase accounts.UserDetailUsecase) api.UserHandlers {
+func NewUserDetailHandlers(userUsecase accounts.UserDetailUsecase) api.UserHandlers {
 	return &Handlers{UserUsecase: userUsecase}
 }
 

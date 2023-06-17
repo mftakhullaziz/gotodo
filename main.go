@@ -66,7 +66,7 @@ func main() {
 	// User Detail Handler
 	userDetailService := accountsService.NewUserDetailServiceImpl(userRepository, accountRepository, validate)
 	userDetailUsecase := accountsUsecase.NewUserDetailUsecaseImpl(userDetailService, validate)
-	userDetailHandler := accountsHandler.NewUserDetailHandlerAPI(userDetailUsecase)
+	userDetailHandler := accountsHandler.NewUserDetailHandlers(userDetailUsecase)
 
 	// Call http router
 	app := router.NewRouter(&loginHandler, &accountHandler, &userDetailHandler, &taskHandler)
