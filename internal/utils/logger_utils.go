@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -76,7 +75,7 @@ func LoggerParent() *Logger {
 			//os.Stdout = nullFile
 		}
 	} else {
-		fmt.Println("Testing run")
+		// Condition in develop or prod environment
 		logs.SetOutput(ioutil.Discard)
 
 		// Create a custom formatter for file logging
