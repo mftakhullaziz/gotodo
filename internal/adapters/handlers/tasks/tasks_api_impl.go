@@ -14,17 +14,17 @@ import (
 	"time"
 )
 
-type TaskHandlerAPI struct {
+type Handlers struct {
 	TaskUseCase tasks.TaskUseCase
 }
 
-func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlerAPI {
-	return &TaskHandlerAPI{TaskUseCase: taskUseCase}
+func NewTaskHandlerAPI(taskUseCase tasks.TaskUseCase) api.TaskHandlers {
+	return &Handlers{TaskUseCase: taskUseCase}
 }
 
 // CreateTaskHandler : do update task based on user authorized
 // Params : http.ResponseWriter, *http.Request
-func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (t Handlers) CreateTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent().Log
 
@@ -68,7 +68,7 @@ func (t TaskHandlerAPI) CreateTaskHandler(writer http.ResponseWriter, requests *
 
 // UpdateTaskHandler : do update task based on user authorized and idTask
 // Params : http.ResponseWriter, *http.Request
-func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
+func (t Handlers) UpdateTaskHandler(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent().Log
 
@@ -111,7 +111,7 @@ func (t TaskHandlerAPI) UpdateTaskHandler(writer http.ResponseWriter, requests *
 	utils.WriteToResponseBody(writer, &updateTaskResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
+func (t Handlers) FindTaskHandlerById(writer http.ResponseWriter, requests *http.Request, param httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent().Log
 
@@ -153,7 +153,7 @@ func (t TaskHandlerAPI) FindTaskHandlerById(writer http.ResponseWriter, requests
 	utils.WriteToResponseBody(writer, findTaskHandlerResponse)
 }
 
-func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (t Handlers) FindTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent().Log
 
@@ -188,7 +188,7 @@ func (t TaskHandlerAPI) FindTaskHandler(writer http.ResponseWriter, requests *ht
 	utils.WriteToResponseBody(writer, findAllTaskHandlerResponse)
 }
 
-func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (t Handlers) DeleteTaskHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Define logger utils
 	log := utils.LoggerParent().Log
 
@@ -228,7 +228,7 @@ func (t TaskHandlerAPI) DeleteTaskHandler(writer http.ResponseWriter, requests *
 	utils.WriteToResponseBody(writer, res)
 }
 
-func (t TaskHandlerAPI) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
+func (t Handlers) UpdateTaskStatusHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
 	// Do get authorization token if any from user login
 	token := requests.Header.Get(handlers.AuthHeaderKey)
 	authorized, err := middleware.AuthenticateUser(token)

@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type TaskHandlerAPI interface {
+type TaskHandlers interface {
 	CreateTaskHandler(writer http.ResponseWriter, request *http.Request, _ httprouter.Params)
 	UpdateTaskHandler(writer http.ResponseWriter, request *http.Request, param httprouter.Params)
 	FindTaskHandlerById(writer http.ResponseWriter, request *http.Request, param httprouter.Params)
