@@ -68,3 +68,27 @@ func MakeAuthenticatedRequest(token string) error {
 		return nil
 	*/
 }
+
+func CheckAndRemoveExpiredToken(tokenString string) bool {
+	// Parse the token without verifying the signature
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("gotodo-secret-key"), nil // Secret key used during token generation
+	})
+	if err != nil {
+		// Failed to parse the token
+		return false
+	}
+
+	// Check if the token is valid and not expired
+	if claims, ok := token.Claims.(*jwt.StandardClaims); ok && token.Valid {
+		currentTime := time.Now().Unix()
+		if currentTime < claims.ExpiresAt || currentTime > claims.ExpiresAt {
+			// Token has expired, remove it
+			return false
+		}
+		return true
+	}
+
+	// Token is invalid or expired
+	return false
+}

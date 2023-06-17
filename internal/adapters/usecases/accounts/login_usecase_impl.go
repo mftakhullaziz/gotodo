@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
+	"gotodo/internal/middleware"
 	"gotodo/internal/ports/services/accounts"
 	account "gotodo/internal/ports/usecases/accounts"
 	"gotodo/internal/utils"
@@ -42,8 +43,19 @@ func (l LoginUsecaseImpl) LogoutAccountUsecase(ctx context.Context, userId int, 
 	err := utils.ValidateIntValue(userId)
 	utils.LoggerIfError(err)
 
-	logoutUsecase := l.LoginService.LogoutAccountService(ctx, int64(userId), token)
-	utils.LoggerIfError(logoutUsecase)
+	// Check token in jwt or caching or redis if any remove from that
+	// Logout first rules remove token from jwt
+	tokenJwt := middleware.CheckAndRemoveExpiredToken(token)
+	if tokenJwt == false {
+		// Remove token from cache
+		err = middleware.CheckAndRemoveTokenFromCache(token)
+		if err != nil {
+			panic(err.Error())
+		}
+		// Update to table histories logout
+		logoutUsecase := l.LoginService.LogoutAccountService(ctx, int64(userId), token)
+		utils.LoggerIfError(logoutUsecase)
+	}
 
 	return nil
 }

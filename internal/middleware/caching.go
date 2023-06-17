@@ -37,3 +37,14 @@ func AuthenticateUser(token string) (string, error) {
 	c.Set(token, userID, 30*time.Minute)
 	return userID.(string), nil
 }
+
+func CheckAndRemoveTokenFromCache(token string) error {
+	// Check if the token exists in the cache
+	_, exists := c.Get(token)
+	if exists {
+		// Remove the token from the cache
+		c.Delete(token)
+	}
+
+	return nil
+}
