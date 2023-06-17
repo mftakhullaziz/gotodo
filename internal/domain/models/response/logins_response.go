@@ -3,9 +3,9 @@ package response
 import "time"
 
 type LoginResponse struct {
-	AccountID int       `json:"account_id"`
-	Username  string    `json:"username"`
-	Password  string    `json:"password"`
-	LoginAt   time.Time `json:"login_at"`
-	Token     string    `json:"token"`
+	AccountID         int       `json:"account_id"`
+	Username          string    `json:"username"`
+	Password          string    `json:"password"`
+	LoginCreationTime time.Time `json:"login_at"`
+	LoginToken        string    `json:"token"`
 }

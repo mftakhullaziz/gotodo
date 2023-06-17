@@ -29,11 +29,11 @@ func (l LoginUsecaseImpl) LoginAccountUsecase(ctx context.Context, request reque
 	}
 
 	responseUsecase := response.LoginResponse{
-		AccountID: int(loginUsecase.AccountID),
-		Username:  loginUsecase.Username,
-		Password:  loginUsecase.Password,
-		LoginAt:   loginUsecase.CreatedAt,
-		Token:     token,
+		AccountID:         int(loginUsecase.AccountID),
+		Username:          loginUsecase.Username,
+		Password:          loginUsecase.Password,
+		LoginCreationTime: loginUsecase.CreatedAt,
+		LoginToken:        token,
 	}
 	return responseUsecase, nil
 }

@@ -1,4 +1,4 @@
-package accounts
+package login
 
 import (
 	"github.com/julienschmidt/httprouter"

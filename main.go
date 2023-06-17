@@ -2,14 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/julienschmidt/httprouter"
-	"gotodo/apis"
 	"gotodo/config"
 	"gotodo/config/database"
 	accountsHandler "gotodo/internal/adapters/handlers/accounts"
+	loginsHandler "gotodo/internal/adapters/handlers/accounts/login"
 	tasksHandler "gotodo/internal/adapters/handlers/tasks"
 	accountsRepository "gotodo/internal/adapters/repositories/accounts"
 	tasksRepository "gotodo/internal/adapters/repositories/tasks"
@@ -19,10 +17,9 @@ import (
 	tasksUsecase "gotodo/internal/adapters/usecases/tasks"
 	"gotodo/internal/persistence/record"
 	"gotodo/internal/utils"
+	"gotodo/router"
 	"net/http"
 )
-
-var endpoints []string
 
 func main() {
 	// Initiate context
@@ -47,63 +44,36 @@ func main() {
 	// Initiate validator
 	validate := validator.New()
 
-	// Init Task Handler
+	// Task Handler
 	taskRepository := tasksRepository.NewTaskRepositoryImpl(db, validate)
 	taskService := tasksService.NewTaskServiceImpl(taskRepository, validate)
 	taskUsecase := tasksUsecase.NewTaskUseCaseImpl(taskService, validate)
 	taskHandler := tasksHandler.NewTaskHandlerAPI(taskUsecase)
-	// Init Register Handler
+
+	// Register Handler
 	userRepository := accountsRepository.NewUserDetailRepositoryImpl(db, validate)
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
 	accountService := accountsService.NewRegisterServiceImpl(accountRepository, userRepository, validate)
 	accountUsecase := accountsUsecase.NewRegisterUseCaseImpl(accountService, validate)
 	accountHandler := accountsHandler.NewRegisterHandlerAPI(accountUsecase)
+
 	// Login Handler
 	loginService := accountsService.NewLoginServiceImpl(accountRepository, validate)
 	loginUsecase := accountsUsecase.NewLoginUsecaseImpl(loginService, validate)
-	loginHandler := accountsHandler.NewLoginHandlerAPI(loginUsecase)
+	loginHandler := loginsHandler.NewLoginHandlerAPI(loginUsecase)
+
 	// User Detail Handler
 	userDetailService := accountsService.NewUserDetailServiceImpl(userRepository, accountRepository, validate)
 	userDetailUsecase := accountsUsecase.NewUserDetailUsecaseImpl(userDetailService, validate)
 	userDetailHandler := accountsHandler.NewUserDetailHandlerAPI(userDetailUsecase)
 
-	// Init Http Router
-	router := httprouter.New()
-	// Call apis
-	api := apis.Rest()
+	// Call http router
+	app := router.NewRouter(loginHandler, accountHandler, userDetailHandler, taskHandler)
 
-	// Register all apis
-	RegisterEndpoint(http.MethodPost, api.AuthenticateRegister, accountHandler.RegisterHandler, router)
-	RegisterEndpoint(http.MethodPost, api.AuthenticateLogin, loginHandler.LoginHandler, router)
-	RegisterEndpoint(http.MethodPost, api.AuthenticateLogout, loginHandler.LogoutHandler, router)
-	RegisterEndpoint(http.MethodGet, api.AccountUserFind, userDetailHandler.FindDataUserDetailHandler, router)
-	RegisterEndpoint(http.MethodPost, api.AccountUserEdit, userDetailHandler.UpdateUserDetailHandler, router)
-	RegisterEndpoint(http.MethodPost, api.TaskCreate, taskHandler.CreateTaskHandler, router)
-	RegisterEndpoint(http.MethodPut, api.TaskUpdate, taskHandler.UpdateTaskHandler, router)
-	RegisterEndpoint(http.MethodGet, api.TaskFindByID, taskHandler.FindTaskHandlerById, router)
-	RegisterEndpoint(http.MethodGet, api.TaskFind, taskHandler.FindTaskHandler, router)
-	RegisterEndpoint(http.MethodDelete, api.TaskDelete, taskHandler.DeleteTaskHandler, router)
-	RegisterEndpoint(http.MethodPut, api.TaskUpdateStatus, taskHandler.UpdateTaskStatusHandler, router)
-
-	// Logger apis list
-	utils.ListEndpoints(endpoints)
 	// Init Router in Logger
-	LoggerRouter := utils.LoggerMiddleware(router)
+	LoggerRouter := utils.LoggerMiddleware(app)
 
 	// Server listener
 	ok := http.ListenAndServe(":3000", LoggerRouter)
 	utils.PanicIfError(ok)
-}
-
-// RegisterEndpoint function to register all apis on service http router
-//func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, requests *http.Request, ps httprouter.Params), router *httprouter.Router) {
-//	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
-//	router.HandlerFunc(method, path, handler)
-//}
-
-func RegisterEndpoint(method, path string, handler func(writer http.ResponseWriter, request *http.Request, params httprouter.Params), router *httprouter.Router) {
-	endpoints = append(endpoints, fmt.Sprintf("%s %s", method, path))
-	router.Handle(method, path, func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-		handler(writer, request, params)
-	})
 }
