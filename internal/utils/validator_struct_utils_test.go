@@ -1,8 +1,14 @@
 package utils
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestValidateEmail(t *testing.T) {
+	// Set the environment variable for testing
+	_ = os.Setenv("ENV", "test")
+
 	type args struct {
 		email string
 	}
@@ -32,6 +38,8 @@ func TestValidateEmail(t *testing.T) {
 }
 
 func TestValidateIntValue(t *testing.T) {
+	_ = os.Setenv("ENV", "test")
+
 	type args struct {
 		val []int
 	}

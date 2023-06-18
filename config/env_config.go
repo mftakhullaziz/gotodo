@@ -25,3 +25,7 @@ func LoadEnvFromFile(path string) string {
 	envFilePath := filepath.Join(gotodoDir, ".env.test")
 	return envFilePath
 }
+
+func EnvironmentTest() {
+	_ = os.Setenv("ENV", "test")
+}

@@ -3,7 +3,6 @@ package register
 import (
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
@@ -23,16 +22,10 @@ import (
 	"testing"
 )
 
-// Mock function environment testing
-func mockEnvTest() {
-	// The param path is dynamic following testing path file
-	path := config.LoadEnvFromFile("../../../../../..")
-	_ = godotenv.Load(path)
-}
-
 // Mock DB In SQLite
 func mockDbTest() *gorm.DB {
-	mockEnvTest()
+	// Mock function environment testing
+	config.EnvironmentTest()
 
 	// Create an in-memory SQLite database for testing
 	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
