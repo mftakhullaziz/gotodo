@@ -66,13 +66,15 @@ func LoggerParent() *Logger {
 				// File does not exist, log the message
 				logs.Warn("Log file does not exist. Logging to console.")
 			}
+
 			// Set clean console
-			//nullFile, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0666)
-			//if err != nil {
-			//	log.Fatal(err)
-			//}
+			// nullFile, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0666)
+			// if err != nil {
+			//	 log.Fatal(err)
+			// }
+
 			// Redirect os.Stdout to /dev/null
-			//os.Stdout = nullFile
+			// os.Stdout = nullFile
 		}
 	} else {
 		// Condition in develop or prod environment

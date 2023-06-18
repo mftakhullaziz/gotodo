@@ -2,7 +2,6 @@ package database
 
 import (
 	"gorm.io/gorm"
-	"gotodo/internal/utils"
 )
 
 func MigrateDatabase(db *gorm.DB, models ...interface{}) error {
@@ -12,9 +11,10 @@ func MigrateDatabase(db *gorm.DB, models ...interface{}) error {
 		if migrator.HasTable(model) {
 			continue
 		}
-
 		err := db.AutoMigrate(model)
-		utils.LoggerIfError(err)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 	return nil
 }

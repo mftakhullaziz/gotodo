@@ -22,7 +22,6 @@ func (r Handlers) RegisterHandler(writer http.ResponseWriter, requests *http.Req
 
 	registerRequest := request.RegisterRequest{}
 	utils.ReadFromRequestBody(requests, &registerRequest)
-	log.Info("account request: ", registerRequest)
 
 	registerHandler, err := r.RegisterUseCase.CreateAccountUseCase(requests.Context(), registerRequest)
 	utils.LoggerIfErrorWithCustomMessage(err, log, "account already created please using another 'email'")

@@ -1,18 +1,20 @@
 package login
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gotodo/config"
 	"gotodo/config/database"
 	accountsRepository "gotodo/internal/adapters/repositories/accounts"
 	accountsService "gotodo/internal/adapters/services/accounts"
 	accountsUsecase "gotodo/internal/adapters/usecases/accounts"
+	"gotodo/internal/persistence/record"
 	"gotodo/internal/utils"
 	"gotodo/router"
 	"io"
@@ -20,21 +22,77 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
-// Initiate Setup Test Database
-func InitTestDB() *gorm.DB {
-	// Initiate context
-	ctx := context.Background()
+// Mock function environment testing
+func mockEnvTest() {
 	// The param path is dynamic following testing path file
-	env := config.LoadEnvFromFile("../../../../../..")
-	// Do function database connection
-	db, _ := database.NewDatabaseConnection(ctx, env)
+	path := config.LoadEnvFromFile("../../../../../..")
+	_ = godotenv.Load(path)
+}
+
+// Mock function insert data account user
+func mockInsertUserData(db *gorm.DB) {
+	// Perform mock data insertion for account table
+	mockAccount := &record.AccountRecord{
+		// Set the desired mock account data
+		AccountID: 1,
+		UserID:    1,
+		Username:  "@johndoe_test",
+		Password:  utils.HashPasswordAndSalt([]byte("password")),
+		Status:    "active",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	_ = db.Create(mockAccount)
+
+	// Perform mock data insertion for user detail table
+	mockUserDetail := &record.UserDetailRecord{
+		// Set the desired mock user detail data
+		UserID:      uint(mockAccount.UserID),
+		Username:    mockAccount.Username,
+		Password:    mockAccount.Password,
+		Email:       "johndoe@mail.com",
+		Name:        "John Doe",
+		MobilePhone: 6282299812,
+		Address:     "Jakarta",
+		Status:      "active",
+		CreatedAt:   mockAccount.CreatedAt,
+		UpdatedAt:   mockAccount.UpdatedAt,
+	}
+
+	_ = db.Create(mockUserDetail)
+}
+
+// Mock function database sqlite
+func mockDBTest() *gorm.DB {
+	mockEnvTest()
+
+	// Create an in-memory SQLite database for testing
+	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect to database: " + err.Error())
+	}
+
+	// Run database migrations or any other initialization steps
+	// Do migration database
+	_ = database.MigrateDatabase(
+		db,
+		&record.TaskRecord{},
+		&record.AccountRecord{},
+		&record.UserDetailRecord{},
+		&record.AccountLoginHistoriesRecord{},
+	)
+
+	mockInsertUserData(db)
 
 	return db
 }
 
-func InitRouter(db *gorm.DB) *httprouter.Router {
+// Mock function router
+func mockRouter(db *gorm.DB) *httprouter.Router {
 	// Initiate validator
 	validate := validator.New()
 	accountRepository := accountsRepository.NewAccountsRepositoryImpl(db, validate)
@@ -46,12 +104,12 @@ func InitRouter(db *gorm.DB) *httprouter.Router {
 	return r
 }
 
-func TestLoginHandlers_LoginHandler(t *testing.T) {
-	db := InitTestDB()
-	initRouter := InitRouter(db)
+func TestHandlers_LoginHandler(t *testing.T) {
+	db := mockDBTest()
+	initRouter := mockRouter(db)
 
 	t.Run("Login Test Is Success", func(t *testing.T) {
-		requestBody := strings.NewReader(`{"username" : "johndoe_416", "password": "password"}`)
+		requestBody := strings.NewReader(`{"username" : "@johndoe_test", "password": "password"}`)
 		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
 
 		recorder := httptest.NewRecorder()
@@ -73,13 +131,13 @@ func TestLoginHandlers_LoginHandler(t *testing.T) {
 		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
 		username := responseBody["data"].(map[string]interface{})["username"].(string)
 		id := responseBody["data"].(map[string]interface{})["account_id"].(float64)
-		assert.Equalf(t, username, "johndoe_416", "Expected: %s, but got: %s", username, "johndoe_416")
-		assert.Equalf(t, int(id), 12, "Expected: %d, but got: %d", int(id), 12)
+		assert.Equalf(t, username, "@johndoe_test", "Expected: %s, but got: %s", username, "@johndoe_test")
+		assert.Equalf(t, int(id), 1, "Expected: %d, but got: %d", int(id), 1)
 	})
 
 	t.Run("Login Test Is Failed", func(t *testing.T) {
 		// Scenario failed is username or password is not correct
-		requestBody := strings.NewReader(`{"username" : "johndoe_416", "password": "failed"}`)
+		requestBody := strings.NewReader(`{"username" : "@johndoe_test", "password": "failed"}`)
 		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
 
 		recorder := httptest.NewRecorder()
@@ -102,12 +160,12 @@ func TestLoginHandlers_LoginHandler(t *testing.T) {
 	})
 }
 
-func TestLoginHandlers_LogoutHandler(t *testing.T) {
-	db := InitTestDB()
-	initRouter := InitRouter(db)
+func TestHandlers_LogoutHandler(t *testing.T) {
+	db := mockDBTest()
+	initRouter := mockRouter(db)
 
 	t.Run("Logout Test From User Login Is Success", func(t *testing.T) {
-		requestBody := strings.NewReader(`{"username" : "johndoe_416", "password": "password"}`)
+		requestBody := strings.NewReader(`{"username" : "@johndoe_test", "password": "password"}`)
 		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
 
 		recorder := httptest.NewRecorder()

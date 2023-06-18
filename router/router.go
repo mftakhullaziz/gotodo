@@ -5,7 +5,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"gotodo/apis"
 	"gotodo/internal/ports/handlers/api"
-	"gotodo/internal/utils"
 	"net/http"
 )
 
@@ -31,7 +30,7 @@ func NewRouter(login *api.LoginHandlers, register *api.RegisterHandlers, user *a
 		UserRouter(*user, url, router)
 	}
 	// Logger url api list
-	utils.ListEndpoints(endpoints)
+	// utils.ListEndpoints(endpoints)
 
 	return router
 }

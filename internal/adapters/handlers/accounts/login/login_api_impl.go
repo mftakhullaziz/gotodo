@@ -22,14 +22,14 @@ func NewLoginHandlers(loginUsecase accounts.LoginUsecase) api.LoginHandlers {
 }
 
 func (h Handlers) LoginHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
-	log := utils.LoggerParent()
+	log := utils.LoggerParent().Log
 
 	loginRequest := request.LoginRequest{}
 	utils.ReadFromRequestBody(requests, &loginRequest)
 
 	loginHandler, errLogin := h.LoginUsecase.LoginAccountUsecase(requests.Context(), loginRequest)
 	utils.LoggerIfErrorWithCustomMessage(
-		errLogin, log.Log, "user login not success please check username or password!")
+		errLogin, log, "user login not success please check username or password!")
 
 	messageIsSuccess := "login account successfully!"
 	messageNotSuccess := "username and password not valid please check again!"

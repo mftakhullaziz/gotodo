@@ -15,11 +15,9 @@ func HashPassword(password string) string {
 }
 
 func HashPasswordAndSalt(pwd []byte) string {
-	log := LoggerParent()
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
-		log.Println(err)
-		panic("Failed to hash password")
+		panic(err.Error())
 	}
 	return string(hash)
 }

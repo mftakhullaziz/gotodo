@@ -29,9 +29,6 @@ func NewRegisterServiceImpl(
 }
 
 func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request request.RegisterRequest) (dto.AccountDTO, error) {
-	logger := utils.LoggerParent()
-	log := logger.Log
-
 	err := r.Validate.Struct(request)
 	utils.PanicIfError(err)
 
@@ -39,7 +36,6 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 	existingEmail := r.AccountRepository.IsExistAccountEmail(ctx, request.Email)
 
 	if existingEmail == true && existingUsername == true {
-		log.Info("Email already registered")
 		return dto.AccountDTO{}, nil
 	} else {
 		hashPassword := utils.HashPasswordAndSalt([]byte(request.Password))
@@ -68,7 +64,6 @@ func (r RegisterServiceImpl) CreateNewAccount(ctx context.Context, request reque
 		utils.PanicIfError(err)
 
 		accountDTO := utils.RecordToAccountDTO(createAccount)
-		log.Info("Account created successfully")
 		return accountDTO, nil
 	}
 

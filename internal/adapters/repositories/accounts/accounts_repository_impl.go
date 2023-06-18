@@ -103,7 +103,11 @@ func (a AccountRepositoryImpl) FindAccountAll(ctx context.Context) ([]record.Acc
 func (a AccountRepositoryImpl) IsExistAccountEmail(ctx context.Context, email string) bool {
 	accountRecord := &record.UserDetailRecord{}
 	tx := a.SQL.Begin()
-	query := tx.WithContext(ctx).Where("email = ?", email).First(accountRecord)
+	var count int64
+	query := tx.WithContext(ctx).Model(accountRecord).Where("email = ?", email).Count(&count)
+	if count != 0 {
+		return true
+	}
 	if query.Error != nil {
 		tx.Rollback()
 		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
@@ -112,7 +116,7 @@ func (a AccountRepositoryImpl) IsExistAccountEmail(ctx context.Context, email st
 		return false
 	}
 	tx.Commit()
-	return true
+	return false
 }
 
 func (a AccountRepositoryImpl) IsExistUsername(ctx context.Context, username string) bool {
