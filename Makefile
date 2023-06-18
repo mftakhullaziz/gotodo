@@ -30,41 +30,41 @@ help:
 
 # Targets
 build/service:
-	@echo "build package $(PACKAGE_NAME)"
+	@echo "Build Go Package $(PACKAGE_NAME)"
 	go build -o $(BUILD_DIR)/$(PACKAGE_NAME) main.go
 
 run/build:
-	@echo "running from build $(PACKAGE_NAME)"
+	@echo "Running from Go Package $(PACKAGE_NAME)"
 	./$(BUILD_DIR)/$(PACKAGE_NAME) main.go
 
 run/testing:
-	@echo "running unit tests for $(PACKAGE_NAME)"
+	@echo "Running Go Unit Test $(PACKAGE_NAME)"
 	go test -json -v ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/benchmark:
-	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
+	@echo "Running Go Benchmark $(PACKAGE_NAME)"
 	go test -bench=. ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/coverage:
-	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
+	@echo "Running Go Coverage $(PACKAGE_NAME)"
 	go test -cover ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/service:
-	@echo "building and running $(PACKAGE_NAME)"
+	@echo "Running Service Go $(PACKAGE_NAME)"
 	go run main.go
 
 build/clean:
-	@echo "cleaning build directory"
+	@echo "Clear Build Dir"
 	rm -rf $(BUILD_DIR)
 
 clean/cache:
-	@echo "cleaning cache"
+	@echo "Clean Cache and Test Cache"
 	go clean -cache -testcache -modcache
 
 run/download:
-	@echo "download all package from go mod"
+	@echo "Download Package from Mod"
 	go mod download
 
 clean/package:
-	@echo "remove unused package"
+	@echo "Remove Unused Package"
 	go mod tidy
