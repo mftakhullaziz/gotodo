@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"gotodo/config"
+	"os"
 	"testing"
 )
 
 func TestNewDatabaseConnection(t *testing.T) {
+	_ = os.Setenv("ENV", "test")
+
 	nameEnv := config.LoadEnv(".env.test")
 	assert.NotNil(t, nameEnv)
 

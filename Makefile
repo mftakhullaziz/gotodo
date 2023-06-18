@@ -4,7 +4,8 @@ BUILD_DIR=./build
 
 # Helper message lists
 help:
-	@echo "how to use makefile 'make <target>' where <target> is one of the following:"
+	@echo " Helper for 'make <target>' where <target> is one of the following:"
+	@echo ""
 	@echo " build/service  [builds the executable]"
 	@echo " build/clean    [cleans the build directory]"
 	@echo " run/unittest   [run unit testing default]"
@@ -15,7 +16,8 @@ help:
 	@echo " clean/package  [remove unused go package from already project]"
 	@echo " clean/cache    [cleans the cache]"
 	@echo ""
-	@echo "use the command:"
+	@echo " Use the example command:"
+	@echo ""
 	@echo " make build/service"
 	@echo " make build/clean"
 	@echo " make run/unittest"
@@ -37,15 +39,15 @@ run/build:
 
 run/unittest:
 	@echo "running unit tests for $(PACKAGE_NAME)"
-	go test -v ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
+	go test -v ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/benchmark:
 	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
-	go test -bench=. ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
+	go test -bench=. ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/coverage:
 	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"
-	go test -cover ./apis/... ./config/... ./internal/adapters/... ./internal/domain/... ./internal/middleware/... ./internal/persistence/... ./internal/utils/...
+	go test -cover ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/service:
 	@echo "building and running $(PACKAGE_NAME)"
