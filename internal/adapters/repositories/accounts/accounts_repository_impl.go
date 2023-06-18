@@ -198,14 +198,14 @@ func (a AccountRepositoryImpl) UpdateLogoutAt(ctx context.Context, userId int64,
 
 	tx := a.SQL.Begin()
 	// Check if the record exists
-	query := tx.WithContext(ctx).Where("user_id = ? AND token = ?", userId, token).First(&historiesAccount).Error
+	query := tx.WithContext(ctx).Where("user_id = ? AND token = ?", userId, token).First(&historiesAccount)
 	if query != nil {
 		tx.Rollback()
-		if errors.Is(query, gorm.ErrRecordNotFound) {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 			ErrRecordNotFound := errors.New("errors task record not found")
 			return ErrRecordNotFound
 		}
-		return query
+		return query.Error
 	}
 
 	// Save login histories

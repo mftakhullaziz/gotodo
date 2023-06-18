@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"github.com/patrickmn/go-cache"
 	"time"
 )
@@ -27,8 +26,8 @@ func GenerateTokenToCache(userID string, token string, expirationTime time.Time)
 
 // AuthenticateUser Authenticate the user by checking their token against the cache and check token if expire or not
 func AuthenticateUser(token string) (string, error) {
-	userID, found, err := c.GetWithExpiration(token)
-	fmt.Println("Tokens: ", found)
+	userID, _, err := c.GetWithExpiration(token)
+
 	if err != true {
 		return "", errors.New("user account unauthorized")
 	}

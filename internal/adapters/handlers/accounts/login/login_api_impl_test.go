@@ -46,7 +46,7 @@ func InitRouter(db *gorm.DB) *httprouter.Router {
 	return r
 }
 
-func TestLoginHandlerAPI_LoginHandler(t *testing.T) {
+func TestLoginHandlers_LoginHandler(t *testing.T) {
 	db := InitTestDB()
 	initRouter := InitRouter(db)
 
@@ -71,6 +71,10 @@ func TestLoginHandlerAPI_LoginHandler(t *testing.T) {
 		// Verify response data
 		assert.NotEmptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
 		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+		username := responseBody["data"].(map[string]interface{})["username"].(string)
+		id := responseBody["data"].(map[string]interface{})["account_id"].(float64)
+		assert.Equalf(t, username, "johndoe_416", "Expected: %s, but got: %s", username, "johndoe_416")
+		assert.Equalf(t, int(id), 12, "Expected: %d, but got: %d", int(id), 12)
 	})
 
 	t.Run("Login Test Is Failed", func(t *testing.T) {
@@ -95,5 +99,48 @@ func TestLoginHandlerAPI_LoginHandler(t *testing.T) {
 		// Verify response data
 		assert.Emptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
 		assert.Nilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+	})
+}
+
+func TestLoginHandlers_LogoutHandler(t *testing.T) {
+	db := InitTestDB()
+	initRouter := InitRouter(db)
+
+	t.Run("Logout Test From User Login Is Success", func(t *testing.T) {
+		requestBody := strings.NewReader(`{"username" : "johndoe_416", "password": "password"}`)
+		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
+
+		recorder := httptest.NewRecorder()
+		initRouter.ServeHTTP(recorder, httpRequest)
+
+		data := recorder.Result()
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
+
+		// Key from login
+		authorizationKey := responseBody["data"].(map[string]interface{})["token"].(string)
+		httpRequest = httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/logout", nil)
+
+		// Setup Header key for parsing token in authorization
+		headers := make(http.Header)
+		headers.Set("Content-Type", "application/json")
+		headers.Set("Authorization", authorizationKey)
+		httpRequest.Header = headers
+
+		// Execute the request
+		recorder = httptest.NewRecorder()
+		initRouter.ServeHTTP(recorder, httpRequest)
+
+		data1 := recorder.Result()
+		body1, _ := io.ReadAll(data1.Body)
+		var responseBody1 map[string]interface{}
+		_ = json.Unmarshal(body1, &responseBody1)
+
+		// Verify response
+		statusCode, _ := utils.ValueToInt(responseBody1["status_code"])
+		assert.Equalf(t, statusCode, http.StatusAccepted, "Expected: %d, but got: %d", statusCode, http.StatusAccepted)
+		assert.Equalf(t, responseBody1["message"], "logout user account is successfully!", "Expected: %s, but got: %s", responseBody["message"], "logout user account is successfully!")
+		assert.Equalf(t, responseBody1["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
 	})
 }
