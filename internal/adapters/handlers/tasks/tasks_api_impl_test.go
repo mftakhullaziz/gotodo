@@ -246,6 +246,55 @@ func TestHandlers_UpdateTaskHandler(t *testing.T) {
 }
 
 func TestHandlers_UpdateTaskStatusHandler(t *testing.T) {
+	db := mockDBTest()
+	r := mockRouter(db)
+
+	t.Run("Test Update Task Status", func(t *testing.T) {
+		// Build url
+		taskID := "1"
+		isCompleted := "true"
+		url := "http://localhost:3000/api/v1/task/update_status?taskId=" + taskID + "&isCompleted=" + isCompleted
+
+		httpRequest := httptest.NewRequest(http.MethodPut, url, nil)
+
+		// Add URL parameters to the request
+		params := httprouter.Params{
+			httprouter.Param{Key: "taskId", Value: taskID},
+			httprouter.Param{Key: "isCompleted", Value: isCompleted},
+		}
+
+		// Set the params object in the request context
+		ctx := context.WithValue(httpRequest.Context(), httprouter.ParamsKey, params)
+		httpRequest = httpRequest.WithContext(ctx)
+
+		// Mock Authorization
+		authorizationKey := mockLogin()
+
+		// Setup Header key for parsing token in authorization
+		headers := make(http.Header)
+		headers.Set("Content-Type", "application/json")
+		headers.Set("Authorization", authorizationKey)
+		httpRequest.Header = headers
+
+		// Execute the request
+		recorder := httptest.NewRecorder()
+		r.ServeHTTP(recorder, httpRequest)
+
+		data := recorder.Result()
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
+
+		// Verify response
+		statusCode, _ := utils.ValueToInt(responseBody["status_code"])
+		assert.Equalf(t, statusCode, http.StatusAccepted, "Expected: %d, but got: %d", statusCode, http.StatusAccepted)
+		assert.Equalf(t, responseBody["message"], "update completed task successful!", "Expected: %s, but got: %s", responseBody["message"], "update completed task successful!")
+		assert.Equalf(t, responseBody["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
+
+		// Verify response data
+		assert.NotEmptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+	})
 }
 
 func TestHandlers_FindTaskHandler(t *testing.T) {
