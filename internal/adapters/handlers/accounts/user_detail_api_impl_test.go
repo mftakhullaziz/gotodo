@@ -165,3 +165,46 @@ func TestHandlers_FindDataUserDetailHandler(t *testing.T) {
 		assert.Equalf(t, responseBody1["is_success"], true, "Expected: %s, but got: %s", responseBody1["is_success"], true)
 	})
 }
+
+func TestHandlers_UpdateUserDetailHandler(t *testing.T) {
+	db := mockDBTest()
+	r := mockRouter(db)
+
+	t.Run("Update User Detail Is Success", func(t *testing.T) {
+		requestBody := strings.NewReader(`
+			{
+				"email": "",
+				"password": "password1",
+				"name": "",
+				"mobilePhone": 6282244444,
+				"address": "Bandar lampung",
+				"status": "active"
+			}`,
+		)
+		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/user/edit", requestBody)
+
+		// Mock Authorization
+		authorizationKey := mockLogin()
+
+		// Setup Header key for parsing token in authorization
+		headers := make(http.Header)
+		headers.Set("Content-Type", "application/json")
+		headers.Set("Authorization", authorizationKey)
+		httpRequest.Header = headers
+
+		// Execute the request
+		recorder := httptest.NewRecorder()
+		r.ServeHTTP(recorder, httpRequest)
+
+		data1 := recorder.Result()
+		body1, _ := io.ReadAll(data1.Body)
+		var responseBody1 map[string]interface{}
+		_ = json.Unmarshal(body1, &responseBody1)
+
+		// Verify response
+		statusCode, _ := utils.ValueToInt(responseBody1["status_code"])
+		assert.Equalf(t, statusCode, http.StatusCreated, "Expected: %d, but got: %d", statusCode, http.StatusCreated)
+		assert.Equalf(t, responseBody1["message"], "update user successfully!", "Expected: %s, but got: %s", responseBody1["message"], "update user successfully!")
+		assert.Equalf(t, responseBody1["is_success"], true, "Expected: %s, but got: %s", responseBody1["is_success"], true)
+	})
+}

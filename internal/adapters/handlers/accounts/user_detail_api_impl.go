@@ -69,15 +69,12 @@ func (u Handlers) UpdateUserDetailHandler(writer http.ResponseWriter, requests *
 
 	updateUserDetailHandler, err := u.UserUsecase.UpdateUserByUserIdUsecase(requests.Context(), int64(userIsAuthorize), userUpdateRequest)
 
-	updateUserDetailHandlerRes := utils.BuildResponseWithAuthorization(
-		updateUserDetailHandler,
-		http.StatusCreated,
-		int(updateUserDetailHandler.UserID),
-		authorized,
-		"",
+	responses := utils.CreateResponses(updateUserDetailHandler, http.StatusCreated,
+		"update user successfully!",
+		"update user is failed!",
 	)
 
-	utils.WriteToResponseBody(writer, &updateUserDetailHandlerRes)
+	utils.WriteToResponseBody(writer, &responses)
 }
 
 func (u Handlers) DeleteUserHandler(writer http.ResponseWriter, requests *http.Request, _ httprouter.Params) {
