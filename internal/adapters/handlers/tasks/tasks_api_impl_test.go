@@ -405,4 +405,48 @@ func TestHandlers_FindTaskHandlerById(t *testing.T) {
 }
 
 func TestHandlers_DeleteTaskHandler(t *testing.T) {
+	db := mockDBTest()
+	r := mockRouter(db)
+
+	t.Run("Delete Task Data", func(t *testing.T) {
+		// Build url
+		taskID := "2"
+		url := "http://localhost:3000/api/v1/task/delete?task_id=" + taskID
+
+		httpRequest := httptest.NewRequest(http.MethodDelete, url, nil)
+
+		// Add URL parameters to the request
+		params := httprouter.Params{
+			httprouter.Param{Key: "task_id", Value: taskID},
+		}
+
+		// Set the params object in the request context
+		ctx := context.WithValue(httpRequest.Context(), httprouter.ParamsKey, params)
+		httpRequest = httpRequest.WithContext(ctx)
+
+		// Mock Authorization
+		authorizationKey := mockLogin()
+
+		// Setup Header key for parsing token in authorization
+		headers := make(http.Header)
+		headers.Set("Content-Type", "application/json")
+		headers.Set("Authorization", authorizationKey)
+		httpRequest.Header = headers
+
+		// Execute the request
+		recorder := httptest.NewRecorder()
+		r.ServeHTTP(recorder, httpRequest)
+
+		data := recorder.Result()
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
+
+		// Verify response
+		statusCode, _ := utils.ValueToInt(responseBody["status_code"])
+		assert.Equalf(t, statusCode, http.StatusAccepted, "Expected: %d, but got: %d", statusCode, http.StatusAccepted)
+		assert.Equalf(t, responseBody["message"], "delete task is completed", "Expected: %s, but got: %s", responseBody["message"], "delete task is completed")
+		assert.Equalf(t, responseBody["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
+		assert.Equalf(t, responseBody["data"], "delete task is success", "Expected: %s, but got: %s", responseBody["data"], "delete task is success")
+	})
 }
