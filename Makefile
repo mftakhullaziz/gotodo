@@ -37,9 +37,9 @@ run/build:
 	@echo "running from build $(PACKAGE_NAME)"
 	./$(BUILD_DIR)/$(PACKAGE_NAME) main.go
 
-run/unittest:
+run/testing:
 	@echo "running unit tests for $(PACKAGE_NAME)"
-	go test -v ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
+	go test -json -v ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/benchmark:
 	@echo "running unit tests with benchmark for $(PACKAGE_NAME)"

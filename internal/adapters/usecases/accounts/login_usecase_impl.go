@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"gotodo/internal/domain/models/request"
 	"gotodo/internal/domain/models/response"
@@ -45,7 +46,8 @@ func (l LoginUsecaseImpl) LogoutAccountUsecase(ctx context.Context, userId int, 
 
 	// Check token in jwt or caching or redis if any remove from that
 	// Logout first rules remove token from jwt
-	tokenJwt := middleware.CheckAndRemoveExpiredToken(token)
+	tokenJwt, _ := middleware.CheckAndRemoveExpiredToken(token)
+	fmt.Println(tokenJwt)
 	if tokenJwt == false {
 		// Remove token from cache
 		err = middleware.CheckAndRemoveTokenFromCache(token)
