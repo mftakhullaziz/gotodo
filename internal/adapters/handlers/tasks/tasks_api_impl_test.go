@@ -59,7 +59,7 @@ func mockInsertUserData(db *gorm.DB) {
 	}
 	_ = db.Create(mockUserDetail)
 
-	mockTask := &record.TaskRecord{
+	mockTask1 := &record.TaskRecord{
 		TaskID:      1,
 		UserID:      mockAccount.UserID,
 		Title:       "Create first tasks to create fixing bugs",
@@ -70,7 +70,20 @@ func mockInsertUserData(db *gorm.DB) {
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Time{},
 	}
-	_ = db.Create(mockTask)
+	_ = db.Create(mockTask1)
+
+	mockTask2 := &record.TaskRecord{
+		TaskID:      2,
+		UserID:      mockAccount.UserID,
+		Title:       "Building api list",
+		Description: "Build api all in service consumer",
+		Completed:   false,
+		TaskStatus:  "active",
+		CompletedAt: time.Time{},
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Time{},
+	}
+	_ = db.Create(mockTask2)
 }
 
 // Mock function database sqlite
@@ -298,6 +311,44 @@ func TestHandlers_UpdateTaskStatusHandler(t *testing.T) {
 }
 
 func TestHandlers_FindTaskHandler(t *testing.T) {
+	db := mockDBTest()
+	r := mockRouter(db)
+
+	t.Run("Test Find Task All", func(t *testing.T) {
+		httpRequest := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/v1/task/find", nil)
+
+		// Mock Authorization
+		authorizationKey := mockLogin()
+
+		// Setup Header key for parsing token in authorization
+		headers := make(http.Header)
+		headers.Set("Content-Type", "application/json")
+		headers.Set("Authorization", authorizationKey)
+		httpRequest.Header = headers
+
+		// Execute the request
+		recorder := httptest.NewRecorder()
+		r.ServeHTTP(recorder, httpRequest)
+
+		data := recorder.Result()
+
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
+
+		// Verify response
+		statusCode, _ := utils.ValueToInt(responseBody["status_code"])
+		assert.Equalf(t, statusCode, http.StatusOK, "Expected: %d, but got: %d", statusCode, http.StatusOK)
+		assert.Equalf(t, responseBody["message"], "request find task successful!", "Expected: %s, but got: %s", responseBody["message"], "request find task successful!")
+		assert.Equalf(t, responseBody["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
+
+		// Verify response data
+		assert.NotEmptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+
+		totalData, _ := utils.ValueToInt(responseBody["total_data"])
+		assert.GreaterOrEqualf(t, totalData, 0, "Expected: %d, but got: %d", totalData, 0)
+	})
 }
 
 func TestHandlers_FindTaskHandlerById(t *testing.T) {
