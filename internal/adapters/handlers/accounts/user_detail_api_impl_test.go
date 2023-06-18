@@ -153,16 +153,20 @@ func TestHandlers_FindDataUserDetailHandler(t *testing.T) {
 		recorder := httptest.NewRecorder()
 		r.ServeHTTP(recorder, httpRequest)
 
-		data1 := recorder.Result()
-		body1, _ := io.ReadAll(data1.Body)
-		var responseBody1 map[string]interface{}
-		_ = json.Unmarshal(body1, &responseBody1)
+		data := recorder.Result()
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
 
 		// Verify response
-		statusCode, _ := utils.ValueToInt(responseBody1["status_code"])
+		statusCode, _ := utils.ValueToInt(responseBody["status_code"])
 		assert.Equalf(t, statusCode, http.StatusOK, "Expected: %d, but got: %d", statusCode, http.StatusOK)
-		assert.Equalf(t, responseBody1["message"], "find user detail successfully!", "Expected: %s, but got: %s", responseBody1["message"], "find user detail successfully!")
-		assert.Equalf(t, responseBody1["is_success"], true, "Expected: %s, but got: %s", responseBody1["is_success"], true)
+		assert.Equalf(t, responseBody["message"], "find user detail successfully!", "Expected: %s, but got: %s", responseBody["message"], "find user detail successfully!")
+		assert.Equalf(t, responseBody["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
+
+		// Verify response data
+		assert.NotEmptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
 	})
 }
 
@@ -196,15 +200,19 @@ func TestHandlers_UpdateUserDetailHandler(t *testing.T) {
 		recorder := httptest.NewRecorder()
 		r.ServeHTTP(recorder, httpRequest)
 
-		data1 := recorder.Result()
-		body1, _ := io.ReadAll(data1.Body)
-		var responseBody1 map[string]interface{}
-		_ = json.Unmarshal(body1, &responseBody1)
+		data := recorder.Result()
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
 
 		// Verify response
-		statusCode, _ := utils.ValueToInt(responseBody1["status_code"])
+		statusCode, _ := utils.ValueToInt(responseBody["status_code"])
 		assert.Equalf(t, statusCode, http.StatusCreated, "Expected: %d, but got: %d", statusCode, http.StatusCreated)
-		assert.Equalf(t, responseBody1["message"], "update user successfully!", "Expected: %s, but got: %s", responseBody1["message"], "update user successfully!")
-		assert.Equalf(t, responseBody1["is_success"], true, "Expected: %s, but got: %s", responseBody1["is_success"], true)
+		assert.Equalf(t, responseBody["message"], "update user successfully!", "Expected: %s, but got: %s", responseBody["message"], "update user successfully!")
+		assert.Equalf(t, responseBody["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
+
+		// Verify response data
+		assert.NotEmptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
 	})
 }

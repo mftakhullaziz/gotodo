@@ -3,7 +3,6 @@ package tasks
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
@@ -31,7 +30,6 @@ func (t TaskRepositoryImpl) SaveTask(ctx context.Context, taskRecord record.Task
 		return record.TaskRecord{}, query.Error
 	}
 	tx.Commit()
-	fmt.Println("result: ", taskRecord)
 	return taskRecord, nil
 }
 
