@@ -109,6 +109,8 @@ func LoggerParent() *Logger {
 	// Create a console logger that writes to os.Stdout
 	consoleLog := logrus.New()
 	consoleLog.SetOutput(os.Stdout)
+	consoleLog.SetFormatter(&logrus.TextFormatter{
+		TimestampFormat: "2006-01-02 15:04:05.000", FullTimestamp: true, ForceColors: true})
 
 	// Return a custom struct that encapsulates both loggers
 	return &Logger{

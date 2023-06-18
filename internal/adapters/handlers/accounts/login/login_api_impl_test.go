@@ -106,14 +106,14 @@ func mockRouter(db *gorm.DB) *httprouter.Router {
 
 func TestHandlers_LoginHandler(t *testing.T) {
 	db := mockDBTest()
-	initRouter := mockRouter(db)
+	r := mockRouter(db)
 
 	t.Run("Login Test Is Success", func(t *testing.T) {
 		requestBody := strings.NewReader(`{"username" : "@johndoe_test", "password": "password"}`)
 		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
 
 		recorder := httptest.NewRecorder()
-		initRouter.ServeHTTP(recorder, httpRequest)
+		r.ServeHTTP(recorder, httpRequest)
 
 		data := recorder.Result()
 		body, _ := io.ReadAll(data.Body)
@@ -141,7 +141,7 @@ func TestHandlers_LoginHandler(t *testing.T) {
 		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
 
 		recorder := httptest.NewRecorder()
-		initRouter.ServeHTTP(recorder, httpRequest)
+		r.ServeHTTP(recorder, httpRequest)
 
 		data := recorder.Result()
 		body, _ := io.ReadAll(data.Body)
@@ -162,14 +162,14 @@ func TestHandlers_LoginHandler(t *testing.T) {
 
 func TestHandlers_LogoutHandler(t *testing.T) {
 	db := mockDBTest()
-	initRouter := mockRouter(db)
+	r := mockRouter(db)
 
 	t.Run("Logout Test From User Login Is Success", func(t *testing.T) {
 		requestBody := strings.NewReader(`{"username" : "@johndoe_test", "password": "password"}`)
 		httpRequest := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/authenticate/login", requestBody)
 
 		recorder := httptest.NewRecorder()
-		initRouter.ServeHTTP(recorder, httpRequest)
+		r.ServeHTTP(recorder, httpRequest)
 
 		data := recorder.Result()
 		body, _ := io.ReadAll(data.Body)
@@ -188,7 +188,7 @@ func TestHandlers_LogoutHandler(t *testing.T) {
 
 		// Execute the request
 		recorder = httptest.NewRecorder()
-		initRouter.ServeHTTP(recorder, httpRequest)
+		r.ServeHTTP(recorder, httpRequest)
 
 		data1 := recorder.Result()
 		body1, _ := io.ReadAll(data1.Body)

@@ -68,7 +68,7 @@ func mockRouter(db *gorm.DB) *httprouter.Router {
 
 func TestHandlers_RegisterHandler(t *testing.T) {
 	db := mockDbTest()
-	initRouter := mockRouter(db)
+	r := mockRouter(db)
 
 	t.Run("Register New User Test Is Success", func(t *testing.T) {
 		requestBody := strings.NewReader(`{"username": "@johndoe_test", "email": "johndoetest04@mail.com", "password": "password" }`)
@@ -76,7 +76,7 @@ func TestHandlers_RegisterHandler(t *testing.T) {
 
 		// Execute the request
 		recorder := httptest.NewRecorder()
-		initRouter.ServeHTTP(recorder, httpRequest)
+		r.ServeHTTP(recorder, httpRequest)
 
 		data := recorder.Result()
 		body, _ := io.ReadAll(data.Body)
