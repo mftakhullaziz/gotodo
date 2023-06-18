@@ -352,6 +352,56 @@ func TestHandlers_FindTaskHandler(t *testing.T) {
 }
 
 func TestHandlers_FindTaskHandlerById(t *testing.T) {
+	db := mockDBTest()
+	r := mockRouter(db)
+
+	t.Run("Test Find Task Handler By Id", func(t *testing.T) {
+		// Set the task ID parameter value
+		taskId := "1"
+		url := "http://localhost:3000/api/v1/task/find/" + taskId
+
+		httpRequest := httptest.NewRequest(http.MethodGet, url, nil)
+
+		// Create a new httprouter.Params object and add the task ID parameter to it
+		params := httprouter.Params{
+			httprouter.Param{
+				Key:   "task_id",
+				Value: taskId,
+			},
+		}
+
+		// Set the params object in the request context
+		ctx := context.WithValue(httpRequest.Context(), httprouter.ParamsKey, params)
+		httpRequest = httpRequest.WithContext(ctx)
+
+		// Mock Authorization
+		authorizationKey := mockLogin()
+
+		// Setup Header key for parsing token in authorization
+		headers := make(http.Header)
+		headers.Set("Content-Type", "application/json")
+		headers.Set("Authorization", authorizationKey)
+		httpRequest.Header = headers
+
+		// Execute the request
+		recorder := httptest.NewRecorder()
+		r.ServeHTTP(recorder, httpRequest)
+
+		data := recorder.Result()
+		body, _ := io.ReadAll(data.Body)
+		var responseBody map[string]interface{}
+		_ = json.Unmarshal(body, &responseBody)
+
+		// Verify response
+		statusCode, _ := utils.ValueToInt(responseBody["status_code"])
+		assert.Equalf(t, statusCode, http.StatusAccepted, "Expected: %d, but got: %d", statusCode, http.StatusAccepted)
+		assert.Equalf(t, responseBody["message"], "request find task successful!", "Expected: %s, but got: %s", responseBody["message"], "request find task successful!")
+		assert.Equalf(t, responseBody["is_success"], true, "Expected: %s, but got: %s", responseBody["is_success"], true)
+
+		// Verify response data
+		assert.NotEmptyf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+		assert.NotNilf(t, responseBody["data"], "Expected: %s", responseBody["data"])
+	})
 }
 
 func TestHandlers_DeleteTaskHandler(t *testing.T) {
