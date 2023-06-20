@@ -31,3 +31,18 @@ func TestLoadEnv(t *testing.T) {
 	envPath := LoadEnv(".env.test")
 	assert.NotNil(t, envPath)
 }
+
+func TestEnvironmentTest(t *testing.T) {
+	expectedEnv := "test"
+
+	// Call the EnvironmentTest function
+	EnvironmentTest()
+
+	// Retrieve the value of the "ENV" environment variable
+	env := os.Getenv("ENV")
+
+	// Check if the environment variable has the expected value
+	if env != expectedEnv {
+		t.Errorf("Unexpected environment variable value. Got: %s, Expected: %s", env, expectedEnv)
+	}
+}

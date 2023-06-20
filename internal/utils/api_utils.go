@@ -1,6 +1,6 @@
 package utils
 
-// ListEndpoints function to show all registered apis
+// ListEndpoints function to show all registered api
 func ListEndpoints(endpoints []string) {
 	log := LoggerParent().Log
 	log.Infoln("URL Endpoints:")

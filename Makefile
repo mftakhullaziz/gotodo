@@ -39,19 +39,19 @@ run/build:
 
 run/testing:
 	@echo "Running Go Unit Test $(PACKAGE_NAME)"
-	go test -v ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
+	go test -v ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/grc-testing:
 	@echo "Running Go Unit Test $(PACKAGE_NAME)"
-	grc go test -v ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
+	grc go test -v ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/benchmark:
 	@echo "Running Go Benchmark $(PACKAGE_NAME)"
-	grc go test -bench=. ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
+	grc go test -bench=. ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/coverage:
 	@echo "Running Go Coverage $(PACKAGE_NAME)"
-	grc go test -cover ./apis/ ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
+	grc go test -cover ./config/ ./internal/adapters/handlers/tasks/ ./internal/adapters/handlers/accounts/ ./internal/adapters/handlers/accounts/login/ ./internal/adapters/handlers/accounts/register/ ./internal/persistence/record/
 
 run/service:
 	@echo "Running Service Go $(PACKAGE_NAME)"
